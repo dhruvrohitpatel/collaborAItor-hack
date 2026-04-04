@@ -1,4 +1,4 @@
-import type { AICharterResponse, AIGenerateTeamsRationaleRequest, AIProfileResponse } from "@/lib/ai/schemas";
+import type { AICharterRequest, AICharterResponse, AIGenerateTeamsRationaleRequest, AIProfileResponse } from "@/lib/ai/schemas";
 import type { StudentIntake } from "@/types/domain";
 
 function scoreLevel(value: number): string {
@@ -75,22 +75,38 @@ export async function generateMockRationale(
 }
 
 export async function generateMockCharter(
-  teamName: string,
-  memberNames: string[]
+  payload: AICharterRequest
 ): Promise<AICharterResponse> {
+  const { teamName, memberNames, projectTheme, communicationStyles, riskFlags } = payload;
+
+  const styleNote =
+    communicationStyles.length > 0
+      ? `a ${[...new Set(communicationStyles)].join("/")} communication dynamic`
+      : "mixed communication styles";
+
+  const riskNote =
+    riskFlags.some((f) => f.severity === "high" || f.severity === "medium")
+      ? ` Given ${riskFlags[0].label.toLowerCase()}, members commit to surfacing blockers within 24 hours.`
+      : " Members commit to surfacing blockers within 24 hours.";
+
+  const roles = ["Facilitator", "Project Tracker", "QA/Reviewer", "Demo Lead", "Scribe"];
+
   return {
-    charter: `${teamName} agrees to deliver work in weekly milestones, surface blockers within 24 hours, and document decisions in a shared note. Members (${memberNames.join(", ")}) commit to respectful feedback and rotating facilitation duties.`,
-    suggestedRoleRotation: [
-      "Week 1: Facilitator",
-      "Week 2: Project Tracker",
-      "Week 3: QA/Reviewer",
-      "Week 4: Demo Lead"
-    ],
+    charter:
+      `${teamName} operates with ${styleNote} and delivers work in weekly milestones tied to the ${projectTheme} scope.` +
+      ` A standing async update is posted by end of each Monday; a 30-minute sync is held mid-week for blockers only.` +
+      riskNote,
+    suggestedRoleRotation: memberNames.map(
+      (name, i) => `${name} — ${roles[i % roles.length]}`
+    ),
     kickoffChecklist: [
-      "Align project scope and definition of done",
-      "Set recurring meeting cadence",
-      "Assign first-week tasks and owners",
-      "Decide communication channel norms"
+      `Agree on the primary async channel for ${projectTheme} updates`,
+      "Define milestone owners and delivery format for week one",
+      "Set the quality bar and review checklist before first submission",
+      "Schedule the mid-week sync and confirm attendance expectations",
+      ...(riskFlags.some((f) => f.severity === "high")
+        ? [`Address "${riskFlags.find((f) => f.severity === "high")!.label}" before sprint start`]
+        : [])
     ]
   };
 }

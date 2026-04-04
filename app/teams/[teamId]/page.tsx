@@ -89,6 +89,11 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
         <AiToolsPanel
           defaultTeamName={team.id}
           defaultMembers={team.members.map((member) => member.name)}
+          communicationStyles={team.members.map((member) => member.communicationStyle)}
+          riskFlags={team.riskFlags.map((flag) => ({
+            label: flag.label,
+            severity: flag.severity
+          }))}
         />
       </div>
     </div>
