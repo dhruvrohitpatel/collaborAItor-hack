@@ -1,5 +1,11 @@
-import type { AICharterResponse, AIProfileResponse } from "@/lib/ai/schemas";
-import type { StudentIntake, Team } from "@/types/domain";
+import type { AICharterResponse, AIGenerateTeamsRationaleRequest, AIProfileResponse } from "@/lib/ai/schemas";
+import type { StudentIntake } from "@/types/domain";
+
+function scoreLevel(value: number): string {
+  if (value >= 75) return "strong";
+  if (value >= 50) return "moderate";
+  return "limited";
+}
 
 function hashString(input: string) {
   let hash = 0;
@@ -46,17 +52,26 @@ export async function generateMockProfile(
       student.preferredRole
     ],
     leadershipSignal,
+    riskFlags: [],
     profileSource: "mock"
   };
 }
 
-export async function generateMockRationale(team: Team): Promise<string> {
-  const strengthMix = new Set(team.members.flatMap((member) => member.strengths));
-  const growthThemes = new Set(team.members.flatMap((member) => member.growthAreas));
+export async function generateMockRationale(
+  payload: AIGenerateTeamsRationaleRequest
+): Promise<string> {
+  const { teamId, memberNames, scoreSummary, riskFlags } = payload;
 
-  return `Team ${team.id} combines ${strengthMix.size} distinct strengths with complementary growth goals in ${Array.from(growthThemes)
-    .slice(0, 2)
-    .join(" and ")}. The grouping favors overlap in working windows while balancing communication styles and leadership signals.`;
+  const skillLine = `${teamId} brings ${scoreLevel(scoreSummary.skillDiversity)} skill diversity across ${memberNames.length} members`;
+  const availLine = `availability overlap is ${scoreLevel(scoreSummary.availabilityOverlap)}`;
+  const balanceLine = `communication and leadership balance is ${scoreLevel(scoreSummary.communicationBalance)}`;
+
+  const flagLine =
+    riskFlags.length > 0
+      ? ` One area to watch: ${riskFlags[0].label.toLowerCase()}.`
+      : " No critical coordination risks were flagged.";
+
+  return `${skillLine}, with ${availLine} and ${balanceLine}. Growth opportunity fit is ${scoreLevel(scoreSummary.growthOpportunityFit)}, suggesting members can learn meaningfully from each other.${flagLine}`;
 }
 
 export async function generateMockCharter(
