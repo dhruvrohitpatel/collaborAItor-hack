@@ -112,16 +112,47 @@ export async function generateMockCharter(
 }
 
 export async function summarizeMeetingNotes(notes: string) {
-  const condensed = notes.split("\n").filter(Boolean).slice(0, 2).join(" ");
-  return {
-    summary: condensed || "Team reviewed goals, blockers, and immediate next steps.",
-    actionItems: [
-      "Document open decisions in project tracker",
-      "Assign owners for next milestone deliverables",
-      "Schedule mid-week async check-in"
-    ],
-    ownersNeeded: ["Facilitator", "Tracker", "Reviewer"]
-  };
+  const lines = notes.split("\n").map((l) => l.trim()).filter(Boolean);
+
+  // Summary: first two substantive lines joined into a sentence.
+  const summaryBase = lines.slice(0, 3).join(" ").replace(/\s+/g, " ");
+  const summary = summaryBase.length >= 10
+    ? summaryBase.endsWith(".") ? summaryBase : `${summaryBase}.`
+    : "Team reviewed progress, surfaced blockers, and identified next steps.";
+
+  // Action items: lines containing action keywords; extract trailing owner hint.
+  const actionKeywords = /\b(will|should|needs? to|must|action:|todo:|follow.?up|assign|complete|finish|update|fix|send|schedule|confirm|review|prepare)\b/i;
+  const ownerPattern = /^([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\s+(will|should|needs? to|must)\b/i;
+
+  const extracted = lines
+    .filter((line) => actionKeywords.test(line))
+    .slice(0, 5)
+    .map((line) => {
+      const ownerMatch = line.match(ownerPattern);
+      const owner = ownerMatch ? ownerMatch[1] : "";
+      // Strip leading name + verb from task description.
+      const task = ownerMatch
+        ? line.replace(ownerPattern, "").trim()
+        : line.replace(/^[-*•]\s*/, "").replace(/^(action:|todo:)\s*/i, "");
+      return { task: task.charAt(0).toUpperCase() + task.slice(1), owner };
+    });
+
+  const actionItems =
+    extracted.length > 0
+      ? extracted
+      : [
+          { task: "Document open decisions in shared project notes", owner: "" },
+          { task: "Assign owners for next milestone deliverables", owner: "" },
+          { task: "Schedule mid-week async check-in", owner: "" }
+        ];
+
+  // Open questions: lines ending with "?" or containing "question" / "unclear".
+  const openQuestions = lines
+    .filter((line) => line.endsWith("?") || /\b(question|unclear|TBD|who|when|which)\b/i.test(line))
+    .slice(0, 3)
+    .map((line) => line.replace(/^[-*•]\s*/, ""));
+
+  return { summary, actionItems, openQuestions };
 }
 
 export async function rewriteMessage(
