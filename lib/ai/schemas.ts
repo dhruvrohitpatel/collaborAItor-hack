@@ -60,10 +60,29 @@ export const aiSummarizeMeetingRequestSchema = z.object({
   notes: z.string().min(10)
 });
 
+/**
+ * Structured meeting summary designed for direct copy-paste into task trackers or docs.
+ *
+ * @example
+ * {
+ *   summary: "The team reviewed sprint progress and unblocked the auth integration...",
+ *   actionItems: [
+ *     { task: "Finish auth token refresh flow", owner: "Alex" },
+ *     { task: "Update README with setup steps", owner: "" }
+ *   ],
+ *   openQuestions: ["Which environment should the integration test run against?"]
+ * }
+ */
 export const aiSummarizeMeetingResponseSchema = z.object({
-  summary: z.string(),
-  actionItems: z.array(z.string()),
-  ownersNeeded: z.array(z.string())
+  summary: z.string().min(10),
+  actionItems: z.array(
+    z.object({
+      task: z.string().min(1),
+      /** Empty string means no owner was identified. */
+      owner: z.string()
+    })
+  ).min(1),
+  openQuestions: z.array(z.string()).default([])
 });
 
 export const aiRewriteMessageRequestSchema = z.object({

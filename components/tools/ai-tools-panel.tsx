@@ -148,19 +148,25 @@ export function AiToolsPanel({
                 try {
                   const result = await callApi<{
                     summary: string;
-                    actionItems: string[];
-                    ownersNeeded: string[];
+                    actionItems: { task: string; owner: string }[];
+                    openQuestions: string[];
                   }>("/api/ai/summarize-meeting", { notes: notesInput });
+
+                  const actionLines = result.actionItems.map(({ task, owner }) =>
+                    owner ? `- [ ] ${task}  →  ${owner}` : `- [ ] ${task}`
+                  );
+                  const questionLines =
+                    result.openQuestions.length > 0
+                      ? ["", "Open Questions:", ...result.openQuestions.map((q) => `- ${q}`)]
+                      : [];
 
                   setNotesOutput(
                     [
                       `Summary: ${result.summary}`,
                       "",
                       "Action Items:",
-                      ...result.actionItems.map((entry) => `- ${entry}`),
-                      "",
-                      "Owners Needed:",
-                      ...result.ownersNeeded.map((entry) => `- ${entry}`)
+                      ...actionLines,
+                      ...questionLines
                     ].join("\n")
                   );
                 } catch (error) {

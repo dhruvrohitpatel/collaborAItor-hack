@@ -131,8 +131,24 @@ export function buildCharterPrompt(payload: AICharterRequest) {
 
 export function buildMeetingSummaryPrompt(notes: string) {
   return [
-    "Summarize meeting notes into action-oriented outputs.",
-    "Return: short summary, concrete action items, and owners needed.",
+    "You are extracting structured output from raw academic team meeting notes.",
+    "Return ONLY a JSON object — no markdown, no preamble.",
+    "",
+    "Required JSON shape:",
+    "{",
+    '  "summary": "<2-3 sentence summary of what was discussed and decided>",',
+    '  "actionItems": [{ "task": "<verb phrase>", "owner": "<name or empty string>" }],',
+    '  "openQuestions": ["<unresolved question>"]',
+    "}",
+    "",
+    "Rules:",
+    "- summary: 2-3 sentences covering key decisions and overall progress. No bullet points.",
+    "- actionItems: one object per concrete next step. Extract owner from context",
+    '  (e.g. "Alex will fix the bug" → owner: "Alex"). Use "" if no owner is mentioned.',
+    "  Format task as a verb phrase (e.g. 'Fix auth token refresh flow').",
+    "- openQuestions: questions raised but not resolved. Empty array if none.",
+    "- Extract from the notes faithfully — do not invent tasks or owners.",
+    "",
     "Meeting notes:",
     notes
   ].join("\n");
