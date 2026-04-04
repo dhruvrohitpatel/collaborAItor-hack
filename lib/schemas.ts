@@ -26,9 +26,75 @@ export const studentIntakeSchema = z.object({
   shortReflection: z.string().min(10)
 });
 
+/**
+ * Validates individual risk flags surfaced during profile generation.
+ * Codes are short snake_case identifiers (e.g. "limited_availability").
+ *
+ * @example
+ * {
+ *   code: "limited_availability",
+ *   label: "Limited weekly availability",
+ *   severity: "medium",
+ *   note: "Only 4 h/week overlap with standard team windows"
+ * }
+ */
+export const riskFlagSchema = z.object({
+  code: z.string().min(1),
+  label: z.string().min(1),
+  severity: z.enum(["low", "medium", "high"]),
+  note: z.string()
+});
+
+/**
+ * Full collaboration profile schema — the validated contract for every
+ * profile object returned by the Gemini endpoint or the mock fallback.
+ *
+ * Extends studentIntakeSchema with AI-generated fields and risk signals so
+ * downstream consumers (team engine, profile card, instructor view) can rely
+ * on a single, strict shape.
+ *
+ * @example
+ * {
+ *   id: "s-01",
+ *   name: "Jordan Lee",
+ *   email: "jordan@example.edu",
+ *   timezone: "America/Chicago",
+ *   availability: [{ day: "Mon", start: "09:00", end: "11:00" }],
+ *   strengths: ["systems thinking", "async communication"],
+ *   growthAreas: ["public speaking", "conflict resolution"],
+ *   preferredRole: "backend engineer",
+ *   communicationStyle: "analytical",
+ *   collaborationPreferences: ["async-first", "clear task ownership"],
+ *   shortReflection: "I thrive when problems are well-scoped and I can work heads-down.",
+ *   profileSummary: "Jordan is a detail-oriented backend engineer who communicates...",
+ *   inferredTags: ["async-first", "detail-oriented", "systems-thinker"],
+ *   leadershipSignal: "emerging",
+ *   riskFlags: [
+ *     {
+ *       code: "limited_availability",
+ *       label: "Limited weekly availability",
+ *       severity: "medium",
+ *       note: "Only 4 h/week overlap with standard team windows"
+ *     }
+ *   ],
+ *   profileSource: "ai",
+ *   profileGeneratedAt: "2026-04-04T12:00:00.000Z"
+ * }
+ */
+export const collaborationProfileSchema = studentIntakeSchema.extend({
+  profileSummary: z.string().min(10),
+  inferredTags: z.array(z.string().min(1)).min(1),
+  leadershipSignal: z.enum(["high", "medium", "emerging"]),
+  riskFlags: z.array(riskFlagSchema).default([]),
+  profileSource: z.enum(["mock", "ai"]),
+  profileGeneratedAt: z.string().datetime()
+});
+
 export const generateTeamsInputSchema = z.object({
   teamSize: z.number().int().min(2).max(6).default(4)
 });
 
 export type StudentIntakeInput = z.infer<typeof studentIntakeSchema>;
 export type GenerateTeamsInput = z.infer<typeof generateTeamsInputSchema>;
+export type RiskFlagInput = z.infer<typeof riskFlagSchema>;
+export type CollaborationProfile = z.infer<typeof collaborationProfileSchema>;
