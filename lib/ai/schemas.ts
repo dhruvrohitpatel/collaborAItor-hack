@@ -73,5 +73,7 @@ export const aiRewriteMessageResponseSchema = z.object({
 
 export type AIProfileRequest = z.infer<typeof aiProfileRequestSchema>;
 export type AIProfileResponse = z.infer<typeof aiProfileResponseSchema>;
+export type AIGenerateTeamsRationaleRequest = z.infer<typeof aiGenerateTeamsRationaleRequestSchema>;
+export type AIGenerateTeamsRationaleResponse = z.infer<typeof aiGenerateTeamsRationaleResponseSchema>;
 export type AICharterRequest = z.infer<typeof aiCharterRequestSchema>;
 export type AICharterResponse = z.infer<typeof aiCharterResponseSchema>;
