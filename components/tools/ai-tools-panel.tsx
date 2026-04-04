@@ -12,11 +12,17 @@ import { useToast } from "@/components/ui/toast";
 type AiToolsPanelProps = {
   defaultTeamName?: string;
   defaultMembers?: string[];
+  /** Communication styles from member profiles — forwarded to charter API for specific norms. */
+  communicationStyles?: string[];
+  /** Active risk flags — forwarded to charter API for accountability language. */
+  riskFlags?: { label: string; severity: "low" | "medium" | "high" }[];
 };
 
 export function AiToolsPanel({
   defaultTeamName = "Team Demo",
-  defaultMembers = ["Avery", "Noah", "Mina", "Ethan"]
+  defaultMembers = ["Avery", "Noah", "Mina", "Ethan"],
+  communicationStyles = [],
+  riskFlags = []
 }: AiToolsPanelProps) {
   const { push } = useToast();
   const [charterInput, setCharterInput] = useState({
@@ -100,7 +106,9 @@ export function AiToolsPanel({
                       .split(",")
                       .map((value) => value.trim())
                       .filter(Boolean),
-                    projectTheme: charterInput.projectTheme
+                    projectTheme: charterInput.projectTheme,
+                    communicationStyles,
+                    riskFlags
                   });
 
                   setCharterOutput(

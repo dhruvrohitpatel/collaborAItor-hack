@@ -39,15 +39,21 @@ export const aiGenerateTeamsRationaleResponseSchema = z.object({
 });
 
 export const aiCharterRequestSchema = z.object({
-  teamName: z.string(),
-  memberNames: z.array(z.string()).min(1),
-  projectTheme: z.string().default("Course project")
+  teamName: z.string().min(1),
+  memberNames: z.array(z.string().min(1)).min(1),
+  projectTheme: z.string().default("Course project"),
+  /** Communication styles drawn from member profiles — used to write specific norms. */
+  communicationStyles: z.array(z.string()).default([]),
+  /** Active risk flags — addressed in accountability section of the charter. */
+  riskFlags: z
+    .array(z.object({ label: z.string(), severity: z.enum(["low", "medium", "high"]) }))
+    .default([])
 });
 
 export const aiCharterResponseSchema = z.object({
-  charter: z.string(),
-  suggestedRoleRotation: z.array(z.string()),
-  kickoffChecklist: z.array(z.string())
+  charter: z.string().min(20),
+  suggestedRoleRotation: z.array(z.string().min(1)).min(1),
+  kickoffChecklist: z.array(z.string().min(1)).min(3).max(6)
 });
 
 export const aiSummarizeMeetingRequestSchema = z.object({

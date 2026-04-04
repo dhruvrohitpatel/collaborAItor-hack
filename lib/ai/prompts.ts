@@ -1,4 +1,4 @@
-import type { AIGenerateTeamsRationaleRequest } from "@/lib/ai/schemas";
+import type { AICharterRequest, AIGenerateTeamsRationaleRequest } from "@/lib/ai/schemas";
 import type { StudentIntake } from "@/types/domain";
 
 export function buildProfilePrompt(student: StudentIntake) {
@@ -80,17 +80,52 @@ export function buildTeamRationalePrompt(payload: AIGenerateTeamsRationaleReques
   ].join("\n");
 }
 
-export function buildCharterPrompt(
-  teamName: string,
-  memberNames: string[],
-  projectTheme: string
-) {
+export function buildCharterPrompt(payload: AICharterRequest) {
+  const { teamName, memberNames, projectTheme, communicationStyles, riskFlags } = payload;
+
+  const stylesLine =
+    communicationStyles.length > 0
+      ? communicationStyles.join(", ")
+      : "not specified";
+
+  const flagLines =
+    riskFlags.length > 0
+      ? riskFlags.map((f) => `  - ${f.label} (${f.severity})`).join("\n")
+      : "  None";
+
+  const roles = ["Facilitator", "Project Tracker", "QA/Reviewer", "Demo Lead", "Scribe"];
+  const rotationExample = memberNames
+    .slice(0, 4)
+    .map((name, i) => `"${name} — ${roles[i % roles.length]}"`)
+    .join(", ");
+
   return [
-    "Draft a concise student team charter.",
+    "You are writing a team charter for an academic project team.",
+    "Return ONLY a JSON object — no markdown, no preamble.",
+    "",
+    "Required JSON shape:",
+    "{",
+    '  "charter": "<2-3 sentences of specific norms, communication cadence, accountability>",',
+    '  "suggestedRoleRotation": [' + rotationExample + ", ...],",
+    '  "kickoffChecklist": ["<actionable verb phrase>", ...]',
+    "}",
+    "",
+    "Rules:",
+    "- charter: 2-3 sentences. Reference the team's communication style(s) to set concrete norms.",
+    "  Include a check-in cadence (e.g. async weekly update + 30-min sync). End with an",
+    "  accountability norm that addresses any high/medium risk flags if present.",
+    "- suggestedRoleRotation: one entry per member, each a distinct role from:",
+    `  Facilitator, Project Tracker, QA/Reviewer, Demo Lead, Scribe.`,
+    "- kickoffChecklist: 4-5 actionable items specific to this team.",
+    "  Reference risk flags if present. Format: verb phrase (e.g. 'Confirm async update channel').",
+    "- Do NOT use filler phrases like 'your team', 'feel free', or 'as needed'.",
+    "",
     `Team: ${teamName}`,
-    `Members: ${memberNames.join(", ")}`,
+    `Members (${memberNames.length}): ${memberNames.join(", ")}`,
     `Project theme: ${projectTheme}`,
-    "Include norms, communication cadence, and accountability language."
+    `Communication styles: ${stylesLine}`,
+    "Active risk flags:",
+    flagLines
   ].join("\n");
 }
 
