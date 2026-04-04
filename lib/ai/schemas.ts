@@ -1,15 +1,16 @@
 import { z } from "zod";
 
-import { studentIntakeSchema } from "@/lib/schemas";
+import { riskFlagSchema, studentIntakeSchema } from "@/lib/schemas";
 
 export const aiProfileRequestSchema = z.object({
   student: studentIntakeSchema
 });
 
 export const aiProfileResponseSchema = z.object({
-  profileSummary: z.string(),
-  inferredTags: z.array(z.string()),
+  profileSummary: z.string().min(10),
+  inferredTags: z.array(z.string().min(1)).min(1),
   leadershipSignal: z.enum(["high", "medium", "emerging"]),
+  riskFlags: z.array(riskFlagSchema).default([]),
   profileSource: z.enum(["mock", "ai"]).default("mock")
 });
 
