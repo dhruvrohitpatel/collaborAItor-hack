@@ -1,8 +1,14 @@
 import { useMockData } from "@/lib/config";
-import { generateMockProfile } from "@/lib/ai/mock";
+import { generateProfileForStudent } from "@/lib/ai/profileGeneration";
 import {
   addFirestoreStudentIntake,
-  getFirestoreStudents
+  clearFirestoreTeams,
+  getFirestoreProfiles,
+  getFirestoreStudents,
+  getFirestoreTeamById,
+  getFirestoreTeams,
+  saveFirestoreProfiles,
+  saveFirestoreTeams
 } from "@/lib/repo/firestoreRepository";
 import {
   addStudentIntake as addMockStudentIntake,
@@ -16,19 +22,6 @@ import { generateTeamsInputSchema } from "@/lib/schemas";
 import { generateTeamsDeterministic } from "@/lib/teamFormation";
 import type { DemoState, StudentIntake, StudentProfile, Team } from "@/types/domain";
 
-type DerivedFirestoreState = {
-  profiles: StudentProfile[];
-  teams: Team[];
-  sourceSignature: string;
-  updatedAt: string;
-};
-
-let firestoreState: DerivedFirestoreState | null = null;
-
-function buildSourceSignature(students: StudentIntake[]) {
-  return students.map((student) => student.id).sort().join("|");
-}
-
 function buildEmptyDemoState(students: StudentIntake[]): DemoState {
   return {
     students,
@@ -39,36 +32,31 @@ function buildEmptyDemoState(students: StudentIntake[]): DemoState {
 }
 
 async function buildProfiles(students: StudentIntake[]): Promise<StudentProfile[]> {
-  return Promise.all(
-    students.map(async (student) => {
-      const profile = await generateMockProfile(student);
-      return {
-        ...student,
-        ...profile,
-        profileGeneratedAt: new Date().toISOString()
-      };
-    })
-  );
+  const profiles: StudentProfile[] = [];
+
+  for (const student of students) {
+    profiles.push(await generateProfileForStudent(student));
+  }
+
+  return profiles;
 }
 
 async function getFirestoreBackedState() {
-  const students = await getFirestoreStudents();
-  const sourceSignature = buildSourceSignature(students);
-
-  if (!firestoreState || firestoreState.sourceSignature !== sourceSignature) {
-    firestoreState = {
-      profiles: [],
-      teams: [],
-      sourceSignature,
-      updatedAt: new Date().toISOString()
-    };
-  }
+  const [students, profiles, teams] = await Promise.all([
+    getFirestoreStudents(),
+    getFirestoreProfiles(),
+    getFirestoreTeams()
+  ]);
+  const timestamps = [
+    ...profiles.map((profile) => profile.profileGeneratedAt),
+    ...teams.flatMap((team) => team.members.map((member) => member.profileGeneratedAt))
+  ].sort();
 
   return {
     students,
-    profiles: firestoreState.profiles,
-    teams: firestoreState.teams,
-    updatedAt: firestoreState.updatedAt
+    profiles,
+    teams,
+    updatedAt: timestamps.at(-1) ?? new Date().toISOString()
   } satisfies DemoState;
 }
 
@@ -94,12 +82,7 @@ export async function loadDemoSeed(): Promise<DemoState> {
   }
 
   const students = await getFirestoreStudents();
-  firestoreState = {
-    profiles: [],
-    teams: [],
-    sourceSignature: buildSourceSignature(students),
-    updatedAt: new Date().toISOString()
-  };
+  await Promise.all([saveFirestoreProfiles([]), clearFirestoreTeams()]);
 
   return buildEmptyDemoState(students);
 }
@@ -110,7 +93,6 @@ export async function addStudentIntake(input: StudentIntake): Promise<StudentInt
   }
 
   const student = await addFirestoreStudentIntake(input);
-  firestoreState = null;
   return student;
 }
 
@@ -121,15 +103,10 @@ export async function generateProfilesForStudents(): Promise<StudentProfile[]> {
 
   const students = await getFirestoreStudents();
   const profiles = await buildProfiles(students);
+  const savedProfiles = await saveFirestoreProfiles(profiles);
+  await clearFirestoreTeams();
 
-  firestoreState = {
-    profiles,
-    teams: [],
-    sourceSignature: buildSourceSignature(students),
-    updatedAt: new Date().toISOString()
-  };
-
-  return structuredClone(profiles);
+  return structuredClone(savedProfiles);
 }
 
 export async function generateTeamsForProfiles(teamSize = 4): Promise<Team[]> {
@@ -138,22 +115,17 @@ export async function generateTeamsForProfiles(teamSize = 4): Promise<Team[]> {
   }
 
   const parsed = generateTeamsInputSchema.parse({ teamSize });
-  const students = await getFirestoreStudents();
-  const sourceSignature = buildSourceSignature(students);
-  const profiles =
-    firestoreState?.sourceSignature === sourceSignature && firestoreState.profiles.length
-      ? firestoreState.profiles
-      : await buildProfiles(students);
+  let profiles = await getFirestoreProfiles();
+
+  if (!profiles.length) {
+    profiles = await saveFirestoreProfiles(await buildProfiles(await getFirestoreStudents()));
+  }
+
   const teams = generateTeamsDeterministic(profiles, parsed.teamSize);
+  await clearFirestoreTeams();
+  const savedTeams = await saveFirestoreTeams(teams);
 
-  firestoreState = {
-    profiles,
-    teams,
-    sourceSignature,
-    updatedAt: new Date().toISOString()
-  };
-
-  return structuredClone(teams);
+  return structuredClone(savedTeams);
 }
 
 export async function getTeamById(teamId: string): Promise<Team | null> {
@@ -161,6 +133,5 @@ export async function getTeamById(teamId: string): Promise<Team | null> {
     return getMockTeamById(teamId);
   }
 
-  const state = await getFirestoreBackedState();
-  return state.teams.find((team) => team.id === teamId) ?? null;
+  return getFirestoreTeamById(teamId);
 }
