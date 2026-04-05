@@ -4,6 +4,7 @@ import { ScoreSummary } from "@/components/teams/score-summary";
 import { RiskBadge } from "@/components/teams/risk-badge";
 import { DisengagementPanel } from "@/components/teams/disengagement-panel";
 import { AiToolsPanel } from "@/components/tools/ai-tools-panel";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTeamById } from "@/lib/repo";
 
@@ -20,10 +21,17 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
     notFound();
   }
 
+  const isOutOfBounds = team.riskFlags.some(
+    (flag) => flag.code === "team_size_over_max" || flag.code === "team_size_under_min"
+  );
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">{team.id} Detail</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-2xl font-semibold">{team.id} Detail</h1>
+          {isOutOfBounds ? <Badge variant="danger">Out of bounds</Badge> : null}
+        </div>
         <p className="text-sm text-muted-foreground">Transparent assignment rationale and support tools.</p>
       </div>
 
