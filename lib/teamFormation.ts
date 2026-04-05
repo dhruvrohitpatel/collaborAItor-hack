@@ -100,10 +100,31 @@ function normalizeToken(value: string) {
   return value.trim().toLowerCase();
 }
 
-function availabilityToSet(profile: StudentProfile) {
-  return new Set(
-    profile.availability.map((slot) => `${slot.day}-${slot.start}-${slot.end}`)
-  );
+function parseTimeToMinutes(value: string) {
+  const [hours, minutes] = value.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+function slotDurationMinutes(slot: StudentProfile["availability"][number]) {
+  return Math.max(0, parseTimeToMinutes(slot.end) - parseTimeToMinutes(slot.start));
+}
+
+function availabilityMinutes(profile: StudentProfile) {
+  return profile.availability.reduce((total, slot) => total + slotDurationMinutes(slot), 0);
+}
+
+function overlapMinutes(
+  left: StudentProfile["availability"][number],
+  right: StudentProfile["availability"][number]
+) {
+  if (left.day !== right.day) {
+    return 0;
+  }
+
+  const start = Math.max(parseTimeToMinutes(left.start), parseTimeToMinutes(right.start));
+  const end = Math.min(parseTimeToMinutes(left.end), parseTimeToMinutes(right.end));
+
+  return Math.max(0, end - start);
 }
 
 /**
@@ -118,11 +139,19 @@ export function scoreAvailabilityOverlap(members: StudentProfile[]) {
 
   for (let i = 0; i < members.length; i += 1) {
     for (let j = i + 1; j < members.length; j += 1) {
-      const a = availabilityToSet(members[i]);
-      const b = availabilityToSet(members[j]);
-      const intersection = [...a].filter((entry) => b.has(entry)).length;
-      const union = new Set([...a, ...b]).size;
-      overlapTotal += union ? intersection / union : 0;
+      const left = members[i];
+      const right = members[j];
+      const intersection = left.availability.reduce(
+        (total, leftSlot) =>
+          total +
+          right.availability.reduce(
+            (slotTotal, rightSlot) => slotTotal + overlapMinutes(leftSlot, rightSlot),
+            0
+          ),
+        0
+      );
+      const union = availabilityMinutes(left) + availabilityMinutes(right) - intersection;
+      overlapTotal += union > 0 ? intersection / union : 0;
       comparisons += 1;
     }
   }

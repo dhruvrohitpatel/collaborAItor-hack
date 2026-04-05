@@ -63,6 +63,18 @@ function formatTimestamp(value: string | null) {
   }).format(new Date(value));
 }
 
+function buildMemberNameLookup(team: Team) {
+  return new Map(
+    team.members.map((member) => [member.email.trim().toLowerCase(), member.name] as const)
+  );
+}
+
+function formatMissingConnectionNames(team: Team, emails: string[]) {
+  const memberNames = buildMemberNameLookup(team);
+
+  return emails.map((email) => memberNames.get(email.trim().toLowerCase()) ?? email);
+}
+
 export function TeamCopilotPanel({
   team,
   viewerRole,
@@ -102,6 +114,9 @@ export function TeamCopilotPanel({
   const selfStatus =
     googleStatus?.members.find((member) => member.email.toLowerCase() === viewerEmail.toLowerCase()) ??
     null;
+  const missingConnectionNames = googleStatus?.membersMissingGoogle?.length
+    ? formatMissingConnectionNames(team, googleStatus.membersMissingGoogle)
+    : [];
 
   async function postJson<T>(url: string, body: unknown): Promise<T> {
     const response = await fetch(url, {
@@ -321,8 +336,8 @@ export function TeamCopilotPanel({
           <CardTitle className="text-base">Google Connections</CardTitle>
           <CardDescription>
             {isInstructor
-              ? "Instructors can audit connection coverage. Students must connect their own Google accounts."
-              : "Connect your Google account for richer invite handling. Meeting invites can still be sent with partial connections."}
+              ? "Students already sign in with Google for identity. Calendar access is a separate, student-owned opt-in for invites and Meet links."
+              : "You are already signed in with Google. Connect Calendar access only if you want copilot to create invites and Meet links from your account."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
@@ -357,7 +372,7 @@ export function TeamCopilotPanel({
 
           {googleStatus?.membersMissingGoogle?.length ? (
             <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-              Missing Google connections: {googleStatus.membersMissingGoogle.join(", ")}
+              Team members still missing Calendar access: {missingConnectionNames.join(", ")}
             </div>
           ) : null}
         </CardContent>
@@ -640,15 +655,18 @@ export function TeamCopilotPanel({
                       Search window: {preview.diagnostics.windowUsed.startDate} to{" "}
                       {preview.diagnostics.windowUsed.endDate}. Source:{" "}
                       {preview.diagnostics.availabilitySource === "google_freebusy_mixed"
-                        ? "mixed (intake + Google-connected members)"
-                        : "intake availability"}.
+                        ? "saved availability plus Google connection coverage"
+                        : "saved availability"}.
                     </div>
                   ) : null}
                   {preview.diagnostics?.membersMissingGoogle?.length ? (
                     <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-900">
-                      Some members are not connected to Google yet:{" "}
-                      {preview.diagnostics.membersMissingGoogle.join(", ")}. Invite creation still
-                      works with warnings.
+                      Some teammates still need Calendar access:{" "}
+                      {formatMissingConnectionNames(
+                        team,
+                        preview.diagnostics.membersMissingGoogle
+                      ).join(", ")}
+                      . Copilot can still preview slots from saved availability.
                     </div>
                   ) : null}
                   {executed?.externalLinks?.meetUrl || executed?.externalLinks?.calendarHtmlLink ? (
@@ -663,8 +681,8 @@ export function TeamCopilotPanel({
                   ) : null}
                   {executed?.membersMissingGoogle?.length ? (
                     <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-900">
-                      Invite sent with missing Google connections for:{" "}
-                      {executed.membersMissingGoogle.join(", ")}.
+                      Invite sent while these teammates still lacked Calendar access:{" "}
+                      {formatMissingConnectionNames(team, executed.membersMissingGoogle).join(", ")}.
                     </div>
                   ) : null}
                   {preview.requiresApproval ? (

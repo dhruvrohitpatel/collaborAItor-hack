@@ -59,7 +59,9 @@ export function SignInCard() {
       <CardHeader>
         <CardTitle>Sign In With Google</CardTitle>
         <CardDescription>
-          Firebase handles identity. After sign-in, the app checks your allowlisted instructor or student role.
+          Firebase handles identity. After sign-in, the app checks your allowlisted instructor or
+          student role. Calendar access is a separate, optional permission requested only for
+          scheduling features.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -69,7 +71,8 @@ export function SignInCard() {
         <div className="rounded-md border bg-slate-50 px-3 py-3 text-sm text-slate-700">
           <p className="font-medium">OAuth demo path</p>
           <p className="mt-1">
-            1. Google sign-in through Firebase. 2. Team access based on allowlisted email. 3. Optional Google Calendar OAuth for meeting workflows.
+            1. Google sign-in through Firebase. 2. Team access based on allowlisted email. 3.
+            Optional Calendar consent only when you want invites and Meet links.
           </p>
         </div>
         {error ? <p className="text-sm text-rose-600">{error}</p> : null}

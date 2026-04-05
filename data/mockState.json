@@ -2,48 +2,48 @@
   "students": [
     {
       "id": "stu-01",
-      "name": "Avery Chen",
-      "email": "avery.chen@example.edu",
-      "timezone": "America/Los_Angeles",
+      "name": "Dhruv Patel",
+      "email": "dhruvpatel007k@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
-          "day": "Mon",
+          "day": "Tue",
           "start": "16:00",
           "end": "18:00"
         },
         {
-          "day": "Wed",
-          "start": "17:00",
-          "end": "19:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
-        "frontend",
-        "ux-research",
-        "storytelling"
+        "full-stack",
+        "ai-workflows",
+        "demo-polish"
       ],
       "growthAreas": [
-        "backend",
+        "delegation",
         "testing"
       ],
-      "preferredRole": "Product lead",
-      "communicationStyle": "facilitative",
+      "preferredRole": "AI workflow lead",
+      "communicationStyle": "collaborative",
       "collaborationPreferences": [
-        "shared docs",
-        "weekly retro"
+        "clear ownership",
+        "async updates"
       ],
-      "shortReflection": "I like helping teams align early and keeping momentum with visible milestones."
+      "shortReflection": "I like tightening end-to-end demos, making the workflow feel polished, and keeping the team moving toward a clear ship date."
     },
     {
       "id": "stu-02",
-      "name": "Noah Ramirez",
-      "email": "noah.ramirez@example.edu",
-      "timezone": "America/Denver",
+      "name": "Wasil Ahmad",
+      "email": "wasil.ahmad4@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
           "day": "Tue",
-          "start": "18:00",
-          "end": "20:00"
+          "start": "17:00",
+          "end": "19:00"
         },
         {
           "day": "Thu",
@@ -66,7 +66,7 @@
         "clear task board",
         "written updates"
       ],
-      "shortReflection": "I contribute best with clear requirements and can quickly prototype data-driven features."
+      "shortReflection": "I like moving quickly through backend and product decisions so the team can ship a clean demo under time pressure."
     },
     {
       "id": "stu-03",
@@ -75,14 +75,14 @@
       "timezone": "America/Phoenix",
       "availability": [
         {
-          "day": "Mon",
-          "start": "19:00",
-          "end": "21:00"
+          "day": "Tue",
+          "start": "16:00",
+          "end": "18:00"
         },
         {
-          "day": "Fri",
-          "start": "15:00",
-          "end": "17:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
@@ -104,9 +104,9 @@
     },
     {
       "id": "stu-04",
-      "name": "Ethan Brooks",
-      "email": "ethan.brooks@example.edu",
-      "timezone": "America/Chicago",
+      "name": "Dhruv Patel 3F",
+      "email": "dhruvpatel3f@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
           "day": "Tue",
@@ -114,9 +114,9 @@
           "end": "19:00"
         },
         {
-          "day": "Sat",
-          "start": "10:00",
-          "end": "12:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
@@ -134,7 +134,7 @@
         "async-first",
         "issue templates"
       ],
-      "shortReflection": "I can architect APIs quickly and like collaborating through structured async updates."
+      "shortReflection": "I focus on implementation speed, API reliability, and making sure the working demo holds together under pressure."
     },
     {
       "id": "stu-05",
@@ -274,19 +274,19 @@
     },
     {
       "id": "stu-09",
-      "name": "Grace Kim",
-      "email": "grace.kim@example.edu",
-      "timezone": "America/Chicago",
+      "name": "Prisha Nag",
+      "email": "prisha.r.nag@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "16:00",
           "end": "18:00"
         },
         {
-          "day": "Sat",
-          "start": "13:00",
-          "end": "15:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
@@ -304,7 +304,7 @@
         "weekly planning",
         "decision logs"
       ],
-      "shortReflection": "I keep teams on timeline and help clarify ownership when project scope shifts."
+      "shortReflection": "I help keep the team organized, push decisions forward, and make sure the final story is clear for judges."
     },
     {
       "id": "stu-10",
@@ -348,8 +348,8 @@
       "availability": [
         {
           "day": "Tue",
-          "start": "15:00",
-          "end": "17:00"
+          "start": "16:00",
+          "end": "18:00"
         },
         {
           "day": "Sun",
@@ -412,58 +412,59 @@
   "profiles": [
     {
       "id": "stu-01",
-      "name": "Avery Chen",
-      "email": "avery.chen@example.edu",
-      "timezone": "America/Los_Angeles",
+      "name": "Dhruv Patel",
+      "email": "dhruvpatel007k@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
-          "day": "Mon",
+          "day": "Tue",
           "start": "16:00",
           "end": "18:00"
         },
         {
-          "day": "Wed",
-          "start": "17:00",
-          "end": "19:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
-        "frontend",
-        "ux-research",
-        "storytelling"
+        "full-stack",
+        "ai-workflows",
+        "demo-polish"
       ],
       "growthAreas": [
-        "backend",
+        "delegation",
         "testing"
       ],
-      "preferredRole": "Product lead",
-      "communicationStyle": "facilitative",
+      "preferredRole": "AI workflow lead",
+      "communicationStyle": "collaborative",
       "collaborationPreferences": [
-        "shared docs",
-        "weekly retro"
+        "clear ownership",
+        "async updates"
       ],
-      "shortReflection": "I like helping teams align early and keeping momentum with visible milestones.",
-      "profileSummary": "Avery Chen is oriented toward product lead contributions. Brings steady execution energy and helps teams stay organized.",
+      "shortReflection": "I like tightening end-to-end demos, making the workflow feel polished, and keeping the team moving toward a clear ship date.",
+      "profileSummary": "Dhruv Patel is oriented toward ai workflow lead contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
       "inferredTags": [
-        "frontend",
-        "ux-research",
-        "facilitative",
-        "Product lead"
+        "full-stack",
+        "ai-workflows",
+        "collaborative",
+        "AI workflow lead"
       ],
       "leadershipSignal": "high",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-02",
-      "name": "Noah Ramirez",
-      "email": "noah.ramirez@example.edu",
-      "timezone": "America/Denver",
+      "name": "Wasil Ahmad",
+      "email": "wasil.ahmad4@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
           "day": "Tue",
-          "start": "18:00",
-          "end": "20:00"
+          "start": "17:00",
+          "end": "19:00"
         },
         {
           "day": "Thu",
@@ -486,17 +487,18 @@
         "clear task board",
         "written updates"
       ],
-      "shortReflection": "I contribute best with clear requirements and can quickly prototype data-driven features.",
-      "profileSummary": "Noah Ramirez is oriented toward technical builder contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
+      "shortReflection": "I like moving quickly through backend and product decisions so the team can ship a clean demo under time pressure.",
+      "profileSummary": "Wasil Ahmad is oriented toward technical builder contributions. Contributes thoughtful perspective and asks clarifying questions early.",
       "inferredTags": [
         "python",
         "data-analysis",
         "analytical",
         "Technical builder"
       ],
-      "leadershipSignal": "emerging",
+      "leadershipSignal": "medium",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-03",
@@ -505,14 +507,14 @@
       "timezone": "America/Phoenix",
       "availability": [
         {
-          "day": "Mon",
-          "start": "19:00",
-          "end": "21:00"
+          "day": "Tue",
+          "start": "16:00",
+          "end": "18:00"
         },
         {
-          "day": "Fri",
-          "start": "15:00",
-          "end": "17:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
@@ -539,14 +541,15 @@
         "Coordinator"
       ],
       "leadershipSignal": "medium",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-04",
-      "name": "Ethan Brooks",
-      "email": "ethan.brooks@example.edu",
-      "timezone": "America/Chicago",
+      "name": "Dhruv Patel 3F",
+      "email": "dhruvpatel3f@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
           "day": "Tue",
@@ -554,9 +557,9 @@
           "end": "19:00"
         },
         {
-          "day": "Sat",
-          "start": "10:00",
-          "end": "12:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
@@ -574,8 +577,8 @@
         "async-first",
         "issue templates"
       ],
-      "shortReflection": "I can architect APIs quickly and like collaborating through structured async updates.",
-      "profileSummary": "Ethan Brooks is oriented toward backend engineer contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
+      "shortReflection": "I focus on implementation speed, API reliability, and making sure the working demo holds together under pressure.",
+      "profileSummary": "Dhruv Patel 3F is oriented toward backend engineer contributions. Brings steady execution energy and helps teams stay organized.",
       "inferredTags": [
         "backend",
         "node",
@@ -583,8 +586,9 @@
         "Backend engineer"
       ],
       "leadershipSignal": "medium",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-05",
@@ -627,8 +631,9 @@
         "Design lead"
       ],
       "leadershipSignal": "high",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-06",
@@ -671,8 +676,9 @@
         "Quality owner"
       ],
       "leadershipSignal": "medium",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-07",
@@ -715,8 +721,9 @@
         "User advocate"
       ],
       "leadershipSignal": "high",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-08",
@@ -759,24 +766,25 @@
         "AI integrator"
       ],
       "leadershipSignal": "emerging",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-09",
-      "name": "Grace Kim",
-      "email": "grace.kim@example.edu",
-      "timezone": "America/Chicago",
+      "name": "Prisha Nag",
+      "email": "prisha.r.nag@gmail.com",
+      "timezone": "America/Phoenix",
       "availability": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "16:00",
           "end": "18:00"
         },
         {
-          "day": "Sat",
-          "start": "13:00",
-          "end": "15:00"
+          "day": "Thu",
+          "start": "18:00",
+          "end": "20:00"
         }
       ],
       "strengths": [
@@ -794,8 +802,8 @@
         "weekly planning",
         "decision logs"
       ],
-      "shortReflection": "I keep teams on timeline and help clarify ownership when project scope shifts.",
-      "profileSummary": "Grace Kim is oriented toward operations lead contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
+      "shortReflection": "I help keep the team organized, push decisions forward, and make sure the final story is clear for judges.",
+      "profileSummary": "Prisha Nag is oriented toward operations lead contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
       "inferredTags": [
         "project-management",
         "stakeholder-comms",
@@ -803,8 +811,9 @@
         "Operations lead"
       ],
       "leadershipSignal": "high",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-10",
@@ -847,8 +856,9 @@
         "Frontend engineer"
       ],
       "leadershipSignal": "medium",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-11",
@@ -858,8 +868,8 @@
       "availability": [
         {
           "day": "Tue",
-          "start": "15:00",
-          "end": "17:00"
+          "start": "16:00",
+          "end": "18:00"
         },
         {
           "day": "Sun",
@@ -891,8 +901,9 @@
         "Communications coordinator"
       ],
       "leadershipSignal": "medium",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     },
     {
       "id": "stu-12",
@@ -935,8 +946,9 @@
         "Full-stack contributor"
       ],
       "leadershipSignal": "emerging",
+      "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
     }
   ],
   "teams": [
@@ -945,58 +957,59 @@
       "members": [
         {
           "id": "stu-01",
-          "name": "Avery Chen",
-          "email": "avery.chen@example.edu",
-          "timezone": "America/Los_Angeles",
+          "name": "Dhruv Patel",
+          "email": "dhruvpatel007k@gmail.com",
+          "timezone": "America/Phoenix",
           "availability": [
             {
-              "day": "Mon",
+              "day": "Tue",
               "start": "16:00",
               "end": "18:00"
             },
             {
-              "day": "Wed",
-              "start": "17:00",
-              "end": "19:00"
+              "day": "Thu",
+              "start": "18:00",
+              "end": "20:00"
             }
           ],
           "strengths": [
-            "frontend",
-            "ux-research",
-            "storytelling"
+            "full-stack",
+            "ai-workflows",
+            "demo-polish"
           ],
           "growthAreas": [
-            "backend",
+            "delegation",
             "testing"
           ],
-          "preferredRole": "Product lead",
-          "communicationStyle": "facilitative",
+          "preferredRole": "AI workflow lead",
+          "communicationStyle": "collaborative",
           "collaborationPreferences": [
-            "shared docs",
-            "weekly retro"
+            "clear ownership",
+            "async updates"
           ],
-          "shortReflection": "I like helping teams align early and keeping momentum with visible milestones.",
-          "profileSummary": "Avery Chen is oriented toward product lead contributions. Brings steady execution energy and helps teams stay organized.",
+          "shortReflection": "I like tightening end-to-end demos, making the workflow feel polished, and keeping the team moving toward a clear ship date.",
+          "profileSummary": "Dhruv Patel is oriented toward ai workflow lead contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
           "inferredTags": [
-            "frontend",
-            "ux-research",
-            "facilitative",
-            "Product lead"
+            "full-stack",
+            "ai-workflows",
+            "collaborative",
+            "AI workflow lead"
           ],
           "leadershipSignal": "high",
+          "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
         },
         {
           "id": "stu-02",
-          "name": "Noah Ramirez",
-          "email": "noah.ramirez@example.edu",
-          "timezone": "America/Denver",
+          "name": "Wasil Ahmad",
+          "email": "wasil.ahmad4@gmail.com",
+          "timezone": "America/Phoenix",
           "availability": [
             {
               "day": "Tue",
-              "start": "18:00",
-              "end": "20:00"
+              "start": "17:00",
+              "end": "19:00"
             },
             {
               "day": "Thu",
@@ -1019,18 +1032,273 @@
             "clear task board",
             "written updates"
           ],
-          "shortReflection": "I contribute best with clear requirements and can quickly prototype data-driven features.",
-          "profileSummary": "Noah Ramirez is oriented toward technical builder contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
+          "shortReflection": "I like moving quickly through backend and product decisions so the team can ship a clean demo under time pressure.",
+          "profileSummary": "Wasil Ahmad is oriented toward technical builder contributions. Contributes thoughtful perspective and asks clarifying questions early.",
           "inferredTags": [
             "python",
             "data-analysis",
             "analytical",
             "Technical builder"
           ],
-          "leadershipSignal": "emerging",
+          "leadershipSignal": "medium",
+          "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
         },
+        {
+          "id": "stu-09",
+          "name": "Prisha Nag",
+          "email": "prisha.r.nag@gmail.com",
+          "timezone": "America/Phoenix",
+          "availability": [
+            {
+              "day": "Tue",
+              "start": "16:00",
+              "end": "18:00"
+            },
+            {
+              "day": "Thu",
+              "start": "18:00",
+              "end": "20:00"
+            }
+          ],
+          "strengths": [
+            "project-management",
+            "stakeholder-comms",
+            "ops"
+          ],
+          "growthAreas": [
+            "coding",
+            "ui-design"
+          ],
+          "preferredRole": "Operations lead",
+          "communicationStyle": "collaborative",
+          "collaborationPreferences": [
+            "weekly planning",
+            "decision logs"
+          ],
+          "shortReflection": "I help keep the team organized, push decisions forward, and make sure the final story is clear for judges.",
+          "profileSummary": "Prisha Nag is oriented toward operations lead contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
+          "inferredTags": [
+            "project-management",
+            "stakeholder-comms",
+            "collaborative",
+            "Operations lead"
+          ],
+          "leadershipSignal": "high",
+          "riskFlags": [],
+          "profileSource": "mock",
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+        },
+        {
+          "id": "stu-04",
+          "name": "Dhruv Patel 3F",
+          "email": "dhruvpatel3f@gmail.com",
+          "timezone": "America/Phoenix",
+          "availability": [
+            {
+              "day": "Tue",
+              "start": "17:00",
+              "end": "19:00"
+            },
+            {
+              "day": "Thu",
+              "start": "18:00",
+              "end": "20:00"
+            }
+          ],
+          "strengths": [
+            "backend",
+            "node",
+            "system-design"
+          ],
+          "growthAreas": [
+            "ux-research",
+            "facilitation"
+          ],
+          "preferredRole": "Backend engineer",
+          "communicationStyle": "direct",
+          "collaborationPreferences": [
+            "async-first",
+            "issue templates"
+          ],
+          "shortReflection": "I focus on implementation speed, API reliability, and making sure the working demo holds together under pressure.",
+          "profileSummary": "Dhruv Patel 3F is oriented toward backend engineer contributions. Brings steady execution energy and helps teams stay organized.",
+          "inferredTags": [
+            "backend",
+            "node",
+            "direct",
+            "Backend engineer"
+          ],
+          "leadershipSignal": "medium",
+          "riskFlags": [],
+          "profileSource": "mock",
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+        }
+      ],
+      "rationale": "Team-1 was formed with balanced collaboration signals across Dhruv Patel, Wasil Ahmad, Prisha Nag, Dhruv Patel 3F. Composite score 56 emphasizes skill coverage (100), availability overlap (73), and growth fit (0) while highlighting risks for instructor review.",
+      "riskFlags": [
+        {
+          "code": "growth_support_low",
+          "label": "Limited growth support fit",
+          "severity": "low",
+          "note": "Current strengths weakly align with stated growth goals."
+        }
+      ],
+      "scoreSummary": {
+        "skillDiversity": 100,
+        "availabilityOverlap": 73,
+        "communicationBalance": 63,
+        "leadershipDistribution": 65,
+        "growthOpportunityFit": 0,
+        "riskPenalty": 5,
+        "total": 56
+      },
+      "support": {
+        "charter": "Team-1 charter: align scope, communicate blockers within 24 hours, and review deliverables before submission. Members commit to shared accountability and respectful feedback loops.",
+        "suggestedRoleRotation": [
+          "Dhruv Patel - Facilitator",
+          "Wasil Ahmad - Tracker",
+          "Prisha Nag - Reviewer",
+          "Dhruv Patel 3F - Demo lead"
+        ],
+        "kickoffChecklist": [
+          "Agree on communication channel and response expectations",
+          "Define milestone owners for week one",
+          "Set quality bar and review checklist",
+          "Schedule midpoint and pre-demo syncs"
+        ]
+      },
+      "projectTheme": "Course project",
+      "currentMilestone": null,
+      "preferredMeetingDurationMin": 60,
+      "aiOptIn": true,
+      "teamNorms": [
+        "Surface blockers within 24 hours.",
+        "Post one async update before the weekly sync.",
+        "Ask for clarification before assuming intent."
+      ],
+      "lastPulseAt": null,
+      "activeMeetingId": null,
+      "tasks": [],
+      "meetings": [
+        {
+          "id": "meeting-77bca241",
+          "status": "proposed",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-08T00:00:00.000Z",
+              "endAt": "2026-04-08T01:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T02:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:30:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": null,
+          "durationMin": 60,
+          "timezone": "America/Phoenix",
+          "calendarEventId": null,
+          "calendarHtmlLink": null,
+          "meetUrl": null,
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-05T17:00:18.622Z",
+          "updatedAt": "2026-04-05T17:00:18.622Z",
+          "createdByStudentId": "stu-01"
+        }
+      ],
+      "copilotRuns": [
+        {
+          "id": "run-a5cf860d",
+          "intent": "schedule_meeting",
+          "status": "preview",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "durationMin": 60,
+            "dateRangeStart": null,
+            "dateRangeEnd": null,
+            "createCalendarInvite": true,
+            "agenda": "Course project working session",
+            "availabilitySource": "google_freebusy_mixed",
+            "membersMissingGoogle": [
+              "wasil.ahmad4@gmail.com",
+              "prisha.r.nag@gmail.com",
+              "dhruvpatel3f@gmail.com"
+            ],
+            "windowUsed": {
+              "startDate": "2026-04-05",
+              "endDate": "2026-04-19"
+            },
+            "meetingId": "meeting-77bca241",
+            "topSlotStartAt": "2026-04-08T00:00:00.000Z",
+            "topSlotEndAt": "2026-04-08T01:00:00.000Z"
+          },
+          "preview": {
+            "headline": "Meeting plan ready for approval",
+            "summary": "Found 3 workable meeting options for Team-1.",
+            "sections": [
+              {
+                "title": "Best slots",
+                "body": "Times shown in America/Phoenix.",
+                "bullets": [
+                  "Tue, Apr 7, 5:00 PM to Tue, Apr 7, 6:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:00 PM to Thu, Apr 9, 7:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:30 PM to Thu, Apr 9, 7:30 PM · 4/4 available"
+                ]
+              },
+              {
+                "title": "What approval does",
+                "body": "Approval will schedule the top slot and attach stub calendar + Meet links for the demo.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared meeting options and stored the proposal.",
+          "suggestedActions": [
+            "Approve to schedule the top slot."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-77bca241"
+          },
+          "approvedAt": null,
+          "executedAt": null,
+          "errorMessage": null,
+          "createdAt": "2026-04-05T17:00:18.656Z"
+        }
+      ]
+    },
+    {
+      "id": "Team-2",
+      "members": [
         {
           "id": "stu-03",
           "name": "Mina Patel",
@@ -1038,14 +1306,14 @@
           "timezone": "America/Phoenix",
           "availability": [
             {
-              "day": "Mon",
-              "start": "19:00",
-              "end": "21:00"
+              "day": "Tue",
+              "start": "16:00",
+              "end": "18:00"
             },
             {
-              "day": "Fri",
-              "start": "15:00",
-              "end": "17:00"
+              "day": "Thu",
+              "start": "18:00",
+              "end": "20:00"
             }
           ],
           "strengths": [
@@ -1072,8 +1340,54 @@
             "Coordinator"
           ],
           "leadershipSignal": "medium",
+          "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+        },
+        {
+          "id": "stu-06",
+          "name": "Liam Okafor",
+          "email": "liam.okafor@example.edu",
+          "timezone": "America/Los_Angeles",
+          "availability": [
+            {
+              "day": "Thu",
+              "start": "16:00",
+              "end": "18:00"
+            },
+            {
+              "day": "Fri",
+              "start": "16:00",
+              "end": "18:00"
+            }
+          ],
+          "strengths": [
+            "testing",
+            "qa",
+            "documentation"
+          ],
+          "growthAreas": [
+            "leadership",
+            "frontend"
+          ],
+          "preferredRole": "Quality owner",
+          "communicationStyle": "analytical",
+          "collaborationPreferences": [
+            "checklists",
+            "rubrics"
+          ],
+          "shortReflection": "I like improving reliability and making expectations explicit for everyone in the team.",
+          "profileSummary": "Liam Okafor is oriented toward quality owner contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
+          "inferredTags": [
+            "testing",
+            "qa",
+            "analytical",
+            "Quality owner"
+          ],
+          "leadershipSignal": "medium",
+          "riskFlags": [],
+          "profileSource": "mock",
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
         },
         {
           "id": "stu-10",
@@ -1116,47 +1430,10 @@
             "Frontend engineer"
           ],
           "leadershipSignal": "medium",
+          "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
-        }
-      ],
-      "rationale": "Team-1 was formed with balanced collaboration signals across Avery Chen, Noah Ramirez, Mina Patel, Arjun Desai. Composite score 47 emphasizes skill diversity (100) and growth opportunity fit (13) while flagging coordination risks for instructor review.",
-      "riskFlags": [
-        {
-          "code": "availability_low",
-          "label": "Low schedule overlap",
-          "severity": "high",
-          "note": "Limited shared collaboration windows may slow coordination."
-        }
-      ],
-      "scoreSummary": {
-        "skillDiversity": 100,
-        "availabilityOverlap": 0,
-        "communicationBalance": 100,
-        "leadershipDistribution": 100,
-        "growthOpportunityFit": 13,
-        "riskPenalty": 18,
-        "total": 47
-      },
-      "support": {
-        "charter": "Team-1 charter: align scope, communicate blockers within 24 hours, and review deliverables before submission. Members commit to shared accountability and respectful feedback loops.",
-        "suggestedRoleRotation": [
-          "Avery Chen - Facilitator",
-          "Noah Ramirez - Tracker",
-          "Mina Patel - Reviewer",
-          "Arjun Desai - Demo lead"
-        ],
-        "kickoffChecklist": [
-          "Agree on communication channel and response expectations",
-          "Define milestone owners for week one",
-          "Set quality bar and review checklist",
-          "Schedule midpoint and pre-demo syncs"
-        ]
-      }
-    },
-    {
-      "id": "Team-2",
-      "members": [
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+        },
         {
           "id": "stu-05",
           "name": "Sofia Nguyen",
@@ -1198,167 +1475,48 @@
             "Design lead"
           ],
           "leadershipSignal": "high",
+          "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
-        },
-        {
-          "id": "stu-09",
-          "name": "Grace Kim",
-          "email": "grace.kim@example.edu",
-          "timezone": "America/Chicago",
-          "availability": [
-            {
-              "day": "Wed",
-              "start": "16:00",
-              "end": "18:00"
-            },
-            {
-              "day": "Sat",
-              "start": "13:00",
-              "end": "15:00"
-            }
-          ],
-          "strengths": [
-            "project-management",
-            "stakeholder-comms",
-            "ops"
-          ],
-          "growthAreas": [
-            "coding",
-            "ui-design"
-          ],
-          "preferredRole": "Operations lead",
-          "communicationStyle": "collaborative",
-          "collaborationPreferences": [
-            "weekly planning",
-            "decision logs"
-          ],
-          "shortReflection": "I keep teams on timeline and help clarify ownership when project scope shifts.",
-          "profileSummary": "Grace Kim is oriented toward operations lead contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
-          "inferredTags": [
-            "project-management",
-            "stakeholder-comms",
-            "collaborative",
-            "Operations lead"
-          ],
-          "leadershipSignal": "high",
-          "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
-        },
-        {
-          "id": "stu-11",
-          "name": "Hannah Lee",
-          "email": "hannah.lee@example.edu",
-          "timezone": "America/Los_Angeles",
-          "availability": [
-            {
-              "day": "Tue",
-              "start": "15:00",
-              "end": "17:00"
-            },
-            {
-              "day": "Sun",
-              "start": "14:00",
-              "end": "16:00"
-            }
-          ],
-          "strengths": [
-            "content-strategy",
-            "documentation",
-            "editing"
-          ],
-          "growthAreas": [
-            "technical-depth",
-            "data-analysis"
-          ],
-          "preferredRole": "Communications coordinator",
-          "communicationStyle": "reflective",
-          "collaborationPreferences": [
-            "meeting summaries",
-            "shared notes"
-          ],
-          "shortReflection": "I help teams communicate clearly and can keep project outputs coherent and polished.",
-          "profileSummary": "Hannah Lee is oriented toward communications coordinator contributions. Contributes thoughtful perspective and asks clarifying questions early.",
-          "inferredTags": [
-            "content-strategy",
-            "documentation",
-            "reflective",
-            "Communications coordinator"
-          ],
-          "leadershipSignal": "medium",
-          "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
-        },
-        {
-          "id": "stu-12",
-          "name": "Jordan Miller",
-          "email": "jordan.miller@example.edu",
-          "timezone": "America/Denver",
-          "availability": [
-            {
-              "day": "Wed",
-              "start": "17:00",
-              "end": "19:00"
-            },
-            {
-              "day": "Fri",
-              "start": "17:00",
-              "end": "19:00"
-            }
-          ],
-          "strengths": [
-            "api-design",
-            "debugging",
-            "integration"
-          ],
-          "growthAreas": [
-            "presentation",
-            "facilitation"
-          ],
-          "preferredRole": "Full-stack contributor",
-          "communicationStyle": "analytical",
-          "collaborationPreferences": [
-            "structured handoffs",
-            "pr reviews"
-          ],
-          "shortReflection": "I like connecting systems end-to-end and improving reliability through careful debugging.",
-          "profileSummary": "Jordan Miller is oriented toward full-stack contributor contributions. Contributes thoughtful perspective and asks clarifying questions early.",
-          "inferredTags": [
-            "api-design",
-            "debugging",
-            "analytical",
-            "Full-stack contributor"
-          ],
-          "leadershipSignal": "emerging",
-          "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
         }
       ],
-      "rationale": "Team-2 was formed with balanced collaboration signals across Sofia Nguyen, Grace Kim, Hannah Lee, Jordan Miller. Composite score 37 emphasizes skill diversity (100) and growth opportunity fit (13) while flagging coordination risks for instructor review.",
+      "rationale": "Team-2 was formed with balanced collaboration signals across Mina Patel, Liam Okafor, Arjun Desai, Sofia Nguyen. Composite score 49 emphasizes skill coverage (100), availability overlap (5), and growth fit (25) while highlighting risks for instructor review.",
       "riskFlags": [
         {
           "code": "availability_low",
           "label": "Low schedule overlap",
           "severity": "high",
           "note": "Limited shared collaboration windows may slow coordination."
+        },
+        {
+          "code": "growth_support_low",
+          "label": "Limited growth support fit",
+          "severity": "low",
+          "note": "Current strengths weakly align with stated growth goals."
+        },
+        {
+          "code": "roster_risk_concentration",
+          "label": "Roster risk concentration",
+          "severity": "low",
+          "note": "This team carries the highest share of severe risk signals in current roster."
         }
       ],
       "scoreSummary": {
         "skillDiversity": 100,
-        "availabilityOverlap": 0,
-        "communicationBalance": 63,
-        "leadershipDistribution": 65,
-        "growthOpportunityFit": 13,
-        "riskPenalty": 18,
-        "total": 37
+        "availabilityOverlap": 5,
+        "communicationBalance": 100,
+        "leadershipDistribution": 100,
+        "growthOpportunityFit": 25,
+        "riskPenalty": 23,
+        "total": 49
       },
       "support": {
         "charter": "Team-2 charter: align scope, communicate blockers within 24 hours, and review deliverables before submission. Members commit to shared accountability and respectful feedback loops.",
         "suggestedRoleRotation": [
-          "Sofia Nguyen - Facilitator",
-          "Grace Kim - Tracker",
-          "Hannah Lee - Reviewer",
-          "Jordan Miller - Demo lead"
+          "Mina Patel - Facilitator",
+          "Liam Okafor - Tracker",
+          "Arjun Desai - Reviewer",
+          "Sofia Nguyen - Demo lead"
         ],
         "kickoffChecklist": [
           "Agree on communication channel and response expectations",
@@ -1366,7 +1524,21 @@
           "Set quality bar and review checklist",
           "Schedule midpoint and pre-demo syncs"
         ]
-      }
+      },
+      "projectTheme": "Course project",
+      "currentMilestone": null,
+      "preferredMeetingDurationMin": 60,
+      "aiOptIn": true,
+      "teamNorms": [
+        "Surface blockers within 24 hours.",
+        "Post one async update before the weekly sync.",
+        "Ask for clarification before assuming intent."
+      ],
+      "lastPulseAt": null,
+      "activeMeetingId": null,
+      "tasks": [],
+      "meetings": [],
+      "copilotRuns": []
     },
     {
       "id": "Team-3",
@@ -1412,96 +1584,9 @@
             "User advocate"
           ],
           "leadershipSignal": "high",
+          "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
-        },
-        {
-          "id": "stu-04",
-          "name": "Ethan Brooks",
-          "email": "ethan.brooks@example.edu",
-          "timezone": "America/Chicago",
-          "availability": [
-            {
-              "day": "Tue",
-              "start": "17:00",
-              "end": "19:00"
-            },
-            {
-              "day": "Sat",
-              "start": "10:00",
-              "end": "12:00"
-            }
-          ],
-          "strengths": [
-            "backend",
-            "node",
-            "system-design"
-          ],
-          "growthAreas": [
-            "ux-research",
-            "facilitation"
-          ],
-          "preferredRole": "Backend engineer",
-          "communicationStyle": "direct",
-          "collaborationPreferences": [
-            "async-first",
-            "issue templates"
-          ],
-          "shortReflection": "I can architect APIs quickly and like collaborating through structured async updates.",
-          "profileSummary": "Ethan Brooks is oriented toward backend engineer contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
-          "inferredTags": [
-            "backend",
-            "node",
-            "direct",
-            "Backend engineer"
-          ],
-          "leadershipSignal": "medium",
-          "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
-        },
-        {
-          "id": "stu-06",
-          "name": "Liam Okafor",
-          "email": "liam.okafor@example.edu",
-          "timezone": "America/Los_Angeles",
-          "availability": [
-            {
-              "day": "Thu",
-              "start": "16:00",
-              "end": "18:00"
-            },
-            {
-              "day": "Fri",
-              "start": "16:00",
-              "end": "18:00"
-            }
-          ],
-          "strengths": [
-            "testing",
-            "qa",
-            "documentation"
-          ],
-          "growthAreas": [
-            "leadership",
-            "frontend"
-          ],
-          "preferredRole": "Quality owner",
-          "communicationStyle": "analytical",
-          "collaborationPreferences": [
-            "checklists",
-            "rubrics"
-          ],
-          "shortReflection": "I like improving reliability and making expectations explicit for everyone in the team.",
-          "profileSummary": "Liam Okafor is oriented toward quality owner contributions. Shows consistent ownership in scoped tasks and values clear handoffs.",
-          "inferredTags": [
-            "testing",
-            "qa",
-            "analytical",
-            "Quality owner"
-          ],
-          "leadershipSignal": "medium",
-          "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
         },
         {
           "id": "stu-08",
@@ -1544,35 +1629,138 @@
             "AI integrator"
           ],
           "leadershipSignal": "emerging",
+          "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+        },
+        {
+          "id": "stu-11",
+          "name": "Hannah Lee",
+          "email": "hannah.lee@example.edu",
+          "timezone": "America/Los_Angeles",
+          "availability": [
+            {
+              "day": "Tue",
+              "start": "16:00",
+              "end": "18:00"
+            },
+            {
+              "day": "Sun",
+              "start": "14:00",
+              "end": "16:00"
+            }
+          ],
+          "strengths": [
+            "content-strategy",
+            "documentation",
+            "editing"
+          ],
+          "growthAreas": [
+            "technical-depth",
+            "data-analysis"
+          ],
+          "preferredRole": "Communications coordinator",
+          "communicationStyle": "reflective",
+          "collaborationPreferences": [
+            "meeting summaries",
+            "shared notes"
+          ],
+          "shortReflection": "I help teams communicate clearly and can keep project outputs coherent and polished.",
+          "profileSummary": "Hannah Lee is oriented toward communications coordinator contributions. Contributes thoughtful perspective and asks clarifying questions early.",
+          "inferredTags": [
+            "content-strategy",
+            "documentation",
+            "reflective",
+            "Communications coordinator"
+          ],
+          "leadershipSignal": "medium",
+          "riskFlags": [],
+          "profileSource": "mock",
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+        },
+        {
+          "id": "stu-12",
+          "name": "Jordan Miller",
+          "email": "jordan.miller@example.edu",
+          "timezone": "America/Denver",
+          "availability": [
+            {
+              "day": "Wed",
+              "start": "17:00",
+              "end": "19:00"
+            },
+            {
+              "day": "Fri",
+              "start": "17:00",
+              "end": "19:00"
+            }
+          ],
+          "strengths": [
+            "api-design",
+            "debugging",
+            "integration"
+          ],
+          "growthAreas": [
+            "presentation",
+            "facilitation"
+          ],
+          "preferredRole": "Full-stack contributor",
+          "communicationStyle": "analytical",
+          "collaborationPreferences": [
+            "structured handoffs",
+            "pr reviews"
+          ],
+          "shortReflection": "I like connecting systems end-to-end and improving reliability through careful debugging.",
+          "profileSummary": "Jordan Miller is oriented toward full-stack contributor contributions. Contributes thoughtful perspective and asks clarifying questions early.",
+          "inferredTags": [
+            "api-design",
+            "debugging",
+            "analytical",
+            "Full-stack contributor"
+          ],
+          "leadershipSignal": "emerging",
+          "riskFlags": [],
+          "profileSource": "mock",
+          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
         }
       ],
-      "rationale": "Team-3 was formed with balanced collaboration signals across Isabella Torres, Ethan Brooks, Liam Okafor, Mateo Silva. Composite score 45 emphasizes skill diversity (100) and growth opportunity fit (25) while flagging coordination risks for instructor review.",
+      "rationale": "Team-3 was formed with balanced collaboration signals across Isabella Torres, Mateo Silva, Hannah Lee, Jordan Miller. Composite score 47 emphasizes skill coverage (100), availability overlap (8), and growth fit (13) while highlighting risks for instructor review.",
       "riskFlags": [
         {
           "code": "availability_low",
           "label": "Low schedule overlap",
           "severity": "high",
           "note": "Limited shared collaboration windows may slow coordination."
+        },
+        {
+          "code": "growth_support_low",
+          "label": "Limited growth support fit",
+          "severity": "low",
+          "note": "Current strengths weakly align with stated growth goals."
+        },
+        {
+          "code": "roster_risk_concentration",
+          "label": "Roster risk concentration",
+          "severity": "low",
+          "note": "This team carries the highest share of severe risk signals in current roster."
         }
       ],
       "scoreSummary": {
         "skillDiversity": 100,
-        "availabilityOverlap": 0,
-        "communicationBalance": 63,
+        "availabilityOverlap": 8,
+        "communicationBalance": 100,
         "leadershipDistribution": 100,
-        "growthOpportunityFit": 25,
-        "riskPenalty": 18,
-        "total": 45
+        "growthOpportunityFit": 13,
+        "riskPenalty": 23,
+        "total": 47
       },
       "support": {
         "charter": "Team-3 charter: align scope, communicate blockers within 24 hours, and review deliverables before submission. Members commit to shared accountability and respectful feedback loops.",
         "suggestedRoleRotation": [
           "Isabella Torres - Facilitator",
-          "Ethan Brooks - Tracker",
-          "Liam Okafor - Reviewer",
-          "Mateo Silva - Demo lead"
+          "Mateo Silva - Tracker",
+          "Hannah Lee - Reviewer",
+          "Jordan Miller - Demo lead"
         ],
         "kickoffChecklist": [
           "Agree on communication channel and response expectations",
@@ -1580,8 +1768,27 @@
           "Set quality bar and review checklist",
           "Schedule midpoint and pre-demo syncs"
         ]
-      }
+      },
+      "projectTheme": "Course project",
+      "currentMilestone": null,
+      "preferredMeetingDurationMin": 60,
+      "aiOptIn": true,
+      "teamNorms": [
+        "Surface blockers within 24 hours.",
+        "Post one async update before the weekly sync.",
+        "Ask for clarification before assuming intent."
+      ],
+      "lastPulseAt": null,
+      "activeMeetingId": null,
+      "tasks": [],
+      "meetings": [],
+      "copilotRuns": []
     }
   ],
-  "updatedAt": "2026-04-04T22:04:52.827Z"
+  "studentsUpdatedAt": "2026-04-05T16:55:29.567Z",
+  "profilesUpdatedAt": "2026-04-05T16:55:29.567Z",
+  "teamsUpdatedAt": "2026-04-05T17:00:18.656Z",
+  "profilesStale": false,
+  "teamsStale": false,
+  "updatedAt": "2026-04-05T17:00:18.656Z"
 }

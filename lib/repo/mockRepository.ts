@@ -34,6 +34,8 @@ import type {
 } from "@/types/domain";
 
 const mockStatePath = path.join(process.cwd(), "data", "mockState.json");
+const DEMO_HOST_EMAIL = "dhruvpatel007k@gmail.com";
+const DEMO_TEAM_ONE_IDS = ["stu-01", "stu-02", "stu-09", "stu-04"] as const;
 
 let inMemoryState: DemoState | null = null;
 
@@ -61,12 +63,72 @@ async function buildProfiles(students: StudentIntake[]): Promise<StudentProfile[
   );
 }
 
+function shouldForceDemoTeamOne() {
+  return process.env.DEMO_STUDENT_EMAILS?.split(",")[0]?.trim().toLowerCase() === DEMO_HOST_EMAIL;
+}
+
+function buildMockTeamsForDemo(profiles: StudentProfile[], teamSize: number) {
+  const generated = generateTeamsDeterministic(profiles, teamSize).map((team) =>
+    normalizeTeamWorkspace(team)
+  );
+
+  if (!shouldForceDemoTeamOne()) {
+    return generated;
+  }
+
+  const candidates = generated.map((team) => ({
+    id: team.id,
+    members: [...team.members]
+  }));
+  const teamOne = candidates.find((team) => team.id === "Team-1");
+
+  if (!teamOne || teamOne.members.length !== DEMO_TEAM_ONE_IDS.length) {
+    return generated;
+  }
+
+  const profileById = new Map(profiles.map((profile) => [profile.id, profile] as const));
+  const desiredMembers = DEMO_TEAM_ONE_IDS.map((id) => profileById.get(id)).filter(
+    (member): member is StudentProfile => Boolean(member)
+  );
+
+  if (desiredMembers.length !== DEMO_TEAM_ONE_IDS.length) {
+    return generated;
+  }
+
+  const desiredSet = new Set<string>(DEMO_TEAM_ONE_IDS);
+  const teamOneExtras = teamOne.members.filter((member) => !desiredSet.has(member.id));
+  const missingDesiredIds = DEMO_TEAM_ONE_IDS.filter(
+    (id) => !teamOne.members.some((member) => member.id === id)
+  );
+
+  if (teamOneExtras.length !== missingDesiredIds.length) {
+    return generated;
+  }
+
+  const extrasQueue = [...teamOneExtras];
+
+  for (const desiredId of missingDesiredIds) {
+    const donorTeam = candidates.find((team) => team.members.some((member) => member.id === desiredId));
+    const replacement = extrasQueue.shift();
+
+    if (!donorTeam || !replacement) {
+      return generated;
+    }
+
+    donorTeam.members = donorTeam.members.map((member) =>
+      member.id === desiredId ? replacement : member
+    );
+  }
+
+  teamOne.members = desiredMembers;
+
+  return buildTeamsFromCandidates(candidates).map((team) => normalizeTeamWorkspace(team));
+}
+
 async function createSeedState(): Promise<DemoState> {
   const students = getSeedStudents();
   const profiles = await buildProfiles(students);
-  const teams = generateTeamsDeterministic(profiles, 4).map((team) =>
-    normalizeTeamWorkspace(team)
-  );
+  const teams = buildMockTeamsForDemo(profiles, 4);
   const now = new Date().toISOString();
 
   return rehydrateState({
@@ -199,10 +261,7 @@ export async function generateTeamsForProfiles(teamSize = 4) {
   }
 
   const now = new Date().toISOString();
-  const teams = mergeTeamWorkspace(
-    state.teams,
-    generateTeamsDeterministic(profiles, parsed.teamSize)
-  );
+  const teams = mergeTeamWorkspace(state.teams, buildMockTeamsForDemo(profiles, parsed.teamSize));
 
   inMemoryState = rehydrateState({
     students: state.students,
