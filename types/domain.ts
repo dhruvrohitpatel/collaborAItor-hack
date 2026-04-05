@@ -15,6 +15,27 @@ export type AvailabilitySlot = {
   end: string;
 };
 
+export type StudentRosterRecord = {
+  section?: string;
+  cohort?: string;
+  rosterSource?: "seed" | "manual" | "import";
+};
+
+export type StudentQuestionnaire = {
+  classPriority?: "low" | "medium" | "high";
+  weeklyCapacityHours?: number;
+  externalCommitments?: string;
+  scheduleConfidence?: "tight" | "manageable" | "flexible";
+  academicConfidence?: "needs_support" | "steady" | "strong";
+  priorExperience?: string[];
+  communicationHabits?: string[];
+  leadershipPreference?: "avoid" | "supporting" | "comfortable" | "prefer";
+  collaborationStylePreferences?: string[];
+  classGoals?: string[];
+  openReflection?: string;
+  completedAt?: string;
+};
+
 export type StudentIntake = {
   id: string;
   name: string;
@@ -27,6 +48,8 @@ export type StudentIntake = {
   communicationStyle: CommunicationStyle;
   collaborationPreferences: string[];
   shortReflection: string;
+  roster?: StudentRosterRecord;
+  questionnaire?: StudentQuestionnaire;
 };
 
 export type StudentProfile = StudentIntake & {
