@@ -3,6 +3,8 @@ import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 
+export const dynamic = "force-dynamic";
+
 type RouteContext = {
   params: {
     teamId: string;

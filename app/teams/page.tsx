@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEFAULT_TEAM_SIZE, MAX_TEAM_SIZE, MIN_TEAM_SIZE } from "@/lib/config";
 import { getDemoState } from "@/lib/repo";
 
+export const dynamic = "force-dynamic";
+
 export default async function TeamsPage() {
   const state = await getDemoState();
 

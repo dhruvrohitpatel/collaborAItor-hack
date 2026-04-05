@@ -4,6 +4,8 @@ import { doc, writeBatch } from "firebase/firestore";
 import { expandedStudents } from "@/data/generateExpandedStudents";
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     if (!isFirebaseConfigured) {
