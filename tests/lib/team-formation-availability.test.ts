@@ -19,6 +19,7 @@ function createProfile(id: string, availability: StudentProfile["availability"])
     profileSummary: "Demo profile",
     inferredTags: ["frontend"],
     leadershipSignal: "medium",
+    riskFlags: [],
     profileSource: "mock",
     profileGeneratedAt: "2026-04-05T00:00:00.000Z"
   };

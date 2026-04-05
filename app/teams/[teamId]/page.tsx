@@ -7,13 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requirePageTeamAccess } from "@/lib/auth/guards";
 import { getTeamBadge } from "@/lib/repo";
 
+export const dynamic = "force-dynamic";
+
 type TeamDetailPageProps = {
   params: {
     teamId: string;
   };
 };
-
-export const dynamic = "force-dynamic";
 
 export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
   const [{ user, team }, badge] = await Promise.all([
