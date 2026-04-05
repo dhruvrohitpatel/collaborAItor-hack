@@ -14,26 +14,62 @@ import type { AIResponseMeta } from "@/lib/ai/schemas";
 type AiToolsPanelProps = {
   defaultTeamName?: string;
   defaultMembers?: string[];
-  /** Communication styles from member profiles — forwarded to charter API for specific norms. */
   communicationStyles?: string[];
-  /** Active risk flags — forwarded to charter API for accountability language. */
   riskFlags?: { label: string; severity: "low" | "medium" | "high" }[];
 };
 
-const rewriteToneOptions = [
-  { value: "professional", label: "Professional" },
-  { value: "polite", label: "Polite" },
-  { value: "direct", label: "Direct" },
-  { value: "encouraging", label: "Encouraging" }
-] as const;
+// ─── Tone options ─────────────────────────────────────────────────────────────
 
-const rewriteAudienceOptions = [
-  { value: "student project team", label: "Student project team" },
-  { value: "a teammate", label: "A teammate" },
-  { value: "an instructor", label: "Instructor" },
-  { value: "a teaching assistant", label: "Teaching assistant" },
-  { value: "a client or stakeholder", label: "Client or stakeholder" }
-] as const;
+const TONE_OPTIONS = [
+  { value: "professional", label: "Professional", desc: "Neutral and formal" },
+  { value: "polite", label: "Polite", desc: "Warm and respectful" },
+  { value: "direct", label: "Direct", desc: "Clear and concise" },
+  { value: "encouraging", label: "Encouraging", desc: "Positive and motivating" },
+];
+
+// ─── Section label ────────────────────────────────────────────────────────────
+
+function FieldLabel({ label, hint }: { label: string; hint?: string }) {
+  return (
+    <div className="mb-1.5">
+      <p className="text-sm font-medium text-slate-700">{label}</p>
+      {hint && <p className="text-xs text-slate-400">{hint}</p>}
+    </div>
+  );
+}
+
+// ─── Meta pill ────────────────────────────────────────────────────────────────
+
+function MetaPill({ meta }: { meta: AIResponseMeta | null }) {
+  if (!meta) return null;
+  const isMock = meta.provider === "mock" || !!meta.fallbackReason;
+  return (
+    <div className={[
+      "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium",
+      isMock
+        ? "border-amber-200 bg-amber-50 text-amber-700"
+        : "border-emerald-200 bg-emerald-50 text-emerald-700"
+    ].join(" ")}>
+      <span className={`h-1.5 w-1.5 rounded-full ${isMock ? "bg-amber-400" : "bg-emerald-400"}`} />
+      {isMock ? "Mock fallback" : `Gemini · ${meta.model}`}
+      {meta.fallbackReason && <span className="opacity-70">— {meta.fallbackReason}</span>}
+    </div>
+  );
+}
+
+// ─── Output box ───────────────────────────────────────────────────────────────
+
+function OutputBox({ value, rows = 10 }: { value: string; rows?: number }) {
+  if (!value) return null;
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">Output</p>
+      <pre className="whitespace-pre-wrap text-sm text-slate-700 leading-relaxed font-sans">{value}</pre>
+    </div>
+  );
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function AiToolsPanel({
   defaultTeamName = "Team Demo",
@@ -42,27 +78,31 @@ export function AiToolsPanel({
   riskFlags = []
 }: AiToolsPanelProps) {
   const { push } = useToast();
+
   const [charterInput, setCharterInput] = useState({
     teamName: defaultTeamName,
     members: defaultMembers.join(", "),
     projectTheme: "Course capstone"
   });
-  const [charterOutput, setCharterOutput] = useState<string>("");
+  const [charterOutput, setCharterOutput] = useState("");
   const [charterMeta, setCharterMeta] = useState<AIResponseMeta | null>(null);
+  const [charterLoading, setCharterLoading] = useState(false);
 
   const [notesInput, setNotesInput] = useState(
     "Reviewed milestone status. Need owners for integration tasks and demo narrative."
   );
-  const [notesOutput, setNotesOutput] = useState<string>("");
+  const [notesOutput, setNotesOutput] = useState("");
   const [notesMeta, setNotesMeta] = useState<AIResponseMeta | null>(null);
+  const [notesLoading, setNotesLoading] = useState(false);
 
   const [rewriteInput, setRewriteInput] = useState({
     message: "Can someone please finish their part? We are behind.",
     tone: "professional",
     audience: "student project team"
   });
-  const [rewriteOutput, setRewriteOutput] = useState<string>("");
+  const [rewriteOutput, setRewriteOutput] = useState("");
   const [rewriteMeta, setRewriteMeta] = useState<AIResponseMeta | null>(null);
+  const [rewriteLoading, setRewriteLoading] = useState(false);
 
   async function callApi<T>(url: string, body: unknown): Promise<T> {
     const response = await fetch(url, {
@@ -70,162 +110,206 @@ export function AiToolsPanel({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed request: ${url}`);
-    }
-
+    if (!response.ok) throw new Error(`Failed request: ${url}`);
     return (await response.json()) as T;
   }
 
-  function renderMeta(meta: AIResponseMeta | null) {
-    if (!meta) {
-      return null;
+  async function handleCharter() {
+    setCharterLoading(true);
+    try {
+      const result = await callApi<{
+        charter: string;
+        suggestedRoleRotation: string[];
+        kickoffChecklist: string[];
+        meta: AIResponseMeta;
+      }>("/api/ai/charter", {
+        teamName: charterInput.teamName,
+        memberNames: charterInput.members.split(",").map((v) => v.trim()).filter(Boolean),
+        projectTheme: charterInput.projectTheme,
+        communicationStyles,
+        riskFlags
+      });
+      setCharterOutput([
+        result.charter, "",
+        "Role Rotation:",
+        ...result.suggestedRoleRotation.map((e) => `- ${e}`), "",
+        "Kickoff Checklist:",
+        ...result.kickoffChecklist.map((e) => `- ${e}`)
+      ].join("\n"));
+      setCharterMeta(result.meta);
+    } catch (error) {
+      push({ kind: "error", title: "Charter generation failed", description: error instanceof Error ? error.message : "Unknown error" });
+    } finally {
+      setCharterLoading(false);
     }
+  }
 
-    return (
-      <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
-        <p>
-          Provider: <span className="font-medium">{meta.provider}</span> | Model:{" "}
-          <span className="font-medium">{meta.model}</span>
-        </p>
-        {meta.fallbackReason ? (
-          <p className="mt-1 text-amber-700">Fallback reason: {meta.fallbackReason}</p>
-        ) : null}
-      </div>
-    );
+  async function handleNotes() {
+    setNotesLoading(true);
+    try {
+      const result = await callApi<{
+        summary: string;
+        actionItems: { task: string; owner: string }[];
+        openQuestions: string[];
+        meta: AIResponseMeta;
+      }>("/api/ai/summarize-meeting", { notes: notesInput });
+
+      const actionLines = result.actionItems.map(({ task, owner }) =>
+        owner ? `- [ ] ${task}  →  ${owner}` : `- [ ] ${task}`
+      );
+      const questionLines = result.openQuestions.length > 0
+        ? ["", "Open Questions:", ...result.openQuestions.map((q) => `- ${q}`)]
+        : [];
+
+      setNotesOutput([
+        `Summary: ${result.summary}`, "",
+        "Action Items:", ...actionLines,
+        ...questionLines
+      ].join("\n"));
+      setNotesMeta(result.meta);
+    } catch (error) {
+      push({ kind: "error", title: "Meeting summary failed", description: error instanceof Error ? error.message : "Unknown error" });
+    } finally {
+      setNotesLoading(false);
+    }
+  }
+
+  async function handleRewrite() {
+    setRewriteLoading(true);
+    try {
+      const result = await callApi<{
+        rewrittenMessage: string;
+        notes: string;
+        meta: AIResponseMeta;
+      }>("/api/ai/rewrite-message", {
+        message: rewriteInput.message,
+        tone: rewriteInput.tone,
+        audience: rewriteInput.audience
+      });
+      setRewriteOutput([
+        `Rewritten:\n${result.rewrittenMessage}`,
+        `\nNote: ${result.notes}`
+      ].join("\n"));
+      setRewriteMeta(result.meta);
+    } catch (error) {
+      push({ kind: "error", title: "Rewrite failed", description: error instanceof Error ? error.message : "Unknown error" });
+    } finally {
+      setRewriteLoading(false);
+    }
   }
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-2">
         <CardTitle>AI Helper Widgets</CardTitle>
+        <p className="text-sm text-slate-400">
+          Generate team charters, extract action items from meeting notes, and rewrite messages.
+        </p>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="charter" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="charter">Charter</TabsTrigger>
-            <TabsTrigger value="meeting">Meeting Notes</TabsTrigger>
-            <TabsTrigger value="rewrite">Rewrite Message</TabsTrigger>
+        <Tabs defaultValue="charter" className="space-y-5">
+          <TabsList className="w-full">
+            <TabsTrigger value="charter" className="flex-1">Charter</TabsTrigger>
+            <TabsTrigger value="meeting" className="flex-1">Meeting Notes</TabsTrigger>
+            <TabsTrigger value="rewrite" className="flex-1">Rewrite Message</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="charter" className="space-y-3">
-            <Input
-              value={charterInput.teamName}
-              onChange={(event) =>
-                setCharterInput((prev) => ({ ...prev, teamName: event.target.value }))
-              }
-              placeholder="Team name"
-            />
-            <Input
-              value={charterInput.members}
-              onChange={(event) =>
-                setCharterInput((prev) => ({ ...prev, members: event.target.value }))
-              }
-              placeholder="Member names, comma-separated"
-            />
-            <Input
-              value={charterInput.projectTheme}
-              onChange={(event) =>
-                setCharterInput((prev) => ({ ...prev, projectTheme: event.target.value }))
-              }
-              placeholder="Project theme"
-            />
-            <Button
-              onClick={async () => {
-                try {
-                  const result = await callApi<{
-                    charter: string;
-                    suggestedRoleRotation: string[];
-                    kickoffChecklist: string[];
-                    meta: AIResponseMeta;
-                  }>("/api/ai/charter", {
-                    teamName: charterInput.teamName,
-                    memberNames: charterInput.members
-                      .split(",")
-                      .map((value) => value.trim())
-                      .filter(Boolean),
-                    projectTheme: charterInput.projectTheme,
-                    communicationStyles,
-                    riskFlags
-                  });
-
-                  setCharterOutput(
-                    [
-                      result.charter,
-                      "",
-                      "Role Rotation:",
-                      ...result.suggestedRoleRotation.map((entry) => `- ${entry}`),
-                      "",
-                      "Kickoff Checklist:",
-                      ...result.kickoffChecklist.map((entry) => `- ${entry}`)
-                    ].join("\n")
-                  );
-                  setCharterMeta(result.meta);
-                } catch (error) {
-                  push({
-                    kind: "error",
-                    title: "Charter generation failed",
-                    description: error instanceof Error ? error.message : "Unknown error"
-                  });
-                }
-              }}
-            >
-              Generate Charter
-            </Button>
-            {renderMeta(charterMeta)}
-            <Textarea value={charterOutput} readOnly rows={10} />
+          {/* ── Charter ── */}
+          <TabsContent value="charter" className="space-y-4">
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-3">
+              <div>
+                <FieldLabel label="Team name" />
+                <Input
+                  value={charterInput.teamName}
+                  onChange={(e) => setCharterInput((p) => ({ ...p, teamName: e.target.value }))}
+                  placeholder="e.g. Team Alpha"
+                />
+              </div>
+              <div>
+                <FieldLabel label="Members" hint="Comma-separated names" />
+                <Input
+                  value={charterInput.members}
+                  onChange={(e) => setCharterInput((p) => ({ ...p, members: e.target.value }))}
+                  placeholder="Avery, Noah, Mina, Ethan"
+                />
+              </div>
+              <div>
+                <FieldLabel label="Project theme" />
+                <Input
+                  value={charterInput.projectTheme}
+                  onChange={(e) => setCharterInput((p) => ({ ...p, projectTheme: e.target.value }))}
+                  placeholder="e.g. Course capstone"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <Button onClick={handleCharter} disabled={charterLoading}>
+                {charterLoading ? "Generating..." : "Generate Charter"}
+              </Button>
+              <MetaPill meta={charterMeta} />
+            </div>
+            <OutputBox value={charterOutput} />
           </TabsContent>
 
-          <TabsContent value="meeting" className="space-y-3">
-            <Textarea
-              value={notesInput}
-              onChange={(event) => setNotesInput(event.target.value)}
-              rows={5}
-              placeholder="Paste meeting notes"
-            />
-            <Button
-              onClick={async () => {
-                try {
-                  const result = await callApi<{
-                    summary: string;
-                    actionItems: { task: string; owner: string }[];
-                    openQuestions: string[];
-                    meta: AIResponseMeta;
-                  }>("/api/ai/summarize-meeting", { notes: notesInput });
-
-                  const actionLines = result.actionItems.map(({ task, owner }) =>
-                    owner ? `- [ ] ${task}  →  ${owner}` : `- [ ] ${task}`
-                  );
-                  const questionLines =
-                    result.openQuestions.length > 0
-                      ? ["", "Open Questions:", ...result.openQuestions.map((q) => `- ${q}`)]
-                      : [];
-
-                  setNotesOutput(
-                    [
-                      `Summary: ${result.summary}`,
-                      "",
-                      "Action Items:",
-                      ...actionLines,
-                      ...questionLines
-                    ].join("\n")
-                  );
-                  setNotesMeta(result.meta);
-                } catch (error) {
-                  push({
-                    kind: "error",
-                    title: "Meeting summary failed",
-                    description: error instanceof Error ? error.message : "Unknown error"
-                  });
-                }
-              }}
-            >
-              Summarize Notes
-            </Button>
-            {renderMeta(notesMeta)}
-            <Textarea value={notesOutput} readOnly rows={10} />
+          {/* ── Meeting Notes ── */}
+          <TabsContent value="meeting" className="space-y-4">
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+              <FieldLabel label="Meeting notes" hint="Paste raw notes — we'll extract a summary, action items, and open questions." />
+              <Textarea
+                value={notesInput}
+                onChange={(e) => setNotesInput(e.target.value)}
+                rows={6}
+                placeholder="e.g. Reviewed milestone status. Alex will fix the auth bug. Still unclear on deployment target."
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Button onClick={handleNotes} disabled={notesLoading}>
+                {notesLoading ? "Summarizing..." : "Summarize Notes"}
+              </Button>
+              <MetaPill meta={notesMeta} />
+            </div>
+            <OutputBox value={notesOutput} />
           </TabsContent>
+
+          {/* ── Rewrite Message ── */}
+          <TabsContent value="rewrite" className="space-y-4">
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-3">
+              <div>
+                <FieldLabel label="Original message" hint="Paste a rough or tense message to rewrite." />
+                <Textarea
+                  value={rewriteInput.message}
+                  onChange={(e) => setRewriteInput((p) => ({ ...p, message: e.target.value }))}
+                  rows={4}
+                  placeholder="e.g. Can someone please finish their part? We are behind."
+                />
+              </div>
+
+              <div>
+                <FieldLabel label="Tone" />
+                <div className="flex flex-wrap gap-2">
+                  {TONE_OPTIONS.map((t) => {
+                    const active = rewriteInput.tone === t.value;
+                    return (
+                      <button
+                        key={t.value}
+                        type="button"
+                        onClick={() => setRewriteInput((p) => ({ ...p, tone: t.value }))}
+                        className={[
+                          "rounded-full border px-3 py-1 text-xs font-medium transition-all",
+                          active
+                            ? "border-blue-500 bg-blue-500 text-white"
+                            : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
+                        ].join(" ")}
+                      >
+                        {t.label}
+                        <span className={`ml-1 ${active ? "text-blue-100" : "text-gray-400"}`}>
+                          — {t.desc}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
           <TabsContent value="rewrite" className="space-y-3">
             <Textarea
@@ -281,37 +365,16 @@ export function AiToolsPanel({
                 </Select>
               </div>
             </div>
-            <Button
-              onClick={async () => {
-                try {
-                  const result = await callApi<{
-                    rewrittenMessage: string;
-                    notes: string;
-                    meta: AIResponseMeta;
-                  }>("/api/ai/rewrite-message", {
-                    message: rewriteInput.message,
-                    tone: rewriteInput.tone,
-                    audience: rewriteInput.audience
-                  });
 
-                  setRewriteOutput(
-                    [`Rewritten:\n${result.rewrittenMessage}`, `\nNote: ${result.notes}`].join("\n")
-                  );
-                  setRewriteMeta(result.meta);
-                } catch (error) {
-                  push({
-                    kind: "error",
-                    title: "Rewrite failed",
-                    description: error instanceof Error ? error.message : "Unknown error"
-                  });
-                }
-              }}
-            >
-              Rewrite Message
-            </Button>
-            {renderMeta(rewriteMeta)}
-            <Textarea value={rewriteOutput} readOnly rows={8} />
+            <div className="flex items-center justify-between">
+              <Button onClick={handleRewrite} disabled={rewriteLoading}>
+                {rewriteLoading ? "Rewriting..." : "Rewrite Message"}
+              </Button>
+              <MetaPill meta={rewriteMeta} />
+            </div>
+            <OutputBox value={rewriteOutput} />
           </TabsContent>
+
         </Tabs>
       </CardContent>
     </Card>
