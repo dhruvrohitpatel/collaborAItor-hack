@@ -8,8 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
-import type { StudentIntake } from "@/types/domain";
 import { AvailabilityPicker } from "@/components/student/availability-picker";
+import {
+  parseAvailabilityText,
+  parseCommaSeparatedList,
+  stringifyAvailability
+} from "@/lib/student-intake";
+import type { StudentIntake } from "@/types/domain";
 
 const communicationStyles = [
   { value: "direct", label: "Direct" },
@@ -45,29 +50,6 @@ const initialState: FormState = {
   shortReflection: ""
 };
 
-function parseCommaList(input: string) {
-  return input
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean);
-}
-
-function parseAvailability(input: string): StudentIntake["availability"] {
-  return input
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) => {
-      const [day, time] = entry.split(" ");
-      const [start, end] = (time || "").split("-");
-      return {
-        day: (day || "Mon") as StudentIntake["availability"][number]["day"],
-        start: start || "16:00",
-        end: end || "18:00"
-      };
-    });
-}
-
 export function StudentIntakeForm() {
   const [form, setForm] = useState<FormState>(initialState);
   const [saving, setSaving] = useState(false);
@@ -88,12 +70,12 @@ export function StudentIntakeForm() {
         name: form.name,
         email: form.email,
         timezone: form.timezone,
-        availability: parseAvailability(form.availabilityRaw),
-        strengths: parseCommaList(form.strengthsRaw),
-        growthAreas: parseCommaList(form.growthAreasRaw),
+        availability: parseAvailabilityText(form.availabilityRaw),
+        strengths: parseCommaSeparatedList(form.strengthsRaw),
+        growthAreas: parseCommaSeparatedList(form.growthAreasRaw),
         preferredRole: form.preferredRole,
         communicationStyle: form.communicationStyle,
-        collaborationPreferences: parseCommaList(form.collaborationPreferencesRaw),
+        collaborationPreferences: parseCommaSeparatedList(form.collaborationPreferencesRaw),
         shortReflection: form.shortReflection
       };
 
@@ -176,12 +158,12 @@ export function StudentIntakeForm() {
           <div className="space-y-1 md:col-span-2">
             <label className="text-sm font-medium">Availability</label>
             <AvailabilityPicker
-              value={parseAvailability(form.availabilityRaw)}
+              value={parseAvailabilityText(form.availabilityRaw)}
               onChange={(availability) => {
-                const raw = availability
-                  .map((slot) => `${slot.day} ${slot.start}-${slot.end}`)
-                  .join(", ");
-                setForm((prev) => ({ ...prev, availabilityRaw: raw }));
+                setForm((prev) => ({
+                  ...prev,
+                  availabilityRaw: stringifyAvailability(availability)
+                }));
               }}
             />
           </div>

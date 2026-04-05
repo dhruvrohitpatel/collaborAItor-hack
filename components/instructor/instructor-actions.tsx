@@ -33,6 +33,14 @@ export function InstructorActions() {
         throw new Error(`Failed ${action}`);
       }
 
+      const data = (await response.json()) as {
+        warning?: string | null;
+        providerUsed?: "gemini" | "mixed" | "mock";
+        geminiProfilesCount?: number;
+        mockProfilesCount?: number;
+        rateLimited?: boolean;
+      };
+
       push({
         kind: "success",
         title:
@@ -40,7 +48,15 @@ export function InstructorActions() {
             ? "Demo seed loaded"
             : action === "profiles"
               ? "Profiles generated"
-              : "Teams generated"
+              : "Teams generated",
+        description:
+          action === "profiles"
+            ? data.warning ??
+              (typeof data.geminiProfilesCount === "number" &&
+              typeof data.mockProfilesCount === "number"
+                ? `${data.geminiProfilesCount} Gemini, ${data.mockProfilesCount} mock. Provider: ${data.providerUsed ?? "unknown"}.`
+                : undefined)
+            : undefined
       });
 
       router.refresh();
