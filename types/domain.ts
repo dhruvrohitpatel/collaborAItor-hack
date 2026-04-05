@@ -60,6 +60,84 @@ export type TeamSupportArtifacts = {
   kickoffChecklist: string[];
 };
 
+export type TeamTaskStatus = "todo" | "in_progress" | "blocked" | "done";
+
+export type TeamTaskPriority = "low" | "medium" | "high";
+
+export type TeamTaskSource = "manual" | "meeting_followup" | "weekly_pulse" | "copilot";
+
+export type TeamTask = {
+  id: string;
+  title: string;
+  description: string;
+  status: TeamTaskStatus;
+  priority: TeamTaskPriority;
+  assigneeStudentId: string | null;
+  source: TeamTaskSource;
+  sourceRunId: string | null;
+  sourceMeetingId: string | null;
+  dueAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  createdByStudentId: string | null;
+};
+
+export type MeetingSlotProposal = {
+  startAt: string;
+  endAt: string;
+  score: number;
+  memberIdsAvailable: string[];
+};
+
+export type MeetingSelectedSlot = {
+  startAt: string;
+  endAt: string;
+};
+
+export type TeamMeetingStatus = "proposed" | "scheduled" | "completed" | "cancelled";
+
+export type TeamMeeting = {
+  id: string;
+  status: TeamMeetingStatus;
+  proposedSlots: MeetingSlotProposal[];
+  selectedSlot: MeetingSelectedSlot | null;
+  durationMin: number;
+  timezone: string;
+  calendarEventId: string | null;
+  calendarHtmlLink: string | null;
+  meetUrl: string | null;
+  agenda: string | null;
+  notesRaw: string | null;
+  summary: string | null;
+  openQuestions: string[];
+  createdAt: string;
+  updatedAt: string;
+  createdByStudentId: string | null;
+};
+
+export type CopilotRunIntent =
+  | "rewrite_message"
+  | "schedule_meeting"
+  | "meeting_followup"
+  | "weekly_pulse";
+
+export type CopilotRunStatus = "preview" | "approved" | "executed" | "failed";
+
+export type TeamCopilotRun = {
+  id: string;
+  intent: CopilotRunIntent;
+  status: CopilotRunStatus;
+  actorStudentId: string | null;
+  inputSnapshot: Record<string, unknown>;
+  preview: Record<string, unknown>;
+  outputSummary: string;
+  requiresApproval: boolean;
+  approvedAt: string | null;
+  executedAt: string | null;
+  errorMessage: string | null;
+  createdAt: string;
+};
+
 export type Team = {
   id: string;
   members: StudentProfile[];
@@ -67,6 +145,13 @@ export type Team = {
   riskFlags: RiskFlag[];
   scoreSummary: TeamScoreBreakdown;
   support: TeamSupportArtifacts;
+  projectTheme: string;
+  currentMilestone: string | null;
+  preferredMeetingDurationMin: number;
+  aiOptIn: boolean;
+  teamNorms: string[];
+  lastPulseAt: string | null;
+  activeMeetingId: string | null;
 };
 
 export type MoveAction =

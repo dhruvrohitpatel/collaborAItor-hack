@@ -443,7 +443,8 @@ export function buildTeamsFromCandidates(candidates: TeamCandidate[]): Team[] {
       rationale: buildRationale(team.id, team.members, team.scoreSummary),
       riskFlags,
       scoreSummary: team.scoreSummary,
-      support: defaultSupport(team.id, team.members)
+      support: defaultSupport(team.id, team.members),
+      ...defaultTeamMetadata()
     };
   });
 }
@@ -470,6 +471,22 @@ function defaultSupport(teamId: string, members: StudentProfile[]) {
       "Set quality bar and review checklist",
       "Schedule midpoint and pre-demo syncs"
     ]
+  };
+}
+
+function defaultTeamMetadata() {
+  return {
+    projectTheme: "Course project",
+    currentMilestone: null,
+    preferredMeetingDurationMin: 45,
+    aiOptIn: true,
+    teamNorms: [
+      "Share blockers within 24 hours",
+      "Keep task owners explicit",
+      "Review work before submission"
+    ],
+    lastPulseAt: null,
+    activeMeetingId: null
   };
 }
 
