@@ -1,0 +1,96 @@
+import { notFound } from "next/navigation";
+
+import { ScoreSummary } from "@/components/teams/score-summary";
+import { RiskBadge } from "@/components/teams/risk-badge";
+import { AiToolsPanel } from "@/components/tools/ai-tools-panel";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getTeamById } from "@/lib/repo";
+
+type TeamDetailPageProps = {
+  params: {
+    teamId: string;
+  };
+};
+
+export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
+  const team = await getTeamById(params.teamId);
+
+  if (!team) {
+    notFound();
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold">{team.id} Detail</h1>
+        <p className="text-sm text-muted-foreground">Transparent assignment rationale and support tools.</p>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle>Team Snapshot</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <p>{team.rationale}</p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Members</p>
+              <ul className="mt-1 space-y-1">
+                {team.members.map((member) => (
+                  <li key={member.id}>
+                    {member.name} - {member.preferredRole}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {team.riskFlags.length ? (
+                team.riskFlags.map((risk) => <RiskBadge key={risk.code} risk={risk} />)
+              ) : (
+                <p className="text-xs text-muted-foreground">No major risk flags.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <ScoreSummary score={team.scoreSummary} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Generated Charter</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p>{team.support.charter}</p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Suggested Role Rotation
+              </p>
+              <ul className="mt-1 space-y-1">
+                {team.support.suggestedRoleRotation.map((entry) => (
+                  <li key={entry}>{entry}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Kickoff Checklist
+              </p>
+              <ul className="mt-1 space-y-1">
+                {team.support.kickoffChecklist.map((entry) => (
+                  <li key={entry}>{entry}</li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        <AiToolsPanel
+          defaultTeamName={team.id}
+          defaultMembers={team.members.map((member) => member.name)}
+        />
+      </div>
+    </div>
+  );
+}
