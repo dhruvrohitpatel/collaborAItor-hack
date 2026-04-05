@@ -2,7 +2,7 @@ import {
   DEFAULT_TEAM_SIZE,
   MAX_TEAM_SIZE,
   MIN_TEAM_SIZE,
-  useMockData
+  isMockDataEnabled
 } from "@/lib/config";
 
 import { generateProfileForStudent } from "@/lib/ai/profileGeneration";
@@ -53,6 +53,19 @@ import type {
   Team
 } from "@/types/domain";
 
+type DerivedFirestoreState = {
+  profiles: StudentProfile[];
+  teams: Team[];
+  sourceSignature: string;
+  updatedAt: string;
+};
+
+let firestoreState: DerivedFirestoreState | null = null;
+
+function buildSourceSignature(students: StudentIntake[]) {
+  return students.map((student) => student.id).sort().join("|");
+}
+
 function buildEmptyDemoState(students: StudentIntake[]): DemoState {
   return {
     students,
@@ -91,11 +104,6 @@ async function getFirestoreBackedState() {
   } satisfies DemoState;
 }
 
-/**
- * Firestore mode currently persists students only.
- * If derived teams/profiles are empty in this process, rebuild them deterministically
- * so move actions still work before full DB persistence is implemented.
- */
 async function ensureDerivedFirestoreState(
   state: DemoState,
   fallbackTeamSize = DEFAULT_TEAM_SIZE
@@ -126,6 +134,24 @@ async function ensureDerivedFirestoreState(
   };
 
   return hydratedState;
+}
+
+async function persistFirestoreTeams(
+  students: StudentIntake[],
+  profiles: StudentProfile[],
+  teams: Team[]
+) {
+  const savedTeams = await saveFirestoreTeams(teams);
+  const updatedAt = new Date().toISOString();
+
+  firestoreState = {
+    profiles,
+    teams: savedTeams,
+    sourceSignature: buildSourceSignature(students),
+    updatedAt
+  };
+
+  return savedTeams;
 }
 
 export async function getStudents(): Promise<StudentIntake[]> {
@@ -246,15 +272,9 @@ export async function moveStudentBetweenTeams(input: {
   }));
   const moved = applyInstructorSwap(candidates, parsed);
   const teams = buildTeamsFromCandidates(moved);
+  const savedTeams = await persistFirestoreTeams(state.students, state.profiles, teams);
 
-  firestoreState = {
-    profiles: state.profiles,
-    teams,
-    sourceSignature: buildSourceSignature(state.students),
-    updatedAt: new Date().toISOString()
-  };
-
-  return structuredClone(teams);
+  return structuredClone(savedTeams);
 }
 
 function toTeamCandidates(teams: Team[]) {
@@ -414,17 +434,12 @@ export async function resolveTeamMoveRequest(
     nextTeams = buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed));
   }
 
-  firestoreState = {
-    profiles: state.profiles,
-    teams: nextTeams,
-    sourceSignature: buildSourceSignature(state.students),
-    updatedAt: new Date().toISOString()
-  };
+  const savedTeams = await persistFirestoreTeams(state.students, state.profiles, nextTeams);
 
   return {
     ok: true,
     status: "moved",
     resolution: parsed.action,
-    teams: structuredClone(nextTeams)
+    teams: structuredClone(savedTeams)
   };
 }
