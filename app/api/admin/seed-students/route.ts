@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { doc, writeBatch } from "firebase/firestore";
 
-import { expandedStudents } from "@/data/generateExpandedStudents";
-import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
-
 export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireInstructorApi } from "@/lib/auth/guards";
+import { getExpandedStudents } from "@/lib/demo-seed";
+import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 
 export async function GET() {
   try {
+    await requireInstructorApi();
     if (!isFirebaseConfigured) {
       return NextResponse.json(
         { ok: false, error: "Firebase env vars are not configured." },
@@ -26,6 +28,8 @@ export async function GET() {
 
     const batch = writeBatch(db);
 
+    const expandedStudents = getExpandedStudents();
+
     for (const student of expandedStudents) {
       batch.set(doc(db, "students", student.id), student);
     }
@@ -39,13 +43,6 @@ export async function GET() {
     });
   } catch (error: unknown) {
     console.error("Seed students route error:", error);
-
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    );
+    return authErrorResponse(error);
   }
 }

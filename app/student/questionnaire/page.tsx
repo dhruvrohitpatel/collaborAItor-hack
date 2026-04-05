@@ -1,6 +1,11 @@
+import { requireStudentPage } from "@/lib/auth/guards";
 import { StudentQuestionnaireForm } from "@/components/student/questionnaire-form";
 
-export default function StudentQuestionnairePage() {
+export const dynamic = "force-dynamic";
+
+export default async function StudentQuestionnairePage() {
+  const user = await requireStudentPage();
+
   return (
     <div className="space-y-4">
       <div>
@@ -10,7 +15,7 @@ export default function StudentQuestionnairePage() {
           collaboration preferences for richer AI-generated collaboration profiles.
         </p>
       </div>
-      <StudentQuestionnaireForm />
+      <StudentQuestionnaireForm initialEmail={user.email} initialName={user.name ?? ""} />
     </div>
   );
 }

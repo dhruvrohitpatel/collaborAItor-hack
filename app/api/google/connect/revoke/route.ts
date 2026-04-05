@@ -1,23 +1,28 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireStudentApi } from "@/lib/auth/guards";
 import { disconnectGoogleByEmail } from "@/lib/google/connections";
 
-const requestSchema = z.object({
-  memberEmail: z.string().email()
-});
-
 export async function POST(request: Request) {
-  const body = await request.json();
-  const parsed = requestSchema.parse(body);
+  try {
+    const user = await requireStudentApi();
+    await request.json().catch(() => null);
 
-  const revoked = await disconnectGoogleByEmail(parsed.memberEmail);
-  if (!revoked) {
-    return NextResponse.json({ error: "No Google connection found for this email." }, { status: 404 });
+    const revoked = await disconnectGoogleByEmail(user.email);
+    if (!revoked) {
+      return NextResponse.json(
+        { error: "No Google connection found for this email." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      memberEmail: user.email
+    });
+  } catch (error) {
+    return authErrorResponse(error);
   }
-
-  return NextResponse.json({
-    ok: true,
-    memberEmail: parsed.memberEmail.toLowerCase()
-  });
 }

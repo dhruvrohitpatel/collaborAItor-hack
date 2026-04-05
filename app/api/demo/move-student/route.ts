@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireInstructorApi } from "@/lib/auth/guards";
 import { resolveTeamMoveRequest } from "@/lib/repo";
 
 export async function POST(request: Request) {
   try {
+    await requireInstructorApi();
     const body = await request.json().catch(() => ({}));
     const result = await resolveTeamMoveRequest(body);
 
@@ -17,12 +21,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
   } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 400 }
-    );
+    return authErrorResponse(error);
   }
 }

@@ -1,6 +1,10 @@
 import { AiToolsPanel } from "@/components/tools/ai-tools-panel";
+import { requireInstructorPage } from "@/lib/auth/guards";
 
-export default function ToolsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ToolsPage() {
+  await requireInstructorPage();
   return (
     <div className="space-y-4">
       <div>

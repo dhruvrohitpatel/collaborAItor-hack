@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireInstructorApi } from "@/lib/auth/guards";
 import { generateProfilesForStudents } from "@/lib/repo";
 
 export async function POST() {
   try {
+    await requireInstructorApi();
     const result = await generateProfilesForStudents();
 
     return NextResponse.json({
@@ -16,12 +20,6 @@ export async function POST() {
       warning: result.summary.warning
     });
   } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    );
+    return authErrorResponse(error);
   }
 }

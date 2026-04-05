@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
+export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireApiTeamAccess } from "@/lib/auth/guards";
 import { executeCopilotRun } from "@/lib/ai/teamCopilot";
 import {
   teamCopilotExecuteRequestSchema,
@@ -12,6 +15,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const parsed = teamCopilotExecuteRequestSchema.parse(body);
+    await requireApiTeamAccess(parsed.teamId);
     const team = await getTeamById(parsed.teamId);
 
     if (!team) {
@@ -22,9 +26,11 @@ export async function POST(request: Request) {
     await saveTeam(result.team);
     return NextResponse.json(teamCopilotExecuteResponseSchema.parse(result.response));
   } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     const message = error instanceof Error ? error.message : "Unknown error";
-    const status = error instanceof ZodError ? 400 : 500;
     console.error(`[team-copilot] execute failed: ${message}`, error);
-    return NextResponse.json({ error: message }, { status });
+    return authErrorResponse(error);
   }
 }

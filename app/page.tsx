@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import {
   ArrowRight,
   BellRing,
@@ -10,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getOptionalSessionUser } from "@/lib/auth/session";
 
 const principles = [
   { label: "Augment, not automate", desc: "Instructors stay in control at every step." },
@@ -39,7 +41,7 @@ const features = [
   {
     icon: WandSparkles,
     title: "AI Team Support",
-    desc: "Generate charters, summarize meeting notes into action items, and rewrite team messages with the right tone.",
+    desc: "Generate charters, summarize meeting notes into action items, rewrite team messages, and coordinate meeting workflows.",
     color: "text-emerald-500",
     bg: "bg-emerald-50",
     border: "border-emerald-100"
@@ -73,11 +75,21 @@ const workflowSteps = [
   {
     step: "04",
     title: "Ongoing Team Support",
-    desc: "Badges, coaching alerts, charters, meeting summaries, and rewrites help teams stay healthy after formation."
+    desc: "Badges, coaching alerts, charters, meeting summaries, rewrites, and OAuth-backed scheduling keep teams healthy after formation."
   }
 ];
 
-export default function LandingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function LandingPage() {
+  const user = await getOptionalSessionUser();
+  const primaryHref = !user ? "/sign-in" : user.role === "instructor" ? "/instructor" : "/my-team";
+  const primaryLabel = !user
+    ? "Sign In With Google"
+    : user.role === "instructor"
+      ? "Open Instructor Dashboard"
+      : "Open My Team";
+
   return (
     <div className="space-y-10">
       <section className="overflow-hidden rounded-2xl border bg-white shadow-sm">
@@ -105,8 +117,8 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Link href="/instructor" className={buttonVariants({})}>
-                Open Instructor Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+              <Link href={primaryHref as Route} className={buttonVariants({})}>
+                {primaryLabel} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link
                 href="/student/questionnaire"

@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireInstructorApi } from "@/lib/auth/guards";
 import { createRosterStudent } from "@/lib/repo";
 import { rosterSetupInputSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
   try {
+    await requireInstructorApi();
     const body = await request.json();
     const payload = rosterSetupInputSchema.parse(body);
     const student = await createRosterStudent(payload);
@@ -14,12 +18,6 @@ export async function POST(request: Request) {
       studentId: student.id
     });
   } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    );
+    return authErrorResponse(error);
   }
 }

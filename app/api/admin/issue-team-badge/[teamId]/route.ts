@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireInstructorApi } from "@/lib/auth/guards";
 import { issueOrUpdateTeamBadge } from "@/lib/repo";
 
 type RouteContext = {
@@ -10,6 +13,7 @@ type RouteContext = {
 
 export async function POST(_request: Request, { params }: RouteContext) {
   try {
+    await requireInstructorApi();
     const badge = await issueOrUpdateTeamBadge(params.teamId);
 
     return NextResponse.json({
@@ -17,12 +21,6 @@ export async function POST(_request: Request, { params }: RouteContext) {
       badge
     });
   } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    );
+    return authErrorResponse(error);
   }
 }

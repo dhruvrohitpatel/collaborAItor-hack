@@ -10,6 +10,7 @@ import {
   type ProfileGenerationResult
 } from "@/lib/ai/profileGeneration";
 import { normalizeDemoState } from "@/lib/demo-state";
+import { normalizeEmail } from "@/lib/email";
 
 import {
   addFirestoreStudentIntake,
@@ -123,13 +124,24 @@ async function saveStudentRecord(student: StudentIntake) {
   return addFirestoreStudentIntake(student);
 }
 
-async function getStudentByEmail(email: string) {
-  const normalized = email.trim().toLowerCase();
+export async function getStudentByEmail(email: string) {
+  const normalized = normalizeEmail(email);
   const students = await getStudents();
 
   return (
     students.find(
-      (student) => student.email.trim().toLowerCase() === normalized
+      (student) => normalizeEmail(student.email) === normalized
+    ) ?? null
+  );
+}
+
+export async function getTeamByMemberEmail(email: string) {
+  const normalized = normalizeEmail(email);
+  const state = await getDemoState();
+
+  return (
+    state.teams.find((team) =>
+      team.members.some((member) => normalizeEmail(member.email) === normalized)
     ) ?? null
   );
 }

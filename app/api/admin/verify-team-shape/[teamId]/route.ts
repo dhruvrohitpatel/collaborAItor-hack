@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
-import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
-
 export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireInstructorApi } from "@/lib/auth/guards";
+import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 
 type RouteContext = {
   params: {
@@ -13,6 +14,7 @@ type RouteContext = {
 
 export async function GET(_request: Request, { params }: RouteContext) {
   try {
+    await requireInstructorApi();
     if (!isFirebaseConfigured) {
       return NextResponse.json(
         { ok: false, error: "Firebase env vars are not configured." },
@@ -80,12 +82,6 @@ export async function GET(_request: Request, { params }: RouteContext) {
         : null
     });
   } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    );
+    return authErrorResponse(error);
   }
 }

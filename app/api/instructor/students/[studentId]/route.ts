@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
+import { authErrorResponse, requireInstructorApi } from "@/lib/auth/guards";
 import { updateStudentIntake } from "@/lib/repo";
 import { studentIntakeSchema } from "@/lib/schemas";
 
@@ -11,6 +14,7 @@ type RouteContext = {
 
 export async function PATCH(request: Request, { params }: RouteContext) {
   try {
+    await requireInstructorApi();
     const body = await request.json();
     const payload = studentIntakeSchema.parse({
       ...body,
@@ -24,12 +28,6 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       studentId: student.id
     });
   } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 400 }
-    );
+    return authErrorResponse(error);
   }
 }
