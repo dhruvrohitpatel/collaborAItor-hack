@@ -1,5 +1,6 @@
 import type { AICharterRequest, AICharterResponse, AIGenerateTeamsRationaleRequest, AIProfileResponse } from "@/lib/ai/schemas";
-import type { StudentIntake } from "@/types/domain";
+import type { DisengagementCandidate } from "@/lib/ai/participation";
+import type { ParticipationSignal, StudentIntake } from "@/types/domain";
 
 function scoreLevel(value: number): string {
   if (value >= 75) return "strong";
@@ -200,4 +201,42 @@ export async function rewriteMessage(
     rewrittenMessage: `${openers[tone]} ${body} ${closers[tone]}`.replace(/\s{2,}/g, " ").trim(),
     notes: notesMap[tone]
   };
+}
+
+export function generateMockCoachingAlerts(
+  teamId: string,
+  signals: ParticipationSignal[],
+  candidates: DisengagementCandidate[]
+) {
+  const alerts = candidates.map((c) => {
+    const { signal, reasons, severity } = c;
+
+    const reasonText =
+      `${signal.memberName} appears to have reduced activity: ${reasons.join(" and ")}.`;
+
+    const followUpMap: Record<typeof severity, string> = {
+      high: `Send ${signal.memberName} a brief private check-in to see if they need support.`,
+      medium: `Mention in the next team sync that all voices are needed and check in with ${signal.memberName} afterward.`,
+      low: `Monitor for another 2–3 days; if the pattern continues, send a brief check-in.`
+    };
+
+    return {
+      flaggedMember: signal.memberName,
+      memberId: signal.memberId,
+      reason: reasonText,
+      suggestedFollowUp: followUpMap[severity],
+      severity,
+      participationShare: signal.sharePercent,
+      daysSilent: signal.daysSilent
+    };
+  });
+
+  const participationSummary = signals.map((s) => ({
+    memberName: s.memberName,
+    messageCount: s.messageCount,
+    sharePercent: s.sharePercent,
+    lastActiveAt: s.lastActiveAt
+  }));
+
+  return { teamId, hasAlert: alerts.length > 0, alerts, participationSummary };
 }
