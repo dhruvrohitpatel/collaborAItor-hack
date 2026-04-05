@@ -11,7 +11,6 @@ import {
 
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 import type { BadgeCredentialInput, DemoStateMetaInput } from "@/lib/schemas";
-import type { DemoStateMetaInput } from "@/lib/schemas";
 import {
   badgeCredentialSchema,
   collaborationProfileSchema,
