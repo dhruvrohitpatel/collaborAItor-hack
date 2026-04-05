@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier . --write",
     "seed": "node --import tsx scripts/seed.ts",
-    "seed:reset": "node --import tsx scripts/seed.ts --reset"
+    "seed:reset": "node --import tsx scripts/seed.ts --reset",
+    "seed:firestore": "node --import tsx scripts/seedFirestore.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
