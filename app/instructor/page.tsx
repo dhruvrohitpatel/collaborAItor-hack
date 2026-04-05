@@ -1,3 +1,4 @@
+import { DerivedDataAlert } from "@/components/shared/derived-data-alert";
 import { InstructorActions } from "@/components/instructor/instructor-actions";
 import { KpiCards } from "@/components/instructor/kpi-cards";
 import { RosterTable } from "@/components/instructor/roster-table";
@@ -29,6 +30,11 @@ export default async function InstructorPage() {
         profiles={state.profiles.length}
         teams={state.teams.length}
         updatedAt={state.updatedAt}
+      />
+
+      <DerivedDataAlert
+        profilesStale={state.profilesStale}
+        teamsStale={state.teamsStale}
       />
 
       <Card>

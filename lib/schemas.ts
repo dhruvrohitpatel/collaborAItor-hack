@@ -172,6 +172,12 @@ export const teamSchema = z.object({
   support: teamSupportArtifactsSchema
 });
 
+export const demoStateMetaSchema = z.object({
+  studentsUpdatedAt: z.string().datetime(),
+  profilesUpdatedAt: z.string().datetime().nullable().default(null),
+  teamsUpdatedAt: z.string().datetime().nullable().default(null)
+});
+
 export const generateTeamsInputSchema = z.object({
   teamSize: z.number().int().min(MIN_TEAM_SIZE).max(MAX_TEAM_SIZE).default(DEFAULT_TEAM_SIZE)
 });
@@ -217,3 +223,4 @@ export type MoveStudentInput = z.infer<typeof moveStudentInputSchema>;
 export type MoveStudentRequestInput = z.infer<typeof moveStudentRequestSchema>;
 export type RiskFlagInput = z.infer<typeof riskFlagSchema>;
 export type CollaborationProfile = z.infer<typeof collaborationProfileSchema>;
+export type DemoStateMetaInput = z.infer<typeof demoStateMetaSchema>;

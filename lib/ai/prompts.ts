@@ -90,6 +90,54 @@ export function buildProfilePrompt(student: StudentIntake) {
   ].join("\n");
 }
 
+export function buildBatchProfilePrompt(students: StudentIntake[]) {
+  const serializedStudents = students.map((student) => ({
+    studentId: student.id,
+    name: student.name,
+    timezone: student.timezone,
+    availability: student.availability.map((slot) => `${slot.day} ${slot.start}-${slot.end}`),
+    strengths: student.strengths,
+    growthAreas: student.growthAreas,
+    preferredRole: student.preferredRole,
+    communicationStyle: student.communicationStyle,
+    collaborationPreferences: student.collaborationPreferences,
+    shortReflection: student.shortReflection
+  }));
+
+  return [
+    "You are a neutral collaboration profiler for an academic team-formation tool.",
+    "Analyze every student intake record below and return ONLY a single JSON object.",
+    "Do not use markdown. Do not omit any students. Do not add commentary.",
+    "",
+    "Required JSON shape:",
+    "{",
+    '  "profiles": [',
+    "    {",
+    '      "studentId": "<must exactly match an input studentId>",',
+    '      "profileSummary": "<2-3 sentence neutral description of collaboration style and role fit>",',
+    '      "inferredTags": ["<tag1>", "<tag2>", "..."],',
+    '      "leadershipSignal": "<high | medium | emerging>",',
+    '      "riskFlags": [',
+    '        { "code": "<snake_case_id>", "label": "<short label>", "severity": "<low | medium | high>", "note": "<one sentence>" }',
+    "      ]",
+    "    }",
+    "  ]",
+    "}",
+    "",
+    "Rules:",
+    "- Return exactly one profile object for every input student.",
+    "- studentId must be copied exactly from the input roster.",
+    "- inferredTags: 3-5 lowercase tags derived from strengths, style, and role.",
+    "- leadershipSignal: high if preferred role or style suggests facilitation/leadership; emerging if limited signals; otherwise medium.",
+    "- riskFlags: flag genuine collaboration risks only. Use an empty array if none.",
+    "- Do NOT include email or any other PII in output fields.",
+    "- Be descriptive and neutral.",
+    "",
+    "Student roster:",
+    JSON.stringify(serializedStudents, null, 2)
+  ].join("\n");
+}
+
 function scoreLevel(value: number): string {
   if (value >= 75) return "strong";
   if (value >= 50) return "moderate";

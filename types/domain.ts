@@ -176,6 +176,11 @@ export type DemoState = {
   students: StudentIntake[];
   profiles: StudentProfile[];
   teams: Team[];
+  studentsUpdatedAt: string;
+  profilesUpdatedAt: string | null;
+  teamsUpdatedAt: string | null;
+  profilesStale: boolean;
+  teamsStale: boolean;
   updatedAt: string;
 };
 
