@@ -9,6 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
 import type { StudentIntake } from "@/types/domain";
+import { AvailabilityPicker } from "@/components/student/availability-picker";
+
+const communicationStyles = [
+  { value: "direct", label: "Direct" },
+  { value: "collaborative", label: "Collaborative" },
+  { value: "reflective", label: "Reflective" },
+  { value: "facilitative", label: "Facilitative" },
+  { value: "analytical", label: "Analytical" }
+] as const;
 
 type FormState = {
   name: string;
@@ -120,103 +129,123 @@ export function StudentIntakeForm() {
       <CardHeader>
         <CardTitle>Student Collaboration Intake</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Name</label>
-            <Input
-              value={form.name}
-              onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
-              required
-            />
+      <CardContent className="overflow-visible">
+        <form onSubmit={onSubmit} className="space-y-6">
+          {/* Row 1: Name & Email */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Name</label>
+              <Input
+                value={form.name}
+                onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Email</label>
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+                required
+              />
+            </div>
           </div>
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Email</label>
-            <Input
-              type="email"
-              value={form.email}
-              onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-              required
-            />
+
+          {/* Row 2: Timezone & Preferred Role */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Timezone</label>
+              <Input
+                value={form.timezone}
+                onChange={(event) => setForm((prev) => ({ ...prev, timezone: event.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Preferred Role</label>
+              <Input
+                value={form.preferredRole}
+                onChange={(event) => setForm((prev) => ({ ...prev, preferredRole: event.target.value }))}
+                required
+              />
+            </div>
           </div>
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Timezone</label>
-            <Input
-              value={form.timezone}
-              onChange={(event) => setForm((prev) => ({ ...prev, timezone: event.target.value }))}
-              required
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Preferred Role</label>
-            <Input
-              value={form.preferredRole}
-              onChange={(event) => setForm((prev) => ({ ...prev, preferredRole: event.target.value }))}
-              required
-            />
-          </div>
+
+          {/* Row 3: Availability (full width) */}
           <div className="space-y-1 md:col-span-2">
             <label className="text-sm font-medium">Availability</label>
-            <Input
-              value={form.availabilityRaw}
-              onChange={(event) =>
-                setForm((prev) => ({ ...prev, availabilityRaw: event.target.value }))
-              }
-              placeholder="Mon 16:00-18:00, Wed 17:00-19:00"
-              required
+            <AvailabilityPicker
+              value={parseAvailability(form.availabilityRaw)}
+              onChange={(availability) => {
+                const raw = availability
+                  .map((slot) => `${slot.day} ${slot.start}-${slot.end}`)
+                  .join(", ");
+                setForm((prev) => ({ ...prev, availabilityRaw: raw }));
+              }}
             />
           </div>
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Strengths (comma-separated)</label>
-            <Input
-              value={form.strengthsRaw}
-              onChange={(event) => setForm((prev) => ({ ...prev, strengthsRaw: event.target.value }))}
-              required
-            />
+
+          {/* Row 4: Strengths & Growth Areas */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Strengths (comma-separated)</label>
+              <Input
+                value={form.strengthsRaw}
+                onChange={(event) => setForm((prev) => ({ ...prev, strengthsRaw: event.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Growth Areas (comma-separated)</label>
+              <Input
+                value={form.growthAreasRaw}
+                onChange={(event) => setForm((prev) => ({ ...prev, growthAreasRaw: event.target.value }))}
+                required
+              />
+            </div>
           </div>
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Growth Areas (comma-separated)</label>
-            <Input
-              value={form.growthAreasRaw}
-              onChange={(event) => setForm((prev) => ({ ...prev, growthAreasRaw: event.target.value }))}
-              required
-            />
+
+          {/* Row 5: Communication Style & Collaboration Preferences */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Communication Style</label>
+              <Select
+                value={form.communicationStyle || "collaborative"}
+                onValueChange={(value) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    communicationStyle: value as StudentIntake["communicationStyle"]
+                  }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a style" />
+                </SelectTrigger>
+                <SelectContent>
+                  {communicationStyles.map((style) => (
+                    <SelectItem key={style.value} value={style.value}>
+                      {style.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Collaboration Preferences</label>
+              <Input
+                value={form.collaborationPreferencesRaw}
+                onChange={(event) =>
+                  setForm((prev) => ({ ...prev, collaborationPreferencesRaw: event.target.value }))
+                }
+                placeholder="shared docs, async updates"
+                required
+              />
+            </div>
           </div>
+
+          {/* Row 6: Short Reflection (full width) */}
           <div className="space-y-1">
-            <label className="text-sm font-medium">Communication Style</label>
-            <Select
-              value={form.communicationStyle}
-              onValueChange={(value) =>
-                setForm((prev) => ({
-                  ...prev,
-                  communicationStyle: value as StudentIntake["communicationStyle"]
-                }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="direct">Direct</SelectItem>
-                <SelectItem value="collaborative">Collaborative</SelectItem>
-                <SelectItem value="reflective">Reflective</SelectItem>
-                <SelectItem value="facilitative">Facilitative</SelectItem>
-                <SelectItem value="analytical">Analytical</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Collaboration Preferences</label>
-            <Input
-              value={form.collaborationPreferencesRaw}
-              onChange={(event) =>
-                setForm((prev) => ({ ...prev, collaborationPreferencesRaw: event.target.value }))
-              }
-              placeholder="shared docs, async updates"
-              required
-            />
-          </div>
-          <div className="space-y-1 md:col-span-2">
             <label className="text-sm font-medium">Short Reflection</label>
             <Textarea
               value={form.shortReflection}
@@ -227,7 +256,9 @@ export function StudentIntakeForm() {
               required
             />
           </div>
-          <div className="md:col-span-2">
+
+          {/* Submit Button */}
+          <div>
             <Button type="submit" disabled={saving}>
               {saving ? "Submitting..." : "Submit Intake"}
             </Button>
