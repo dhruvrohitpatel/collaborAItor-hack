@@ -5,17 +5,24 @@ import {
   isMockDataEnabled
 } from "@/lib/config";
 
-import { generateProfileForStudent } from "@/lib/ai/profileGeneration";
+import {
+  generateProfilesForStudentsBatched,
+  type ProfileGenerationResult
+} from "@/lib/ai/profileGeneration";
+import { normalizeDemoState } from "@/lib/demo-state";
 
 import {
   addFirestoreStudentIntake,
   clearFirestoreTeams,
+  getFirestoreStateMeta,
   getFirestoreProfiles,
   getFirestoreStudents,
   getFirestoreTeamById,
   getFirestoreTeams,
   saveFirestoreProfiles,
-  saveFirestoreTeams
+  saveFirestoreStateMeta,
+  saveFirestoreTeams,
+  updateFirestoreStudentIntake
 } from "@/lib/repo/firestoreRepository";
 import {
   addStudentIntake as addMockStudentIntake,
@@ -25,7 +32,8 @@ import {
   getTeamById as getMockTeamById,
   loadDemoSeed as loadMockDemoSeed,
   moveStudentBetweenTeams as moveMockStudentBetweenTeams,
-  resolveTeamMoveRequest as resolveMockTeamMoveRequest
+  resolveTeamMoveRequest as resolveMockTeamMoveRequest,
+  updateStudentIntake as updateMockStudentIntake
 } from "@/lib/repo/mockRepository";
 import {
   generateTeamsInputSchema,
@@ -49,59 +57,39 @@ import type {
   MoveStudentRequest,
   MoveStudentResponse,
   StudentIntake,
-  StudentProfile,
   Team
 } from "@/types/domain";
 
-type DerivedFirestoreState = {
-  profiles: StudentProfile[];
-  teams: Team[];
-  sourceSignature: string;
-  updatedAt: string;
-};
-
-let firestoreState: DerivedFirestoreState | null = null;
-
-function buildSourceSignature(students: StudentIntake[]) {
-  return students.map((student) => student.id).sort().join("|");
-}
-
 function buildEmptyDemoState(students: StudentIntake[]): DemoState {
-  return {
+  const now = new Date().toISOString();
+
+  return normalizeDemoState({
     students,
     profiles: [],
     teams: [],
-    updatedAt: new Date().toISOString()
-  };
-}
-
-async function buildProfiles(students: StudentIntake[]): Promise<StudentProfile[]> {
-  const profiles: StudentProfile[] = [];
-
-  for (const student of students) {
-    profiles.push(await generateProfileForStudent(student));
-  }
-
-  return profiles;
+    studentsUpdatedAt: now,
+    profilesUpdatedAt: null,
+    teamsUpdatedAt: null,
+    updatedAt: now
+  });
 }
 
 async function getFirestoreBackedState() {
-  const [students, profiles, teams] = await Promise.all([
+  const [students, profiles, teams, meta] = await Promise.all([
     getFirestoreStudents(),
     getFirestoreProfiles(),
-    getFirestoreTeams()
+    getFirestoreTeams(),
+    getFirestoreStateMeta()
   ]);
-  const timestamps = [
-    ...profiles.map((profile) => profile.profileGeneratedAt),
-    ...teams.flatMap((team) => team.members.map((member) => member.profileGeneratedAt))
-  ].sort();
 
-  return {
+  return normalizeDemoState({
     students,
     profiles,
     teams,
-    updatedAt: timestamps.at(-1) ?? new Date().toISOString()
-  } satisfies DemoState;
+    studentsUpdatedAt: meta?.studentsUpdatedAt,
+    profilesUpdatedAt: meta?.profilesUpdatedAt,
+    teamsUpdatedAt: meta?.teamsUpdatedAt
+  });
 }
 
 async function ensureDerivedFirestoreState(
@@ -116,40 +104,48 @@ async function ensureDerivedFirestoreState(
     return state;
   }
 
-  const profiles = state.profiles.length ? state.profiles : await buildProfiles(state.students);
+  const profiles = state.profiles.length
+    ? state.profiles
+    : (await generateProfilesForStudentsBatched(state.students)).profiles;
   const teams = generateTeamsDeterministic(profiles, fallbackTeamSize);
-
-  const hydratedState: DemoState = {
+  const now = new Date().toISOString();
+  const hydratedState = normalizeDemoState({
     students: state.students,
     profiles,
     teams,
-    updatedAt: new Date().toISOString()
-  };
-
-  firestoreState = {
-    profiles: hydratedState.profiles,
-    teams: hydratedState.teams,
-    sourceSignature: buildSourceSignature(hydratedState.students),
-    updatedAt: hydratedState.updatedAt
-  };
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt: state.profiles.length ? state.profilesUpdatedAt : now,
+    teamsUpdatedAt: now
+  });
+  await saveFirestoreStateMeta({
+    studentsUpdatedAt: hydratedState.studentsUpdatedAt,
+    profilesUpdatedAt: hydratedState.profilesUpdatedAt,
+    teamsUpdatedAt: hydratedState.teamsUpdatedAt
+  });
 
   return hydratedState;
 }
 
 async function persistFirestoreTeams(
-  students: StudentIntake[],
-  profiles: StudentProfile[],
-  teams: Team[]
+  state: Pick<
+    DemoState,
+    "students" | "profiles" | "teams" | "studentsUpdatedAt" | "profilesUpdatedAt" | "teamsUpdatedAt"
+  >
 ) {
-  const savedTeams = await saveFirestoreTeams(teams);
-  const updatedAt = new Date().toISOString();
-
-  firestoreState = {
-    profiles,
+  const savedTeams = await saveFirestoreTeams(state.teams);
+  const nextState = normalizeDemoState({
+    students: state.students,
+    profiles: state.profiles,
     teams: savedTeams,
-    sourceSignature: buildSourceSignature(students),
-    updatedAt
-  };
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt: state.profilesUpdatedAt,
+    teamsUpdatedAt: state.teamsUpdatedAt
+  });
+  await saveFirestoreStateMeta({
+    studentsUpdatedAt: nextState.studentsUpdatedAt,
+    profilesUpdatedAt: nextState.profilesUpdatedAt,
+    teamsUpdatedAt: nextState.teamsUpdatedAt
+  });
 
   return savedTeams;
 }
@@ -177,6 +173,11 @@ export async function loadDemoSeed(): Promise<DemoState> {
 
   const students = await getFirestoreStudents();
   await Promise.all([saveFirestoreProfiles([]), clearFirestoreTeams()]);
+  await saveFirestoreStateMeta({
+    studentsUpdatedAt: new Date().toISOString(),
+    profilesUpdatedAt: null,
+    teamsUpdatedAt: null
+  });
 
   return buildEmptyDemoState(students);
 }
@@ -187,20 +188,60 @@ export async function addStudentIntake(input: StudentIntake): Promise<StudentInt
   }
 
   const student = await addFirestoreStudentIntake(input);
+  const state = await getFirestoreBackedState();
+  await saveFirestoreStateMeta({
+    studentsUpdatedAt: new Date().toISOString(),
+    profilesUpdatedAt: state.profilesUpdatedAt,
+    teamsUpdatedAt: state.teamsUpdatedAt
+  });
   return student;
 }
 
-export async function generateProfilesForStudents(): Promise<StudentProfile[]> {
+export async function updateStudentIntake(input: StudentIntake): Promise<StudentIntake> {
   if (isMockDataEnabled()) {
-    return generateMockProfilesForStudents();
+    return updateMockStudentIntake(input);
+  }
+
+  const student = await updateFirestoreStudentIntake(input);
+  const state = await getFirestoreBackedState();
+  await saveFirestoreStateMeta({
+    studentsUpdatedAt: new Date().toISOString(),
+    profilesUpdatedAt: state.profilesUpdatedAt,
+    teamsUpdatedAt: state.teamsUpdatedAt
+  });
+
+  return student;
+}
+
+export async function generateProfilesForStudents(): Promise<ProfileGenerationResult> {
+  if (isMockDataEnabled()) {
+    const profiles = await generateMockProfilesForStudents();
+    return {
+      profiles,
+      summary: {
+        providerUsed: "mock",
+        geminiProfilesCount: 0,
+        mockProfilesCount: profiles.length,
+        rateLimited: false,
+        warning: "Mock mode is enabled, so Gemini profile generation is bypassed."
+      }
+    };
   }
 
   const students = await getFirestoreStudents();
-  const profiles = await buildProfiles(students);
-  const savedProfiles = await saveFirestoreProfiles(profiles);
-  await clearFirestoreTeams();
+  const result = await generateProfilesForStudentsBatched(students);
+  const savedProfiles = await saveFirestoreProfiles(result.profiles);
+  const state = await getFirestoreBackedState();
+  await saveFirestoreStateMeta({
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt: new Date().toISOString(),
+    teamsUpdatedAt: state.teamsUpdatedAt
+  });
 
-  return structuredClone(savedProfiles);
+  return {
+    profiles: structuredClone(savedProfiles),
+    summary: result.summary
+  };
 }
 
 export async function generateTeamsForProfiles(teamSize = 4): Promise<Team[]> {
@@ -210,14 +251,26 @@ export async function generateTeamsForProfiles(teamSize = 4): Promise<Team[]> {
 
   const parsed = generateTeamsInputSchema.parse({ teamSize });
   let profiles = await getFirestoreProfiles();
+  const state = await getFirestoreBackedState();
+  let profilesUpdatedAt = state.profilesUpdatedAt;
 
   if (!profiles.length) {
-    profiles = await saveFirestoreProfiles(await buildProfiles(await getFirestoreStudents()));
+    profiles = await saveFirestoreProfiles(
+      (await generateProfilesForStudentsBatched(await getFirestoreStudents())).profiles
+    );
+    profilesUpdatedAt = new Date().toISOString();
   }
 
   const teams = generateTeamsDeterministic(profiles, parsed.teamSize);
   await clearFirestoreTeams();
-  const savedTeams = await saveFirestoreTeams(teams);
+  const savedTeams = await persistFirestoreTeams({
+    students: state.students,
+    profiles,
+    teams,
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt,
+    teamsUpdatedAt: new Date().toISOString()
+  });
 
   return structuredClone(savedTeams);
 }
@@ -272,7 +325,14 @@ export async function moveStudentBetweenTeams(input: {
   }));
   const moved = applyInstructorSwap(candidates, parsed);
   const teams = buildTeamsFromCandidates(moved);
-  const savedTeams = await persistFirestoreTeams(state.students, state.profiles, teams);
+  const savedTeams = await persistFirestoreTeams({
+    students: state.students,
+    profiles: state.profiles,
+    teams,
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt: state.profilesUpdatedAt,
+    teamsUpdatedAt: new Date().toISOString()
+  });
 
   return structuredClone(savedTeams);
 }
@@ -434,7 +494,14 @@ export async function resolveTeamMoveRequest(
     nextTeams = buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed));
   }
 
-  const savedTeams = await persistFirestoreTeams(state.students, state.profiles, nextTeams);
+  const savedTeams = await persistFirestoreTeams({
+    students: state.students,
+    profiles: state.profiles,
+    teams: nextTeams,
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt: state.profilesUpdatedAt,
+    teamsUpdatedAt: new Date().toISOString()
+  });
 
   return {
     ok: true,
