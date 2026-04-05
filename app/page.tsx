@@ -1,9 +1,11 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { ArrowRight, GraduationCap, UsersRound, WandSparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getOptionalSessionUser } from "@/lib/auth/session";
 
 const principles = [
   "Augment, not automate",
@@ -12,7 +14,17 @@ const principles = [
   "Descriptive AI outputs"
 ];
 
-export default function LandingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function LandingPage() {
+  const user = await getOptionalSessionUser();
+  const primaryHref = !user ? "/sign-in" : user.role === "instructor" ? "/instructor" : "/my-team";
+  const primaryLabel = !user
+    ? "Sign In With Google"
+    : user.role === "instructor"
+      ? "Open Instructor Dashboard"
+      : "Open My Team";
+
   return (
     <div className="space-y-10">
       <section className="grid gap-6 rounded-2xl border bg-white p-8 shadow-sm md:grid-cols-[1.4fr_1fr]">
@@ -22,15 +34,14 @@ export default function LandingPage() {
             Build better student teams with transparent AI support.
           </h1>
           <p className="max-w-2xl text-slate-600">
-            Collabor-AI-tor helps instructors gather collaboration signals, generate structured
-            profiles, form balanced teams, and provide practical team support tools.
+            Collabor-AI-tor helps instructors gather collaboration signals, generate structured profiles, form balanced teams, and provide practical team support tools.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/instructor" className={buttonVariants({})}>
-              Open Instructor Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+            <Link href={primaryHref as Route} className={buttonVariants({})}>
+              {primaryLabel} <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             <Link href="/student/questionnaire" className={buttonVariants({ variant: "outline" })}>
-              Open Student Onboarding
+              Student Onboarding
             </Link>
           </div>
         </div>
@@ -56,8 +67,7 @@ export default function LandingPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-slate-600">
-            Seed roster data, generate profiles, form teams, and override assignments with clear
-            rationale.
+            Seed roster data, generate profiles, form teams, and override assignments with clear rationale.
           </CardContent>
         </Card>
         <Card>
@@ -67,19 +77,17 @@ export default function LandingPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-slate-600">
-            Deterministic heuristic scoring balances skills, communication styles, availability,
-            leadership, and growth fit.
+            Deterministic heuristic scoring balances skills, communication styles, availability, leadership, and growth fit.
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <WandSparkles className="h-5 w-5 text-primary" /> AI Team Support
+              <WandSparkles className="h-5 w-5 text-primary" /> OAuth-Backed Team Support
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-slate-600">
-            Generate charters, summarize meeting notes into action items, and rewrite professional
-            team messages.
+            Students sign in with Google, optionally link Calendar permissions, and let the agent schedule meetings with Meet links and workflow memory.
           </CardContent>
         </Card>
       </section>

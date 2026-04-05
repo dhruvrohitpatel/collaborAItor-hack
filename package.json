@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next build && tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
     "format": "prettier . --write",
     "seed": "node --import tsx scripts/seed.ts",
     "seed:reset": "node --import tsx scripts/seed.ts --reset",
@@ -22,6 +24,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "firebase": "^10.14.1",
+    "firebase-admin": "^13.7.0",
     "lucide-react": "^0.445.0",
     "next": "^14.2.15",
     "react": "^18.3.1",
@@ -31,6 +34,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
@@ -42,6 +46,7 @@
     "prettier-plugin-tailwindcss": "^0.6.8",
     "tailwindcss": "^3.4.13",
     "tsx": "^4.19.1",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "vitest": "^4.1.2"
   }
 }

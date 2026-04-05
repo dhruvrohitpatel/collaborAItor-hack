@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
+import { requireUserApi } from "@/lib/auth/guards";
 import { saveConnectionFromOAuth } from "@/lib/google/connections";
 import { exchangeCodeForTokens, parseOAuthStateToken } from "@/lib/google/oauth";
 
@@ -45,9 +48,19 @@ export async function GET(request: Request) {
 
   try {
     const state = parseOAuthStateToken(stateToken);
+    const user = await requireUserApi();
+
+    if (user.role !== "student") {
+      throw new Error("Only student accounts can complete Google account linking.");
+    }
+
+    if (user.email !== state.memberEmail || user.uid !== state.firebaseUid) {
+      throw new Error("Google OAuth state does not match the signed-in student session.");
+    }
+
     const tokens = await exchangeCodeForTokens(code);
     const saved = await saveConnectionFromOAuth({
-      firebaseUid: state.firebaseUid,
+      firebaseUid: user.uid,
       expectedEmail: state.memberEmail,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,

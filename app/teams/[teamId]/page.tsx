@@ -1,12 +1,11 @@
-import { notFound } from "next/navigation";
-
 import { ScoreSummary } from "@/components/teams/score-summary";
 import { RiskBadge } from "@/components/teams/risk-badge";
 import { DisengagementPanel } from "@/components/teams/disengagement-panel";
 import { TeamCopilotPanel } from "@/components/teams/team-copilot-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTeamBadge, getTeamById } from "@/lib/repo";
+import { requirePageTeamAccess } from "@/lib/auth/guards";
+import { getTeamBadge } from "@/lib/repo";
 
 type TeamDetailPageProps = {
   params: {
@@ -14,12 +13,13 @@ type TeamDetailPageProps = {
   };
 };
 
-export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
-  const [team, badge] = await Promise.all([getTeamById(params.teamId), getTeamBadge(params.teamId)]);
+export const dynamic = "force-dynamic";
 
-  if (!team) {
-    notFound();
-  }
+export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
+  const [{ user, team }, badge] = await Promise.all([
+    requirePageTeamAccess(params.teamId),
+    getTeamBadge(params.teamId)
+  ]);
 
   const isOutOfBounds = team.riskFlags.some(
     (flag) => flag.code === "team_size_over_max" || flag.code === "team_size_under_min"
@@ -116,7 +116,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
           </CardContent>
         </Card>
 
-        <TeamCopilotPanel team={team} />
+        <TeamCopilotPanel team={team} viewerRole={user.role} viewerEmail={user.email} />
       </div>
     </div>
   );

@@ -3,9 +3,13 @@ import Link from "next/link";
 
 import { ProfileCard } from "@/components/student/profile-card";
 import { buttonVariants } from "@/components/ui/button";
+import { requireInstructorPage } from "@/lib/auth/guards";
 import { getDemoState } from "@/lib/repo";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfileReviewPage() {
+  await requireInstructorPage();
   const state = await getDemoState();
   const aiProfiles = state.profiles.filter((profile) => profile.profileSource === "ai").length;
   const mockProfiles = state.profiles.filter((profile) => profile.profileSource === "mock").length;

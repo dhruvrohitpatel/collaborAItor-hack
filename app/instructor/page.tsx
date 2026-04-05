@@ -4,11 +4,15 @@ import { KpiCards } from "@/components/instructor/kpi-cards";
 import { RosterTable } from "@/components/instructor/roster-table";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { requireInstructorPage } from "@/lib/auth/guards";
 import { getDemoState } from "@/lib/repo";
 import Link from "next/link";
 import type { Route } from "next";
 
+export const dynamic = "force-dynamic";
+
 export default async function InstructorPage() {
+  await requireInstructorPage();
   const state = await getDemoState();
 
   return (

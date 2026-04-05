@@ -43,29 +43,31 @@ type QuestionnaireFormState = {
   openReflection: string;
 };
 
-const initialState: QuestionnaireFormState = {
-  name: "",
-  email: "",
-  timezone: "America/Phoenix",
-  availabilityRaw: "Mon 16:00-18:00, Wed 17:00-19:00",
-  strengthsRaw: "",
-  growthAreasRaw: "",
-  preferredRole: "",
-  communicationStyle: "collaborative",
-  collaborationPreferencesRaw: "",
-  shortReflection: "",
-  classPriority: "high",
-  weeklyCapacityHours: "8",
-  externalCommitments: "",
-  scheduleConfidence: "manageable",
-  academicConfidence: "steady",
-  priorExperienceRaw: "",
-  communicationHabitsRaw: "",
-  leadershipPreference: "supporting",
-  collaborationStylePreferencesRaw: "",
-  classGoalsRaw: "",
-  openReflection: ""
-};
+function buildInitialState(initialEmail: string, initialName: string): QuestionnaireFormState {
+  return {
+    name: initialName,
+    email: initialEmail,
+    timezone: "America/Phoenix",
+    availabilityRaw: "Mon 16:00-18:00, Wed 17:00-19:00",
+    strengthsRaw: "",
+    growthAreasRaw: "",
+    preferredRole: "",
+    communicationStyle: "collaborative",
+    collaborationPreferencesRaw: "",
+    shortReflection: "",
+    classPriority: "high",
+    weeklyCapacityHours: "8",
+    externalCommitments: "",
+    scheduleConfidence: "manageable",
+    academicConfidence: "steady",
+    priorExperienceRaw: "",
+    communicationHabitsRaw: "",
+    leadershipPreference: "supporting",
+    collaborationStylePreferencesRaw: "",
+    classGoalsRaw: "",
+    openReflection: ""
+  };
+}
 
 function parseCommaList(input: string) {
   return input
@@ -90,8 +92,16 @@ function parseAvailability(input: string): StudentIntake["availability"] {
     });
 }
 
-export function StudentQuestionnaireForm() {
-  const [form, setForm] = useState<QuestionnaireFormState>(initialState);
+export function StudentQuestionnaireForm({
+  initialEmail,
+  initialName
+}: {
+  initialEmail: string;
+  initialName: string;
+}) {
+  const [form, setForm] = useState<QuestionnaireFormState>(() =>
+    buildInitialState(initialEmail, initialName)
+  );
   const [saving, setSaving] = useState(false);
   const { push } = useToast();
 
@@ -105,7 +115,6 @@ export function StudentQuestionnaireForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
-          email: form.email,
           timezone: form.timezone,
           availability: parseAvailability(form.availabilityRaw),
           strengths: parseCommaList(form.strengthsRaw),
@@ -140,7 +149,7 @@ export function StudentQuestionnaireForm() {
         title: "Questionnaire submitted",
         description: "Your onboarding responses are now available for AI profile generation."
       });
-      setForm(initialState);
+      setForm((current) => buildInitialState(initialEmail, current.name));
     } catch (error) {
       push({
         kind: "error",
@@ -169,13 +178,8 @@ export function StudentQuestionnaireForm() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Email</label>
-              <Input
-                type="email"
-                value={form.email}
-                onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-                required
-              />
+              <label className="text-sm font-medium">Signed-in email</label>
+              <Input type="email" value={form.email} readOnly disabled />
             </div>
           </div>
 

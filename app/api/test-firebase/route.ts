@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     if (!isFirebaseConfigured) {

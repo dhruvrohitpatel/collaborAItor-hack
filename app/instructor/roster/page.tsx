@@ -1,6 +1,10 @@
 import { RosterSetupForm } from "@/components/instructor/roster-setup-form";
+import { requireInstructorPage } from "@/lib/auth/guards";
 
-export default function InstructorRosterPage() {
+export const dynamic = "force-dynamic";
+
+export default async function InstructorRosterPage() {
+  await requireInstructorPage();
   return (
     <div className="space-y-4">
       <div>

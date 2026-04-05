@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { seedStudents } from "@/data/seedStudents";
 import { MAX_TEAM_SIZE, MIN_TEAM_SIZE } from "@/lib/config";
+import { getSeedStudents } from "@/lib/demo-seed";
 import { normalizeDemoState } from "@/lib/demo-state";
 import { generateMockProfile } from "@/lib/ai/mock";
 import { mergeTeamWorkspace, normalizeTeamWorkspace } from "@/lib/team-workspace";
@@ -62,14 +62,15 @@ async function buildProfiles(students: StudentIntake[]): Promise<StudentProfile[
 }
 
 async function createSeedState(): Promise<DemoState> {
-  const profiles = await buildProfiles(seedStudents);
+  const students = getSeedStudents();
+  const profiles = await buildProfiles(students);
   const teams = generateTeamsDeterministic(profiles, 4).map((team) =>
     normalizeTeamWorkspace(team)
   );
   const now = new Date().toISOString();
 
   return rehydrateState({
-    students: [...seedStudents],
+    students,
     profiles,
     teams,
     studentsUpdatedAt: now,

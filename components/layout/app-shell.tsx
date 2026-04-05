@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
-import { MockAuthToggle } from "@/components/layout/mock-auth-toggle";
+import { AuthStatus } from "@/components/layout/auth-status";
 import { NavLinks } from "@/components/layout/nav-links";
+import { getOptionalSessionUser } from "@/lib/auth/session";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export async function AppShell({ children }: { children: React.ReactNode }) {
+  const user = await getOptionalSessionUser();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-white text-slate-900">
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur">
@@ -19,9 +22,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <p className="text-xs text-muted-foreground">Google Track MVP</p>
               </div>
             </Link>
-            <NavLinks />
+            <NavLinks role={user?.role ?? null} authenticated={Boolean(user)} />
           </div>
-          <MockAuthToggle />
+          <AuthStatus user={user} />
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl px-4 py-8">{children}</main>

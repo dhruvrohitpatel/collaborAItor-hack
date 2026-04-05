@@ -20,10 +20,13 @@ import type {
   TeamCopilotExecuteResponse,
   TeamCopilotResponse
 } from "@/lib/ai/schemas";
+import type { AppRole } from "@/lib/auth/types";
 import type { Team } from "@/types/domain";
 
 type TeamCopilotPanelProps = {
   team: Team;
+  viewerRole: AppRole;
+  viewerEmail: string;
 };
 
 type CopilotIntent =
@@ -60,7 +63,11 @@ function formatTimestamp(value: string | null) {
   }).format(new Date(value));
 }
 
-export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
+export function TeamCopilotPanel({
+  team,
+  viewerRole,
+  viewerEmail
+}: TeamCopilotPanelProps) {
   const router = useRouter();
   const { push } = useToast();
   const [preview, setPreview] = useState<TeamCopilotResponse | null>(null);
@@ -70,9 +77,6 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
   const [executing, setExecuting] = useState(false);
   const [googleStatus, setGoogleStatus] = useState<GoogleConnectionStatus | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [selectedGoogleEmail, setSelectedGoogleEmail] = useState(
-    team.members[0]?.email ?? ""
-  );
 
   const [rewrite, setRewrite] = useState({
     message: "Can someone please finish their part? We are behind.",
@@ -94,6 +98,10 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
   const rewriteAudienceMissing = rewrite.audience.trim().length < 2;
   const rewriteMessageMissing = rewrite.message.trim().length < 5;
   const rewriteFormInvalid = rewriteAudienceMissing || rewriteMessageMissing;
+  const isInstructor = viewerRole === "instructor";
+  const selfStatus =
+    googleStatus?.members.find((member) => member.email.toLowerCase() === viewerEmail.toLowerCase()) ??
+    null;
 
   async function postJson<T>(url: string, body: unknown): Promise<T> {
     const response = await fetch(url, {
@@ -171,7 +179,6 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
     try {
       const result = await postJson<TeamCopilotResponse>("/api/ai/team-copilot", {
         teamId: team.id,
-        actorStudentId: team.members[0]?.id ?? null,
         intent,
         payload
       });
@@ -226,8 +233,8 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
   }
 
   async function startGoogleConnect() {
-    if (!selectedGoogleEmail) {
-      push({ kind: "error", title: "Select a member email first." });
+    if (isInstructor) {
+      push({ kind: "error", title: "Students must connect their own Google accounts." });
       return;
     }
 
@@ -235,8 +242,6 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
     try {
       const result = await postJson<{ oauthUrl: string }>("/api/google/connect/start", {
         teamId: team.id,
-        memberEmail: selectedGoogleEmail,
-        firebaseUid: null,
         returnTo: `/teams/${team.id}`
       });
       window.location.href = result.oauthUrl;
@@ -251,16 +256,14 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
   }
 
   async function revokeGoogleConnect() {
-    if (!selectedGoogleEmail) {
-      push({ kind: "error", title: "Select a member email first." });
+    if (isInstructor) {
+      push({ kind: "error", title: "Students must disconnect their own Google accounts." });
       return;
     }
 
     setGoogleLoading(true);
     try {
-      await postJson<{ ok: true }>("/api/google/connect/revoke", {
-        memberEmail: selectedGoogleEmail
-      });
+      await postJson<{ ok: true }>("/api/google/connect/revoke", {});
       push({
         kind: "success",
         title: "Google connection removed"
@@ -317,39 +320,27 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
         <CardHeader className="pb-4">
           <CardTitle className="text-base">Google Connections</CardTitle>
           <CardDescription>
-            Connect each teammate&apos;s Google account for richer invite handling. Meeting invites
-            can still be sent with partial connections.
+            {isInstructor
+              ? "Instructors can audit connection coverage. Students must connect their own Google accounts."
+              : "Connect your Google account for richer invite handling. Meeting invites can still be sent with partial connections."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
-            <Select value={selectedGoogleEmail} onValueChange={setSelectedGoogleEmail}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select team member email" />
-              </SelectTrigger>
-              <SelectContent>
-                {team.members.map((member) => (
-                  <SelectItem key={member.id} value={member.email}>
-                    {member.name} · {member.email}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              onClick={startGoogleConnect}
-              disabled={googleLoading || !selectedGoogleEmail}
-            >
-              Connect Google
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={revokeGoogleConnect}
-              disabled={googleLoading || !selectedGoogleEmail}
-            >
-              Disconnect
-            </Button>
-          </div>
+          {isInstructor ? (
+            <div className="rounded-md border bg-slate-50 px-3 py-3 text-xs text-slate-700">
+              Student-owned OAuth only in v1. Share this page with a signed-in student if their account still needs Calendar access.
+            </div>
+          ) : (
+            <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
+              <Input value={selfStatus?.email ?? viewerEmail} readOnly disabled />
+              <Button variant="outline" onClick={startGoogleConnect} disabled={googleLoading}>
+                Connect Google
+              </Button>
+              <Button variant="ghost" onClick={revokeGoogleConnect} disabled={googleLoading}>
+                Disconnect
+              </Button>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
             {(googleStatus?.members ?? team.members.map((member) => ({
