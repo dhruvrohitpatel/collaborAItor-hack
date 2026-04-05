@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { callGeminiForJSON } from "@/lib/ai/gemini";
 import { generateMockProfile, hasGeminiCredentials } from "@/lib/ai/mock";
 import { buildProfilePrompt } from "@/lib/ai/prompts";
 import {
@@ -11,20 +12,23 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { student } = aiProfileRequestSchema.parse(body);
 
-  const prompt = buildProfilePrompt(student);
-
   if (hasGeminiCredentials()) {
-    // TODO: Replace this mock fallback with a real Vertex AI / Gemini call.
-    // Keep prompt usage explicit so integration can be dropped in quickly.
-    void prompt;
+    try {
+      const prompt = buildProfilePrompt(student);
+      const raw = await callGeminiForJSON(prompt);
 
-    const generated = await generateMockProfile(student);
-    return NextResponse.json(
-      aiProfileResponseSchema.parse({
-        ...generated,
+      const validated = aiProfileResponseSchema.parse({
+        ...(raw as object),
         profileSource: "ai"
-      })
-    );
+      });
+
+      return NextResponse.json(validated);
+    } catch (err) {
+      // Log enough context to diagnose without leaking prompt content or PII.
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[profile] Gemini call failed for student ${student.id}: ${message}`);
+      // Fall through to deterministic mock so the demo never breaks.
+    }
   }
 
   const mock = await generateMockProfile(student);

@@ -4,13 +4,23 @@ import { generateTeamsForProfiles } from "@/lib/repo";
 import { generateTeamsInputSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({}));
-  const payload = generateTeamsInputSchema.parse(body);
+  try {
+    const body = await request.json().catch(() => ({}));
+    const payload = generateTeamsInputSchema.parse(body);
 
-  const teams = await generateTeamsForProfiles(payload.teamSize);
+    const teams = await generateTeamsForProfiles(payload.teamSize);
 
-  return NextResponse.json({
-    ok: true,
-    teams: teams.length
-  });
+    return NextResponse.json({
+      ok: true,
+      teams: teams.length
+    });
+  } catch (error: unknown) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
+  }
 }

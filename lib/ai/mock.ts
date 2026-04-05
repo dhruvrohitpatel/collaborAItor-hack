@@ -1,5 +1,12 @@
-import type { AICharterResponse, AIProfileResponse } from "@/lib/ai/schemas";
-import type { StudentIntake, Team } from "@/types/domain";
+import type { AICharterRequest, AICharterResponse, AIGenerateTeamsRationaleRequest, AIProfileResponse } from "@/lib/ai/schemas";
+import type { DisengagementCandidate } from "@/lib/ai/participation";
+import type { ParticipationSignal, StudentIntake } from "@/types/domain";
+
+function scoreLevel(value: number): string {
+  if (value >= 75) return "strong";
+  if (value >= 50) return "moderate";
+  return "limited";
+}
 
 function hashString(input: string) {
   let hash = 0;
@@ -46,51 +53,107 @@ export async function generateMockProfile(
       student.preferredRole
     ],
     leadershipSignal,
+    riskFlags: [],
     profileSource: "mock"
   };
 }
 
-export async function generateMockRationale(team: Team): Promise<string> {
-  const strengthMix = new Set(team.members.flatMap((member) => member.strengths));
-  const growthThemes = new Set(team.members.flatMap((member) => member.growthAreas));
+export async function generateMockRationale(
+  payload: AIGenerateTeamsRationaleRequest
+): Promise<string> {
+  const { teamId, memberNames, scoreSummary, riskFlags } = payload;
 
-  return `Team ${team.id} combines ${strengthMix.size} distinct strengths with complementary growth goals in ${Array.from(growthThemes)
-    .slice(0, 2)
-    .join(" and ")}. The grouping favors overlap in working windows while balancing communication styles and leadership signals.`;
+  const skillLine = `${teamId} brings ${scoreLevel(scoreSummary.skillDiversity)} skill diversity across ${memberNames.length} members`;
+  const availLine = `availability overlap is ${scoreLevel(scoreSummary.availabilityOverlap)}`;
+  const balanceLine = `communication and leadership balance is ${scoreLevel(scoreSummary.communicationBalance)}`;
+
+  const flagLine =
+    riskFlags.length > 0
+      ? ` One area to watch: ${riskFlags[0].label.toLowerCase()}.`
+      : " No critical coordination risks were flagged.";
+
+  return `${skillLine}, with ${availLine} and ${balanceLine}. Growth opportunity fit is ${scoreLevel(scoreSummary.growthOpportunityFit)}, suggesting members can learn meaningfully from each other.${flagLine}`;
 }
 
 export async function generateMockCharter(
-  teamName: string,
-  memberNames: string[]
+  payload: AICharterRequest
 ): Promise<AICharterResponse> {
+  const { teamName, memberNames, projectTheme, communicationStyles, riskFlags } = payload;
+
+  const styleNote =
+    communicationStyles.length > 0
+      ? `a ${[...new Set(communicationStyles)].join("/")} communication dynamic`
+      : "mixed communication styles";
+
+  const riskNote =
+    riskFlags.some((f) => f.severity === "high" || f.severity === "medium")
+      ? ` Given ${riskFlags[0].label.toLowerCase()}, members commit to surfacing blockers within 24 hours.`
+      : " Members commit to surfacing blockers within 24 hours.";
+
+  const roles = ["Facilitator", "Project Tracker", "QA/Reviewer", "Demo Lead", "Scribe"];
+
   return {
-    charter: `${teamName} agrees to deliver work in weekly milestones, surface blockers within 24 hours, and document decisions in a shared note. Members (${memberNames.join(", ")}) commit to respectful feedback and rotating facilitation duties.`,
-    suggestedRoleRotation: [
-      "Week 1: Facilitator",
-      "Week 2: Project Tracker",
-      "Week 3: QA/Reviewer",
-      "Week 4: Demo Lead"
-    ],
+    charter:
+      `${teamName} operates with ${styleNote} and delivers work in weekly milestones tied to the ${projectTheme} scope.` +
+      ` A standing async update is posted by end of each Monday; a 30-minute sync is held mid-week for blockers only.` +
+      riskNote,
+    suggestedRoleRotation: memberNames.map(
+      (name, i) => `${name} — ${roles[i % roles.length]}`
+    ),
     kickoffChecklist: [
-      "Align project scope and definition of done",
-      "Set recurring meeting cadence",
-      "Assign first-week tasks and owners",
-      "Decide communication channel norms"
+      `Agree on the primary async channel for ${projectTheme} updates`,
+      "Define milestone owners and delivery format for week one",
+      "Set the quality bar and review checklist before first submission",
+      "Schedule the mid-week sync and confirm attendance expectations",
+      ...(riskFlags.some((f) => f.severity === "high")
+        ? [`Address "${riskFlags.find((f) => f.severity === "high")!.label}" before sprint start`]
+        : [])
     ]
   };
 }
 
 export async function summarizeMeetingNotes(notes: string) {
-  const condensed = notes.split("\n").filter(Boolean).slice(0, 2).join(" ");
-  return {
-    summary: condensed || "Team reviewed goals, blockers, and immediate next steps.",
-    actionItems: [
-      "Document open decisions in project tracker",
-      "Assign owners for next milestone deliverables",
-      "Schedule mid-week async check-in"
-    ],
-    ownersNeeded: ["Facilitator", "Tracker", "Reviewer"]
-  };
+  const lines = notes.split("\n").map((l) => l.trim()).filter(Boolean);
+
+  // Summary: first two substantive lines joined into a sentence.
+  const summaryBase = lines.slice(0, 3).join(" ").replace(/\s+/g, " ");
+  const summary = summaryBase.length >= 10
+    ? summaryBase.endsWith(".") ? summaryBase : `${summaryBase}.`
+    : "Team reviewed progress, surfaced blockers, and identified next steps.";
+
+  // Action items: lines containing action keywords; extract trailing owner hint.
+  const actionKeywords = /\b(will|should|needs? to|must|action:|todo:|follow.?up|assign|complete|finish|update|fix|send|schedule|confirm|review|prepare)\b/i;
+  const ownerPattern = /^([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\s+(will|should|needs? to|must)\b/i;
+
+  const extracted = lines
+    .filter((line) => actionKeywords.test(line))
+    .slice(0, 5)
+    .map((line) => {
+      const ownerMatch = line.match(ownerPattern);
+      const owner = ownerMatch ? ownerMatch[1] : "";
+      // Strip leading name + verb from task description.
+      const task = ownerMatch
+        ? line.replace(ownerPattern, "").trim()
+        : line.replace(/^[-*•]\s*/, "").replace(/^(action:|todo:)\s*/i, "");
+      return { task: task.charAt(0).toUpperCase() + task.slice(1), owner };
+    });
+
+  const actionItems =
+    extracted.length > 0
+      ? extracted
+      : [
+          { task: "Document open decisions in shared project notes", owner: "" },
+          { task: "Assign owners for next milestone deliverables", owner: "" },
+          { task: "Schedule mid-week async check-in", owner: "" }
+        ];
+
+  // Open questions: lines ending with "?" or containing "question" / "unclear".
+  const openQuestions = lines
+    .filter((line) => line.endsWith("?") || /\b(question|unclear|TBD|who|when|which)\b/i.test(line))
+    .slice(0, 3)
+    .map((line) => line.replace(/^[-*•]\s*/, ""));
+
+  return { summary, actionItems, openQuestions };
 }
 
 export async function rewriteMessage(
@@ -98,15 +161,82 @@ export async function rewriteMessage(
   tone: "polite" | "direct" | "encouraging" | "professional",
   audience: string
 ) {
-  const tonePrefix: Record<typeof tone, string> = {
-    polite: "Hi team,",
-    direct: "Team,",
-    encouraging: "Hi everyone, great progress so far.",
-    professional: "Hello team,"
+  // Normalize: trim, strip trailing punctuation clusters, sentence-case.
+  const base = message.trim().replace(/[!?]+$/, "").replace(/\s+/g, " ");
+  const sentenceCased = base.charAt(0).toUpperCase() + base.slice(1);
+
+  // Replace common rough patterns across all tones.
+  const softened = sentenceCased
+    .replace(/\b(just do it|get it done|why haven't you|you need to|you must)\b/gi, "please prioritize")
+    .replace(/\b(failed|messed up|screwed up)\b/gi, "ran into an issue")
+    .replace(/\b(can't|won't)\b/gi, (m) => (m === "can't" ? "am not able to" : "will not"));
+
+  const openers: Record<typeof tone, string> = {
+    polite: `Hi ${audience},`,
+    direct: `${audience.charAt(0).toUpperCase() + audience.slice(1)} —`,
+    encouraging: `Hey ${audience}, making good progress here —`,
+    professional: `Hello ${audience},`
   };
 
-  return {
-    rewrittenMessage: `${tonePrefix[tone]} For ${audience}, here is a clearer version: ${message.trim()} Please confirm alignment by end of day.`,
-    notes: "Mock rewrite used. Connect Gemini for nuanced tone adaptation."
+  const closers: Record<typeof tone, string> = {
+    polite: "Let me know if you have any questions.",
+    direct: "Please confirm receipt.",
+    encouraging: "Appreciate everyone's effort on this.",
+    professional: "Please acknowledge by end of day."
   };
+
+  const notesMap: Record<typeof tone, string> = {
+    polite: "Softened directive language and added a collaborative opener to reduce friction.",
+    direct: "Removed filler and restructured to lead with the core ask.",
+    encouraging: "Reframed around progress and shared effort rather than the gap.",
+    professional: "Standardized to neutral, structured language appropriate for a formal audience."
+  };
+
+  const body =
+    tone === "direct"
+      ? softened.replace(/^(hey|hi|hello)[^,]*,\s*/i, "")
+      : softened;
+
+  return {
+    rewrittenMessage: `${openers[tone]} ${body} ${closers[tone]}`.replace(/\s{2,}/g, " ").trim(),
+    notes: notesMap[tone]
+  };
+}
+
+export function generateMockCoachingAlerts(
+  teamId: string,
+  signals: ParticipationSignal[],
+  candidates: DisengagementCandidate[]
+) {
+  const alerts = candidates.map((c) => {
+    const { signal, reasons, severity } = c;
+
+    const reasonText =
+      `${signal.memberName} appears to have reduced activity: ${reasons.join(" and ")}.`;
+
+    const followUpMap: Record<typeof severity, string> = {
+      high: `Send ${signal.memberName} a brief private check-in to see if they need support.`,
+      medium: `Mention in the next team sync that all voices are needed and check in with ${signal.memberName} afterward.`,
+      low: `Monitor for another 2–3 days; if the pattern continues, send a brief check-in.`
+    };
+
+    return {
+      flaggedMember: signal.memberName,
+      memberId: signal.memberId,
+      reason: reasonText,
+      suggestedFollowUp: followUpMap[severity],
+      severity,
+      participationShare: signal.sharePercent,
+      daysSilent: signal.daysSilent
+    };
+  });
+
+  const participationSummary = signals.map((s) => ({
+    memberName: s.memberName,
+    messageCount: s.messageCount,
+    sharePercent: s.sharePercent,
+    lastActiveAt: s.lastActiveAt
+  }));
+
+  return { teamId, hasAlert: alerts.length > 0, alerts, participationSummary };
 }

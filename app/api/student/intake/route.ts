@@ -4,13 +4,23 @@ import { addStudentIntake } from "@/lib/repo";
 import { studentIntakeSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const payload = studentIntakeSchema.parse(body);
+  try {
+    const body = await request.json();
+    const payload = studentIntakeSchema.parse(body);
 
-  const student = await addStudentIntake(payload);
+    const student = await addStudentIntake(payload);
 
-  return NextResponse.json({
-    ok: true,
-    studentId: student.id
-  });
+    return NextResponse.json({
+      ok: true,
+      studentId: student.id
+    });
+  } catch (error: unknown) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
+  }
 }

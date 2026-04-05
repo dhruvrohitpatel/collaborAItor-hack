@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { ScoreSummary } from "@/components/teams/score-summary";
 import { RiskBadge } from "@/components/teams/risk-badge";
+import { DisengagementPanel } from "@/components/teams/disengagement-panel";
 import { AiToolsPanel } from "@/components/tools/ai-tools-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTeamById } from "@/lib/repo";
@@ -57,6 +58,10 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <DisengagementPanel teamId={team.id} members={team.members} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Generated Charter</CardTitle>
@@ -89,6 +94,11 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
         <AiToolsPanel
           defaultTeamName={team.id}
           defaultMembers={team.members.map((member) => member.name)}
+          communicationStyles={team.members.map((member) => member.communicationStyle)}
+          riskFlags={team.riskFlags.map((flag) => ({
+            label: flag.label,
+            severity: flag.severity
+          }))}
         />
       </div>
     </div>

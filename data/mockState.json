@@ -452,7 +452,7 @@
       ],
       "leadershipSignal": "high",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.907Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-02",
@@ -496,7 +496,7 @@
       ],
       "leadershipSignal": "emerging",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-03",
@@ -540,7 +540,7 @@
       ],
       "leadershipSignal": "medium",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-04",
@@ -584,7 +584,7 @@
       ],
       "leadershipSignal": "medium",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-05",
@@ -628,7 +628,7 @@
       ],
       "leadershipSignal": "high",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-06",
@@ -672,7 +672,7 @@
       ],
       "leadershipSignal": "medium",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-07",
@@ -716,7 +716,7 @@
       ],
       "leadershipSignal": "high",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-08",
@@ -760,7 +760,7 @@
       ],
       "leadershipSignal": "emerging",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-09",
@@ -804,7 +804,7 @@
       ],
       "leadershipSignal": "high",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-10",
@@ -848,7 +848,7 @@
       ],
       "leadershipSignal": "medium",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-11",
@@ -892,7 +892,7 @@
       ],
       "leadershipSignal": "medium",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     },
     {
       "id": "stu-12",
@@ -936,7 +936,7 @@
       ],
       "leadershipSignal": "emerging",
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+      "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
     }
   ],
   "teams": [
@@ -985,7 +985,7 @@
           ],
           "leadershipSignal": "high",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.907Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-02",
@@ -1029,7 +1029,7 @@
           ],
           "leadershipSignal": "emerging",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-03",
@@ -1073,7 +1073,7 @@
           ],
           "leadershipSignal": "medium",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-10",
@@ -1117,7 +1117,7 @@
           ],
           "leadershipSignal": "medium",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         }
       ],
       "rationale": "Team-1 was formed with balanced collaboration signals across Avery Chen, Noah Ramirez, Mina Patel, Arjun Desai. Composite score 47 emphasizes skill diversity (100) and growth opportunity fit (13) while flagging coordination risks for instructor review.",
@@ -1199,7 +1199,7 @@
           ],
           "leadershipSignal": "high",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-09",
@@ -1243,7 +1243,7 @@
           ],
           "leadershipSignal": "high",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-11",
@@ -1287,7 +1287,7 @@
           ],
           "leadershipSignal": "medium",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-12",
@@ -1331,7 +1331,7 @@
           ],
           "leadershipSignal": "emerging",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         }
       ],
       "rationale": "Team-2 was formed with balanced collaboration signals across Sofia Nguyen, Grace Kim, Hannah Lee, Jordan Miller. Composite score 37 emphasizes skill diversity (100) and growth opportunity fit (13) while flagging coordination risks for instructor review.",
@@ -1413,7 +1413,7 @@
           ],
           "leadershipSignal": "high",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-04",
@@ -1457,7 +1457,7 @@
           ],
           "leadershipSignal": "medium",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-06",
@@ -1501,7 +1501,7 @@
           ],
           "leadershipSignal": "medium",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         },
         {
           "id": "stu-08",
@@ -1545,7 +1545,7 @@
           ],
           "leadershipSignal": "emerging",
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-04T20:17:47.908Z"
+          "profileGeneratedAt": "2026-04-04T22:04:52.826Z"
         }
       ],
       "rationale": "Team-3 was formed with balanced collaboration signals across Isabella Torres, Ethan Brooks, Liam Okafor, Mateo Silva. Composite score 45 emphasizes skill diversity (100) and growth opportunity fit (25) while flagging coordination risks for instructor review.",
@@ -1583,5 +1583,5 @@
       }
     }
   ],
-  "updatedAt": "2026-04-04T20:17:47.915Z"
+  "updatedAt": "2026-04-04T22:04:52.827Z"
 }
