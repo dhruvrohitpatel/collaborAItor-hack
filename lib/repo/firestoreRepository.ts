@@ -10,6 +10,7 @@ import {
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 import {
   collaborationProfileSchema,
+  demoStateMetaSchema,
   studentIntakeSchema,
   teamCopilotRunSchema,
   teamMeetingSchema,
@@ -24,6 +25,11 @@ import type {
   TeamMeeting,
   TeamTask
 } from "@/types/domain";
+import type { StudentIntake, StudentProfile, Team } from "@/types/domain";
+import type { DemoStateMetaInput } from "@/lib/schemas";
+
+const META_COLLECTION = "meta";
+const DEMO_STATE_META_DOC = "demo-state";
 
 function getConfiguredFirestoreDb() {
   if (!isFirebaseConfigured) {
@@ -109,6 +115,15 @@ export async function getFirestoreStudents(): Promise<StudentIntake[]> {
 }
 
 export async function addFirestoreStudentIntake(input: StudentIntake): Promise<StudentIntake> {
+  const db = getConfiguredFirestoreDb();
+  const student = studentIntakeSchema.parse(input);
+
+  await setDoc(doc(db, "students", student.id), student);
+
+  return student;
+}
+
+export async function updateFirestoreStudentIntake(input: StudentIntake): Promise<StudentIntake> {
   const db = getConfiguredFirestoreDb();
   const student = studentIntakeSchema.parse(input);
 
@@ -274,4 +289,24 @@ export async function addFirestoreCopilotRun(
   await setDoc(doc(db, "teams", teamId, "copilot_runs", validatedRun.id), validatedRun);
 
   return validatedRun;
+export async function getFirestoreStateMeta(): Promise<DemoStateMetaInput | null> {
+  const db = getConfiguredFirestoreDb();
+  const metaDoc = await getDoc(doc(db, META_COLLECTION, DEMO_STATE_META_DOC));
+
+  if (!metaDoc.exists()) {
+    return null;
+  }
+
+  return demoStateMetaSchema.parse(metaDoc.data());
+}
+
+export async function saveFirestoreStateMeta(
+  meta: DemoStateMetaInput
+): Promise<DemoStateMetaInput> {
+  const db = getConfiguredFirestoreDb();
+  const parsedMeta = demoStateMetaSchema.parse(meta);
+
+  await setDoc(doc(db, META_COLLECTION, DEMO_STATE_META_DOC), parsedMeta);
+
+  return parsedMeta;
 }

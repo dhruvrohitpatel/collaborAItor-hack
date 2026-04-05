@@ -14,6 +14,24 @@ export const aiProfileResponseSchema = z.object({
   profileSource: z.enum(["mock", "ai"]).default("mock")
 });
 
+export const aiBatchProfileItemSchema = z.object({
+  studentId: z.string().min(1),
+  profileSummary: z.string().min(10),
+  inferredTags: z.array(z.string().min(1)).min(1),
+  leadershipSignal: z.enum(["high", "medium", "emerging"]),
+  riskFlags: z.array(riskFlagSchema).default([])
+});
+
+export const aiBatchProfileResponseSchema = z.object({
+  profiles: z.array(aiBatchProfileItemSchema)
+});
+
+export const aiResponseMetaSchema = z.object({
+  provider: z.enum(["gemini", "mock"]),
+  model: z.string().min(1),
+  fallbackReason: z.string().nullable().default(null)
+});
+
 export const aiGenerateTeamsRationaleRequestSchema = z.object({
   teamId: z.string(),
   memberNames: z.array(z.string()).min(1),
@@ -99,6 +117,8 @@ export const aiRewriteMessageResponseSchema = z.object({
 
 export type AIProfileRequest = z.infer<typeof aiProfileRequestSchema>;
 export type AIProfileResponse = z.infer<typeof aiProfileResponseSchema>;
+export type AIBatchProfileResponse = z.infer<typeof aiBatchProfileResponseSchema>;
+export type AIResponseMeta = z.infer<typeof aiResponseMetaSchema>;
 export type AIGenerateTeamsRationaleRequest = z.infer<typeof aiGenerateTeamsRationaleRequestSchema>;
 export type AIGenerateTeamsRationaleResponse = z.infer<typeof aiGenerateTeamsRationaleResponseSchema>;
 export type AICharterRequest = z.infer<typeof aiCharterRequestSchema>;
