@@ -160,15 +160,44 @@ export async function rewriteMessage(
   tone: "polite" | "direct" | "encouraging" | "professional",
   audience: string
 ) {
-  const tonePrefix: Record<typeof tone, string> = {
-    polite: "Hi team,",
-    direct: "Team,",
-    encouraging: "Hi everyone, great progress so far.",
-    professional: "Hello team,"
+  // Normalize: trim, strip trailing punctuation clusters, sentence-case.
+  const base = message.trim().replace(/[!?]+$/, "").replace(/\s+/g, " ");
+  const sentenceCased = base.charAt(0).toUpperCase() + base.slice(1);
+
+  // Replace common rough patterns across all tones.
+  const softened = sentenceCased
+    .replace(/\b(just do it|get it done|why haven't you|you need to|you must)\b/gi, "please prioritize")
+    .replace(/\b(failed|messed up|screwed up)\b/gi, "ran into an issue")
+    .replace(/\b(can't|won't)\b/gi, (m) => (m === "can't" ? "am not able to" : "will not"));
+
+  const openers: Record<typeof tone, string> = {
+    polite: `Hi ${audience},`,
+    direct: `${audience.charAt(0).toUpperCase() + audience.slice(1)} —`,
+    encouraging: `Hey ${audience}, making good progress here —`,
+    professional: `Hello ${audience},`
   };
 
+  const closers: Record<typeof tone, string> = {
+    polite: "Let me know if you have any questions.",
+    direct: "Please confirm receipt.",
+    encouraging: "Appreciate everyone's effort on this.",
+    professional: "Please acknowledge by end of day."
+  };
+
+  const notesMap: Record<typeof tone, string> = {
+    polite: "Softened directive language and added a collaborative opener to reduce friction.",
+    direct: "Removed filler and restructured to lead with the core ask.",
+    encouraging: "Reframed around progress and shared effort rather than the gap.",
+    professional: "Standardized to neutral, structured language appropriate for a formal audience."
+  };
+
+  const body =
+    tone === "direct"
+      ? softened.replace(/^(hey|hi|hello)[^,]*,\s*/i, "")
+      : softened;
+
   return {
-    rewrittenMessage: `${tonePrefix[tone]} For ${audience}, here is a clearer version: ${message.trim()} Please confirm alignment by end of day.`,
-    notes: "Mock rewrite used. Connect Gemini for nuanced tone adaptation."
+    rewrittenMessage: `${openers[tone]} ${body} ${closers[tone]}`.replace(/\s{2,}/g, " ").trim(),
+    notes: notesMap[tone]
   };
 }

@@ -92,8 +92,9 @@ export const aiRewriteMessageRequestSchema = z.object({
 });
 
 export const aiRewriteMessageResponseSchema = z.object({
-  rewrittenMessage: z.string(),
-  notes: z.string()
+  rewrittenMessage: z.string().min(10),
+  /** One sentence explaining the key rewrite decision (tone shift, softened language, etc.). */
+  notes: z.string().min(5)
 });
 
 export type AIProfileRequest = z.infer<typeof aiProfileRequestSchema>;
@@ -102,3 +103,5 @@ export type AIGenerateTeamsRationaleRequest = z.infer<typeof aiGenerateTeamsRati
 export type AIGenerateTeamsRationaleResponse = z.infer<typeof aiGenerateTeamsRationaleResponseSchema>;
 export type AICharterRequest = z.infer<typeof aiCharterRequestSchema>;
 export type AICharterResponse = z.infer<typeof aiCharterResponseSchema>;
+export type AIRewriteMessageRequest = z.infer<typeof aiRewriteMessageRequestSchema>;
+export type AIRewriteMessageResponse = z.infer<typeof aiRewriteMessageResponseSchema>;

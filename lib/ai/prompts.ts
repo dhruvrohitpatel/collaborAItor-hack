@@ -155,11 +155,33 @@ export function buildMeetingSummaryPrompt(notes: string) {
 }
 
 export function buildRewritePrompt(message: string, tone: string, audience: string) {
+  const toneGuide: Record<string, string> = {
+    polite: "warm and respectful — soften demands, acknowledge effort, avoid blame",
+    direct: "clear and concise — remove filler words, lead with the ask, no hedging",
+    encouraging: "positive and motivating — name progress, frame challenges as opportunities",
+    professional: "neutral and formal — structured sentences, no colloquialisms, task-focused"
+  };
+  const guide = toneGuide[tone] ?? "clear and appropriate for a team context";
+
   return [
-    "Rewrite this message for professional team communication.",
-    `Audience: ${audience}`,
-    `Tone: ${tone}`,
-    "Message:",
+    "You are rewriting a team message to improve clarity and professionalism.",
+    "Return ONLY a JSON object — no markdown, no preamble.",
+    "",
+    "Required JSON shape:",
+    '{',
+    '  "rewrittenMessage": "<rewritten message text>",',
+    '  "notes": "<one sentence explaining the key rewrite decision>"',
+    '}',
+    "",
+    "Rules:",
+    `- Tone: ${tone} — ${guide}.`,
+    `- Audience: ${audience}.`,
+    "- Preserve the original intent exactly — do not add tasks, deadlines, or commitments not in the original.",
+    "- rewrittenMessage: complete, ready-to-send text. No placeholders.",
+    "- notes: one sentence naming the primary change (e.g. 'Replaced blame framing with shared ownership language.').",
+    "- Do not start rewrittenMessage with 'I' if the original does not.",
+    "",
+    "Original message:",
     message
   ].join("\n");
 }
