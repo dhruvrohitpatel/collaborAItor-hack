@@ -29,8 +29,8 @@ export default function LandingPage() {
             <Link href="/instructor" className={buttonVariants({})}>
               Open Instructor Dashboard <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
-            <Link href="/student/intake" className={buttonVariants({ variant: "outline" })}>
-              Open Student Intake
+            <Link href="/student/questionnaire" className={buttonVariants({ variant: "outline" })}>
+              Open Student Onboarding
             </Link>
           </div>
         </div>

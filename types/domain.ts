@@ -15,6 +15,27 @@ export type AvailabilitySlot = {
   end: string;
 };
 
+export type StudentRosterRecord = {
+  section?: string;
+  cohort?: string;
+  rosterSource?: "seed" | "manual" | "import";
+};
+
+export type StudentQuestionnaire = {
+  classPriority?: "low" | "medium" | "high";
+  weeklyCapacityHours?: number;
+  externalCommitments?: string;
+  scheduleConfidence?: "tight" | "manageable" | "flexible";
+  academicConfidence?: "needs_support" | "steady" | "strong";
+  priorExperience?: string[];
+  communicationHabits?: string[];
+  leadershipPreference?: "avoid" | "supporting" | "comfortable" | "prefer";
+  collaborationStylePreferences?: string[];
+  classGoals?: string[];
+  openReflection?: string;
+  completedAt?: string;
+};
+
 export type StudentIntake = {
   id: string;
   name: string;
@@ -27,6 +48,8 @@ export type StudentIntake = {
   communicationStyle: CommunicationStyle;
   collaborationPreferences: string[];
   shortReflection: string;
+  roster?: StudentRosterRecord;
+  questionnaire?: StudentQuestionnaire;
 };
 
 export type StudentProfile = StudentIntake & {
@@ -64,7 +87,11 @@ export type TeamTaskStatus = "todo" | "in_progress" | "blocked" | "done";
 
 export type TeamTaskPriority = "low" | "medium" | "high";
 
-export type TeamTaskSource = "manual" | "meeting_followup" | "weekly_pulse" | "copilot";
+export type TeamTaskSource =
+  | "manual"
+  | "meeting_followup"
+  | "weekly_pulse"
+  | "copilot";
 
 export type TeamTask = {
   id: string;
@@ -82,7 +109,11 @@ export type TeamTask = {
   createdByStudentId: string | null;
 };
 
-export type TeamMeetingStatus = "proposed" | "scheduled" | "completed" | "cancelled";
+export type TeamMeetingStatus =
+  | "proposed"
+  | "scheduled"
+  | "completed"
+  | "cancelled";
 
 export type TeamMeetingSlot = {
   startAt: string;
@@ -119,7 +150,11 @@ export type TeamCopilotIntent =
   | "meeting_followup"
   | "weekly_pulse";
 
-export type TeamCopilotRunStatus = "preview" | "approved" | "executed" | "failed";
+export type TeamCopilotRunStatus =
+  | "preview"
+  | "approved"
+  | "executed"
+  | "failed";
 
 export type TeamCopilotPreviewSection = {
   title: string;
@@ -160,6 +195,37 @@ export type Team = {
   riskFlags: RiskFlag[];
   scoreSummary: TeamScoreBreakdown;
   support: TeamSupportArtifacts;
+  projectTheme: string;
+  currentMilestone: string | null;
+  preferredMeetingDurationMin: number;
+  aiOptIn: boolean;
+  teamNorms: string[];
+  lastPulseAt: string | null;
+  activeMeetingId: string | null;
+};
+
+export type BadgeSubjectType = "student" | "team";
+
+export type BadgeType = "good_standing";
+
+export type BadgeProofStatus =
+  | "none"
+  | "reference_prepared"
+  | "anchored_devnet";
+
+export type BadgeCredential = {
+  id: string;
+  subjectType: BadgeSubjectType;
+  subjectId: string;
+  badgeType: BadgeType;
+  isActive: boolean;
+  issuedAt: string | null;
+  updatedAt: string;
+  reasonSummary: string;
+  solanaNetwork: "devnet";
+  solanaReference: string | null;
+  transactionSignature: string | null;
+  proofStatus: BadgeProofStatus;
   projectTheme: string;
   currentMilestone: string | null;
   preferredMeetingDurationMin: number;
@@ -239,7 +305,11 @@ export type MoveStudentResponse =
   | {
       ok: true;
       status: "moved";
-      resolution: "simple_move" | "swap_move" | "reroute_move" | "force_override_move";
+      resolution:
+        | "simple_move"
+        | "swap_move"
+        | "reroute_move"
+        | "force_override_move";
       teams: Team[];
     }
   | {

@@ -14,18 +14,26 @@ import { normalizeDemoState } from "@/lib/demo-state";
 import {
   addFirestoreStudentIntake,
   clearFirestoreTeams,
+  getFirestoreBadgeBySubject,
+  getFirestoreBadgesBySubjectType,
   getFirestoreStateMeta,
   getFirestoreProfiles,
   saveFirestoreTeam,
   getFirestoreStudents,
   getFirestoreTeamById,
   getFirestoreTeams,
+  saveFirestoreBadge,
+  saveFirestoreBadges,
   saveFirestoreProfiles,
   saveFirestoreStateMeta,
   saveFirestoreTeams,
   updateFirestoreStudentIntake
 } from "@/lib/repo/firestoreRepository";
-import { mergeTeamWorkspace, normalizeTeamWorkspace } from "@/lib/team-workspace";
+import {
+  mergeTeamWorkspace,
+  normalizeTeamWorkspace
+} from "@/lib/team-workspace";
+import { buildTeamGoodStandingBadge } from "@/lib/solana/badges";
 import {
   addStudentIntake as addMockStudentIntake,
   generateProfilesForStudents as generateMockProfilesForStudents,
@@ -41,7 +49,9 @@ import {
 import {
   generateTeamsInputSchema,
   moveStudentInputSchema,
-  moveStudentRequestSchema
+  moveStudentRequestSchema,
+  questionnaireSubmissionSchema,
+  rosterSetupInputSchema
 } from "@/lib/schemas";
 import {
   applyInstructorSwap,
@@ -55,13 +65,75 @@ import {
   getTopSwapSuggestions
 } from "@/lib/teamFormation";
 import type {
+  BadgeCredential,
   DemoState,
   DestinationFullResolution,
   MoveStudentRequest,
   MoveStudentResponse,
   StudentIntake,
+  StudentQuestionnaire,
+  StudentProfile,
   Team
 } from "@/types/domain";
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function buildStudentId(name: string, email: string) {
+  const emailLocal = email.split("@")[0] ?? "";
+  const base = slugify(`${name}-${emailLocal}`).slice(0, 24);
+  return base ? `stu-${base}` : `stu-${Date.now()}`;
+}
+
+function buildRosterDefaults(
+  name: string,
+  email: string,
+  section?: string,
+  cohort?: string
+): StudentIntake {
+  return {
+    id: buildStudentId(name, email),
+    name,
+    email,
+    timezone: "America/Phoenix",
+    availability: [{ day: "Mon", start: "17:00", end: "19:00" }],
+    strengths: ["collaboration", "reliability"],
+    growthAreas: ["technical depth", "project planning"],
+    preferredRole: "General contributor",
+    communicationStyle: "collaborative",
+    collaborationPreferences: ["shared docs", "weekly check-ins"],
+    shortReflection:
+      "Roster record created before student questionnaire completion.",
+    roster: {
+      section,
+      cohort,
+      rosterSource: "manual"
+    }
+  };
+}
+
+async function saveStudentRecord(student: StudentIntake) {
+  if (isMockDataEnabled()) {
+    return addMockStudentIntake(student);
+  }
+
+  return addFirestoreStudentIntake(student);
+}
+
+async function getStudentByEmail(email: string) {
+  const normalized = email.trim().toLowerCase();
+  const students = await getStudents();
+
+  return (
+    students.find(
+      (student) => student.email.trim().toLowerCase() === normalized
+    ) ?? null
+  );
+}
 
 function buildEmptyDemoState(students: StudentIntake[]): DemoState {
   const now = new Date().toISOString();
@@ -132,10 +204,16 @@ async function ensureDerivedFirestoreState(
 async function persistFirestoreTeams(
   state: Pick<
     DemoState,
-    "students" | "profiles" | "teams" | "studentsUpdatedAt" | "profilesUpdatedAt" | "teamsUpdatedAt"
+    | "students"
+    | "profiles"
+    | "teams"
+    | "studentsUpdatedAt"
+    | "profilesUpdatedAt"
+    | "teamsUpdatedAt"
   >
 ) {
   const savedTeams = await saveFirestoreTeams(state.teams);
+  await syncTeamBadges(savedTeams);
   const nextState = normalizeDemoState({
     students: state.students,
     profiles: state.profiles,
@@ -151,6 +229,22 @@ async function persistFirestoreTeams(
   });
 
   return savedTeams;
+}
+
+async function syncTeamBadges(teams: Team[]) {
+  const existingBadges = await getFirestoreBadgesBySubjectType("team");
+  const existingByTeamId = new Map(
+    existingBadges.map((badge) => [badge.subjectId, badge] as const)
+  );
+
+  const nextBadges = teams.map((team) =>
+    buildTeamGoodStandingBadge({
+      team,
+      existingBadge: existingByTeamId.get(team.id) ?? null
+    })
+  );
+
+  return saveFirestoreBadges("team", nextBadges);
 }
 
 export async function getStudents(): Promise<StudentIntake[]> {
@@ -175,7 +269,11 @@ export async function loadDemoSeed(): Promise<DemoState> {
   }
 
   const students = await getFirestoreStudents();
-  await Promise.all([saveFirestoreProfiles([]), clearFirestoreTeams()]);
+  await Promise.all([
+    saveFirestoreProfiles([]),
+    clearFirestoreTeams(),
+    saveFirestoreBadges("team", [])
+  ]);
   await saveFirestoreStateMeta({
     studentsUpdatedAt: new Date().toISOString(),
     profilesUpdatedAt: null,
@@ -185,7 +283,9 @@ export async function loadDemoSeed(): Promise<DemoState> {
   return buildEmptyDemoState(students);
 }
 
-export async function addStudentIntake(input: StudentIntake): Promise<StudentIntake> {
+export async function addStudentIntake(
+  input: StudentIntake
+): Promise<StudentIntake> {
   if (isMockDataEnabled()) {
     return addMockStudentIntake(input);
   }
@@ -200,7 +300,40 @@ export async function addStudentIntake(input: StudentIntake): Promise<StudentInt
   return student;
 }
 
-export async function updateStudentIntake(input: StudentIntake): Promise<StudentIntake> {
+export async function createRosterStudent(input: {
+  name: string;
+  email: string;
+  section?: string;
+  cohort?: string;
+}): Promise<StudentIntake> {
+  const parsed = rosterSetupInputSchema.parse(input);
+  const existing = await getStudentByEmail(parsed.email);
+
+  const nextStudent: StudentIntake = existing
+    ? {
+        ...existing,
+        name: parsed.name,
+        email: parsed.email,
+        roster: {
+          ...existing.roster,
+          section: parsed.section,
+          cohort: parsed.cohort,
+          rosterSource: existing.roster?.rosterSource ?? "manual"
+        }
+      }
+    : buildRosterDefaults(
+        parsed.name,
+        parsed.email,
+        parsed.section,
+        parsed.cohort
+      );
+
+  return saveStudentRecord(nextStudent);
+}
+
+export async function updateStudentIntake(
+  input: StudentIntake
+): Promise<StudentIntake> {
   if (isMockDataEnabled()) {
     return updateMockStudentIntake(input);
   }
@@ -216,6 +349,44 @@ export async function updateStudentIntake(input: StudentIntake): Promise<Student
   return student;
 }
 
+export async function submitStudentQuestionnaire(input: {
+  name: string;
+  email: string;
+  timezone: string;
+  availability: StudentIntake["availability"];
+  strengths: string[];
+  growthAreas: string[];
+  preferredRole: string;
+  communicationStyle: StudentIntake["communicationStyle"];
+  collaborationPreferences: string[];
+  shortReflection: string;
+  questionnaire: StudentQuestionnaire;
+}): Promise<StudentIntake> {
+  const parsed = questionnaireSubmissionSchema.parse(input);
+  const existing = await getStudentByEmail(parsed.email);
+
+  const nextStudent: StudentIntake = {
+    ...(existing ?? buildRosterDefaults(parsed.name, parsed.email)),
+    name: parsed.name,
+    email: parsed.email,
+    timezone: parsed.timezone,
+    availability: parsed.availability,
+    strengths: parsed.strengths,
+    growthAreas: parsed.growthAreas,
+    preferredRole: parsed.preferredRole,
+    communicationStyle: parsed.communicationStyle,
+    collaborationPreferences: parsed.collaborationPreferences,
+    shortReflection: parsed.shortReflection,
+    questionnaire: {
+      ...existing?.questionnaire,
+      ...parsed.questionnaire,
+      completedAt: parsed.questionnaire.completedAt ?? new Date().toISOString()
+    }
+  };
+
+  return saveStudentRecord(nextStudent);
+}
+
 export async function generateProfilesForStudents(): Promise<ProfileGenerationResult> {
   if (isMockDataEnabled()) {
     const profiles = await generateMockProfilesForStudents();
@@ -226,7 +397,8 @@ export async function generateProfilesForStudents(): Promise<ProfileGenerationRe
         geminiProfilesCount: 0,
         mockProfilesCount: profiles.length,
         rateLimited: false,
-        warning: "Mock mode is enabled, so Gemini profile generation is bypassed."
+        warning:
+          "Mock mode is enabled, so Gemini profile generation is bypassed."
       }
     };
   }
@@ -259,7 +431,8 @@ export async function generateTeamsForProfiles(teamSize = 4): Promise<Team[]> {
 
   if (!profiles.length) {
     profiles = await saveFirestoreProfiles(
-      (await generateProfilesForStudentsBatched(await getFirestoreStudents())).profiles
+      (await generateProfilesForStudentsBatched(await getFirestoreStudents()))
+        .profiles
     );
     profilesUpdatedAt = new Date().toISOString();
   }
@@ -303,6 +476,38 @@ export async function saveTeam(team: Team): Promise<Team> {
   return structuredClone(saved);
 }
 
+export async function getTeamBadge(
+  teamId: string
+): Promise<BadgeCredential | null> {
+  if (isMockDataEnabled()) {
+    return null;
+  }
+
+  return getFirestoreBadgeBySubject("team", teamId);
+}
+
+export async function issueOrUpdateTeamBadge(
+  teamId: string
+): Promise<BadgeCredential> {
+  const team = await getTeamById(teamId);
+
+  if (!team) {
+    throw new Error(`Team "${teamId}" was not found.`);
+  }
+
+  if (isMockDataEnabled()) {
+    return buildTeamGoodStandingBadge({ team });
+  }
+
+  const existingBadge = await getFirestoreBadgeBySubject("team", teamId);
+  const nextBadge = buildTeamGoodStandingBadge({
+    team,
+    existingBadge
+  });
+
+  return saveFirestoreBadge(nextBadge);
+}
+
 export async function moveStudentBetweenTeams(input: {
   studentId: string;
   fromTeamId: string;
@@ -317,7 +522,9 @@ export async function moveStudentBetweenTeams(input: {
   const state = await ensureDerivedFirestoreState(baseState);
 
   if (!state.teams.length) {
-    throw new Error("No teams exist yet. Generate teams before moving students.");
+    throw new Error(
+      "No teams exist yet. Generate teams before moving students."
+    );
   }
 
   const fromTeam = state.teams.find((team) => team.id === parsed.fromTeamId);
@@ -344,7 +551,10 @@ export async function moveStudentBetweenTeams(input: {
     members: [...team.members]
   }));
   const moved = applyInstructorSwap(candidates, parsed);
-  const teams = mergeTeamWorkspace(state.teams, buildTeamsFromCandidates(moved));
+  const teams = mergeTeamWorkspace(
+    state.teams,
+    buildTeamsFromCandidates(moved)
+  );
   const savedTeams = await persistFirestoreTeams({
     students: state.students,
     profiles: state.profiles,
@@ -380,15 +590,17 @@ function buildDestinationFullResolution(
     destinationTeamName: params.toTeamId,
     currentSize: destinationTeam?.members.length ?? 0,
     maxSize: MAX_TEAM_SIZE,
-    suggestedSwaps: getTopSwapSuggestions(candidates, params).map((suggestion) => ({
-      displacedStudentId: suggestion.displacedStudentId,
-      displacedStudentName: suggestion.displacedStudentName,
-      displacedStudentRole: suggestion.displacedStudentRole,
-      sourceTeamScoreDelta: suggestion.sourceTeamScoreDelta,
-      destinationTeamScoreDelta: suggestion.destinationTeamScoreDelta,
-      fairnessDelta: suggestion.fairnessDelta,
-      legal: suggestion.legal
-    })),
+    suggestedSwaps: getTopSwapSuggestions(candidates, params).map(
+      (suggestion) => ({
+        displacedStudentId: suggestion.displacedStudentId,
+        displacedStudentName: suggestion.displacedStudentName,
+        displacedStudentRole: suggestion.displacedStudentRole,
+        sourceTeamScoreDelta: suggestion.sourceTeamScoreDelta,
+        destinationTeamScoreDelta: suggestion.destinationTeamScoreDelta,
+        fairnessDelta: suggestion.fairnessDelta,
+        legal: suggestion.legal
+      })
+    ),
     destinationMembers:
       destinationTeam?.members.map((member) => ({
         studentId: member.id,
@@ -441,7 +653,10 @@ export async function resolveTeamMoveRequest(
     };
   }
 
-  if (parsed.action !== "swap_move" && fromTeam.members.length - 1 < MIN_TEAM_SIZE) {
+  if (
+    parsed.action !== "swap_move" &&
+    fromTeam.members.length - 1 < MIN_TEAM_SIZE
+  ) {
     return {
       ok: false,
       error: `A team cannot drop below ${MIN_TEAM_SIZE} students.`
@@ -450,7 +665,10 @@ export async function resolveTeamMoveRequest(
 
   const destinationIsFull = toTeam.members.length >= MAX_TEAM_SIZE;
 
-  if (parsed.action === "analyze_move" || (parsed.action === "simple_move" && destinationIsFull)) {
+  if (
+    parsed.action === "analyze_move" ||
+    (parsed.action === "simple_move" && destinationIsFull)
+  ) {
     return {
       ok: true,
       status: "destination_full",
@@ -463,12 +681,16 @@ export async function resolveTeamMoveRequest(
   if (parsed.action === "simple_move") {
     nextTeams = mergeTeamWorkspace(
       state.teams,
-      buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed))
+      buildTeamsFromCandidates(
+        applyInstructorSwap(toTeamCandidates(state.teams), parsed)
+      )
     );
   }
 
   if (parsed.action === "swap_move") {
-    if (!toTeam.members.some((member) => member.id === parsed.displacedStudentId)) {
+    if (
+      !toTeam.members.some((member) => member.id === parsed.displacedStudentId)
+    ) {
       return {
         ok: false,
         error: "Selected swap candidate is not in the destination team."
@@ -489,14 +711,18 @@ export async function resolveTeamMoveRequest(
   }
 
   if (parsed.action === "reroute_move") {
-    if (!toTeam.members.some((member) => member.id === parsed.displacedStudentId)) {
+    if (
+      !toTeam.members.some((member) => member.id === parsed.displacedStudentId)
+    ) {
       return {
         ok: false,
         error: "Selected displaced student is not in the destination team."
       };
     }
 
-    const rerouteTeam = state.teams.find((team) => team.id === parsed.rerouteTeamId);
+    const rerouteTeam = state.teams.find(
+      (team) => team.id === parsed.rerouteTeamId
+    );
     if (!rerouteTeam) {
       return {
         ok: false,
@@ -505,7 +731,9 @@ export async function resolveTeamMoveRequest(
     }
 
     const rerouteCount =
-      parsed.rerouteTeamId === parsed.fromTeamId ? fromTeam.members.length - 1 : rerouteTeam.members.length;
+      parsed.rerouteTeamId === parsed.fromTeamId
+        ? fromTeam.members.length - 1
+        : rerouteTeam.members.length;
     if (rerouteCount + 1 > MAX_TEAM_SIZE) {
       return {
         ok: false,
@@ -515,14 +743,18 @@ export async function resolveTeamMoveRequest(
 
     nextTeams = mergeTeamWorkspace(
       state.teams,
-      buildTeamsFromCandidates(applyRerouteMove(toTeamCandidates(state.teams), parsed))
+      buildTeamsFromCandidates(
+        applyRerouteMove(toTeamCandidates(state.teams), parsed)
+      )
     );
   }
 
   if (parsed.action === "force_override_move") {
     nextTeams = mergeTeamWorkspace(
       state.teams,
-      buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed))
+      buildTeamsFromCandidates(
+        applyInstructorSwap(toTeamCandidates(state.teams), parsed)
+      )
     );
   }
 
