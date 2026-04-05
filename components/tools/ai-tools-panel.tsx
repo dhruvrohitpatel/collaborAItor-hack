@@ -219,7 +219,9 @@ export function AiToolsPanel({
                     audience: rewriteInput.audience
                   });
 
-                  setRewriteOutput(`${result.rewrittenMessage}\n\nNotes: ${result.notes}`);
+                  setRewriteOutput(
+                    [`Rewritten:\n${result.rewrittenMessage}`, `\nNote: ${result.notes}`].join("\n")
+                  );
                 } catch (error) {
                   push({
                     kind: "error",
