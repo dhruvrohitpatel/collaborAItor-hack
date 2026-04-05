@@ -18,6 +18,9 @@ import {
   teamSchema
 } from "@/lib/schemas";
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4f0938e4253cc1766c8f77d4a2ec2d1ca8608f69
 import type {
   StudentIntake,
   StudentProfile,
@@ -26,13 +29,19 @@ import type {
   TeamMeeting,
   TeamTask
 } from "@/types/domain";
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 4f0938e4253cc1766c8f77d4a2ec2d1ca8608f69
 import type { StudentIntake, StudentProfile, Team } from "@/types/domain";
 import type { DemoStateMetaInput } from "@/lib/schemas";
 
 const META_COLLECTION = "meta";
 const DEMO_STATE_META_DOC = "demo-state";
+<<<<<<< HEAD
 >>>>>>> 2b4b66bf3c2971d2c483385cb38c79084cada8d6
+=======
+>>>>>>> 4f0938e4253cc1766c8f77d4a2ec2d1ca8608f69
 
 function getConfiguredFirestoreDb() {
   if (!isFirebaseConfigured) {
@@ -231,6 +240,9 @@ export async function saveFirestoreTeams(teams: Team[]): Promise<Team[]> {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4f0938e4253cc1766c8f77d4a2ec2d1ca8608f69
 export const getFirestoreTeamTasks = (teamId: string) =>
   getTeamSubcollection(teamId, "tasks", (value) => teamTaskSchema.parse(value))();
 
@@ -293,7 +305,10 @@ export async function addFirestoreCopilotRun(
   await setDoc(doc(db, "teams", teamId, "copilot_runs", validatedRun.id), validatedRun);
 
   return validatedRun;
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 4f0938e4253cc1766c8f77d4a2ec2d1ca8608f69
 export async function getFirestoreStateMeta(): Promise<DemoStateMetaInput | null> {
   const db = getConfiguredFirestoreDb();
   const metaDoc = await getDoc(doc(db, META_COLLECTION, DEMO_STATE_META_DOC));
@@ -314,5 +329,8 @@ export async function saveFirestoreStateMeta(
   await setDoc(doc(db, META_COLLECTION, DEMO_STATE_META_DOC), parsedMeta);
 
   return parsedMeta;
+<<<<<<< HEAD
 >>>>>>> 2b4b66bf3c2971d2c483385cb38c79084cada8d6
+=======
+>>>>>>> 4f0938e4253cc1766c8f77d4a2ec2d1ca8608f69
 }
