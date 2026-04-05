@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
@@ -18,6 +19,21 @@ type AiToolsPanelProps = {
   /** Active risk flags — forwarded to charter API for accountability language. */
   riskFlags?: { label: string; severity: "low" | "medium" | "high" }[];
 };
+
+const rewriteToneOptions = [
+  { value: "professional", label: "Professional" },
+  { value: "polite", label: "Polite" },
+  { value: "direct", label: "Direct" },
+  { value: "encouraging", label: "Encouraging" }
+] as const;
+
+const rewriteAudienceOptions = [
+  { value: "student project team", label: "Student project team" },
+  { value: "a teammate", label: "A teammate" },
+  { value: "an instructor", label: "Instructor" },
+  { value: "a teaching assistant", label: "Teaching assistant" },
+  { value: "a client or stakeholder", label: "Client or stakeholder" }
+] as const;
 
 export function AiToolsPanel({
   defaultTeamName = "Team Demo",
@@ -220,20 +236,50 @@ export function AiToolsPanel({
               rows={4}
             />
             <div className="grid gap-3 md:grid-cols-2">
-              <Input
-                value={rewriteInput.tone}
-                onChange={(event) =>
-                  setRewriteInput((prev) => ({ ...prev, tone: event.target.value }))
-                }
-                placeholder="Tone"
-              />
-              <Input
-                value={rewriteInput.audience}
-                onChange={(event) =>
-                  setRewriteInput((prev) => ({ ...prev, audience: event.target.value }))
-                }
-                placeholder="Audience"
-              />
+              <div className="space-y-1">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Tone
+                </p>
+                <Select
+                  value={rewriteInput.tone}
+                  onValueChange={(value) =>
+                    setRewriteInput((prev) => ({ ...prev, tone: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rewriteToneOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Audience
+                </p>
+                <Select
+                  value={rewriteInput.audience}
+                  onValueChange={(value) =>
+                    setRewriteInput((prev) => ({ ...prev, audience: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select audience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rewriteAudienceOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <Button
               onClick={async () => {
