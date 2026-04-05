@@ -202,6 +202,9 @@ export type Team = {
   teamNorms: string[];
   lastPulseAt: string | null;
   activeMeetingId: string | null;
+  tasks: TeamTask[];
+  meetings: TeamMeeting[];
+  copilotRuns: TeamCopilotRun[];
 };
 
 export type BadgeSubjectType = "student" | "team";
@@ -226,16 +229,6 @@ export type BadgeCredential = {
   solanaReference: string | null;
   transactionSignature: string | null;
   proofStatus: BadgeProofStatus;
-  projectTheme: string;
-  currentMilestone: string | null;
-  preferredMeetingDurationMin: number;
-  aiOptIn: boolean;
-  teamNorms: string[];
-  lastPulseAt: string | null;
-  activeMeetingId: string | null;
-  tasks: TeamTask[];
-  meetings: TeamMeeting[];
-  copilotRuns: TeamCopilotRun[];
 };
 
 export type MoveAction =

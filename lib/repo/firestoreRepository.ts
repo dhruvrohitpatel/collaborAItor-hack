@@ -10,7 +10,11 @@ import {
 } from "firebase/firestore";
 
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
-import type { BadgeCredentialInput, DemoStateMetaInput } from "@/lib/schemas";
+import type {
+  BadgeCredentialInput,
+  DemoStateMetaInput,
+  GoogleConnectionInput
+} from "@/lib/schemas";
 import {
   badgeCredentialSchema,
   collaborationProfileSchema,
@@ -31,8 +35,6 @@ import type {
   TeamMeeting,
   TeamTask
 } from "@/types/domain";
-import type { StudentIntake, StudentProfile, Team } from "@/types/domain";
-import type { DemoStateMetaInput, GoogleConnectionInput } from "@/lib/schemas";
 
 const META_COLLECTION = "meta";
 const DEMO_STATE_META_DOC = "demo-state";

@@ -91,6 +91,9 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
     notes:
       "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal."
   });
+  const rewriteAudienceMissing = rewrite.audience.trim().length < 2;
+  const rewriteMessageMissing = rewrite.message.trim().length < 5;
+  const rewriteFormInvalid = rewriteAudienceMissing || rewriteMessageMissing;
 
   async function postJson<T>(url: string, body: unknown): Promise<T> {
     const response = await fetch(url, {
@@ -98,10 +101,21 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
-    const payload = await response.json().catch(() => ({}));
+    const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      throw new Error(payload.error ?? "Request failed.");
+      const message =
+        payload &&
+        typeof payload === "object" &&
+        "error" in payload &&
+        typeof payload.error === "string"
+          ? payload.error
+          : `Request failed (${response.status}).`;
+      throw new Error(message);
+    }
+
+    if (!payload) {
+      throw new Error("Invalid API response.");
     }
 
     return payload as T;
@@ -405,10 +419,17 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
                 <Button
                   className="w-full"
                   onClick={() => requestPreview("rewrite_message", rewrite)}
-                  disabled={loadingIntent === "rewrite_message"}
+                  disabled={loadingIntent === "rewrite_message" || rewriteFormInvalid}
                 >
                   {loadingIntent === "rewrite_message" ? "Preparing..." : "Preview Rewrite"}
                 </Button>
+                {rewriteFormInvalid ? (
+                  <p className="text-xs text-amber-700">
+                    {rewriteMessageMissing
+                      ? "Add a longer draft message."
+                      : "Add who will read this message to continue."}
+                  </p>
+                ) : null}
               </CardContent>
             </Card>
 
@@ -618,6 +639,11 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
                       <p className="mt-1 text-sm text-amber-900">{preview.suggestedActions[0]}</p>
                     </div>
                   ) : null}
+                  {preview.meta.fallbackReason ? (
+                    <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-900">
+                      {preview.meta.fallbackReason}
+                    </div>
+                  ) : null}
                   {preview.diagnostics?.windowUsed ? (
                     <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-700">
                       Search window: {preview.diagnostics.windowUsed.startDate} to{" "}
@@ -650,13 +676,15 @@ export function TeamCopilotPanel({ team }: TeamCopilotPanelProps) {
                       {executed.membersMissingGoogle.join(", ")}.
                     </div>
                   ) : null}
-                  <Button className="w-full" onClick={executePreview} disabled={executing}>
-                    {executing
-                      ? "Saving..."
-                      : preview.requiresApproval
-                        ? "Approve and Save"
-                        : "Save Run"}
-                  </Button>
+                  {preview.requiresApproval ? (
+                    <Button className="w-full" onClick={executePreview} disabled={executing}>
+                      {executing ? "Saving..." : "Approve and Save"}
+                    </Button>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      No approval needed for this action.
+                    </p>
+                  )}
                 </>
               ) : (
                 <p className="text-muted-foreground">
