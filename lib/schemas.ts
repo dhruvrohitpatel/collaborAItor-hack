@@ -92,6 +92,31 @@ export const collaborationProfileSchema = studentIntakeSchema.extend({
   profileGeneratedAt: z.string().datetime()
 });
 
+export const teamScoreBreakdownSchema = z.object({
+  skillDiversity: z.number(),
+  availabilityOverlap: z.number(),
+  communicationBalance: z.number(),
+  leadershipDistribution: z.number(),
+  growthOpportunityFit: z.number(),
+  riskPenalty: z.number(),
+  total: z.number()
+});
+
+export const teamSupportArtifactsSchema = z.object({
+  charter: z.string().min(1),
+  suggestedRoleRotation: z.array(z.string().min(1)),
+  kickoffChecklist: z.array(z.string().min(1))
+});
+
+export const teamSchema = z.object({
+  id: z.string().min(1),
+  members: z.array(collaborationProfileSchema),
+  rationale: z.string().min(1),
+  riskFlags: z.array(riskFlagSchema),
+  scoreSummary: teamScoreBreakdownSchema,
+  support: teamSupportArtifactsSchema
+});
+
 export const generateTeamsInputSchema = z.object({
   teamSize: z.number().int().min(MIN_TEAM_SIZE).max(MAX_TEAM_SIZE).default(DEFAULT_TEAM_SIZE)
 });
