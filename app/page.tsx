@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, GraduationCap, UsersRound, WandSparkles, BellRing } from "lucide-react";
+import {
+  ArrowRight,
+  BellRing,
+  GraduationCap,
+  UsersRound,
+  WandSparkles
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -10,7 +16,7 @@ const principles = [
   { label: "Transparent team formation", desc: "Every team assignment comes with a rationale." },
   { label: "Instructor override", desc: "Swap students and regenerate rationale instantly." },
   { label: "No permanent labels", desc: "AI outputs are descriptive, never prescriptive." },
-  { label: "Privacy by design", desc: "Reflection text is embedded locally before Gemini." },
+  { label: "Privacy by design", desc: "Reflection text is embedded locally before Gemini." }
 ];
 
 const features = [
@@ -20,7 +26,7 @@ const features = [
     desc: "Seed roster data, generate profiles, form teams, and override assignments with clear rationale at every step.",
     color: "text-blue-500",
     bg: "bg-blue-50",
-    border: "border-blue-100",
+    border: "border-blue-100"
   },
   {
     icon: UsersRound,
@@ -28,7 +34,7 @@ const features = [
     desc: "Deterministic scoring balances skills, communication styles, availability, leadership, and growth targets.",
     color: "text-violet-500",
     bg: "bg-violet-50",
-    border: "border-violet-100",
+    border: "border-violet-100"
   },
   {
     icon: WandSparkles,
@@ -36,7 +42,7 @@ const features = [
     desc: "Generate charters, summarize meeting notes into action items, and rewrite team messages with the right tone.",
     color: "text-emerald-500",
     bg: "bg-emerald-50",
-    border: "border-emerald-100",
+    border: "border-emerald-100"
   },
   {
     icon: BellRing,
@@ -44,35 +50,57 @@ const features = [
     desc: "An autonomous agent monitors team participation, detects disengagement early, and alerts instructors before problems escalate.",
     color: "text-amber-500",
     bg: "bg-amber-50",
-    border: "border-amber-100",
+    border: "border-amber-100"
+  }
+];
+
+const workflowSteps = [
+  {
+    step: "01",
+    title: "Roster + Onboarding",
+    desc: "Instructors set up the roster and students complete the richer questionnaire instead of the old flat intake."
   },
+  {
+    step: "02",
+    title: "AI Profile Generation",
+    desc: "Gemini turns student responses into structured collaboration profiles with readable summaries and risk signals."
+  },
+  {
+    step: "03",
+    title: "Deterministic Team Formation",
+    desc: "A transparent scoring engine balances skill mix, availability, communication, leadership, and growth fit."
+  },
+  {
+    step: "04",
+    title: "Ongoing Team Support",
+    desc: "Badges, coaching alerts, charters, meeting summaries, and rewrites help teams stay healthy after formation."
+  }
 ];
 
 export default function LandingPage() {
   return (
     <div className="space-y-10">
-
-      {/* Hero */}
-      <section className="rounded-2xl border bg-white shadow-sm overflow-hidden">
+      <section className="overflow-hidden rounded-2xl border bg-white shadow-sm">
         <div className="grid md:grid-cols-[1.5fr_1fr]">
-
-          {/* Left */}
-          <div className="p-8 space-y-6">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="space-y-6 p-8">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary">Google Track MVP</Badge>
-              <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
-                Powered by Gemini on Vertex AI
+              <Badge
+                variant="outline"
+                className="border-blue-200 bg-blue-50 text-blue-600"
+              >
+                Powered by Gemini + Firestore
               </Badge>
             </div>
 
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-tight leading-tight">
+              <h1 className="text-4xl font-semibold leading-tight tracking-tight">
                 Build better student teams with{" "}
                 <span className="text-blue-600">transparent AI support.</span>
               </h1>
-              <p className="text-slate-500 text-lg leading-relaxed max-w-xl">
-                Collabor-AI-tor helps instructors gather collaboration signals, form balanced teams,
-                and keep teams healthy throughout the semester — all with a human in the loop.
+              <p className="max-w-xl text-lg leading-relaxed text-slate-500">
+                Collabor-AI-tor helps instructors gather collaboration signals, form balanced
+                teams, and keep teams healthy throughout the semester with a human in the loop.
               </p>
             </div>
 
@@ -80,12 +108,15 @@ export default function LandingPage() {
               <Link href="/instructor" className={buttonVariants({})}>
                 Open Instructor Dashboard <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-              <Link href="/student/questionnaire" className={buttonVariants({ variant: "outline" })}>
+              <Link
+                href="/student/questionnaire"
+                className={buttonVariants({ variant: "outline" })}
+              >
                 Open Student Onboarding
               </Link>
             </div>
 
-            <div className="flex gap-6 pt-2 border-t border-slate-100">
+            <div className="flex gap-6 border-t border-slate-100 pt-2">
               <div>
                 <p className="text-2xl font-semibold text-slate-800">60+</p>
                 <p className="text-xs text-slate-400">Students supported</p>
@@ -99,61 +130,45 @@ export default function LandingPage() {
                 <p className="text-xs text-slate-400">Black-box decisions</p>
               </div>
             </div>
-      <section className="grid gap-6 rounded-2xl border bg-white p-8 shadow-sm md:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-4">
-          <Badge variant="secondary">Google Track Hackathon MVP</Badge>
-          <h1 className="text-4xl font-semibold tracking-tight">
-            Build better student teams with transparent AI support.
-          </h1>
-          <p className="max-w-2xl text-slate-600">
-            Collabor-AI-tor helps instructors gather collaboration signals, generate structured
-            profiles, form balanced teams, and provide practical team support tools.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/instructor" className={buttonVariants({})}>
-              Open Instructor Dashboard <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-            <Link href="/student/questionnaire" className={buttonVariants({ variant: "outline" })}>
-              Open Student Onboarding
-            </Link>
           </div>
 
-          {/* Right — principles */}
-          <div className="bg-slate-50 border-l border-slate-100 p-8 space-y-4">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+          <div className="space-y-4 border-l border-slate-100 bg-slate-50 p-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
               Core Principles
             </p>
             <div className="space-y-3">
               {principles.map((item) => (
                 <div key={item.label} className="space-y-0.5">
                   <p className="text-sm font-medium text-slate-800">
-                    <span className="text-blue-500 mr-1.5">✓</span>
+                    <span className="mr-1.5 text-blue-500">✓</span>
                     {item.label}
                   </p>
-                  <p className="text-xs text-slate-400 pl-5">{item.desc}</p>
+                  <p className="pl-5 text-xs text-slate-400">{item.desc}</p>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* Feature cards */}
       <section>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">
           What it does
         </p>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {features.map(({ icon: Icon, title, desc, color, bg, border }) => (
             <Card key={title} className={`border ${border} ${bg}`}>
               <CardHeader className="pb-2">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center bg-white border ${border} mb-1`}>
+                <div
+                  className={`mb-1 flex h-9 w-9 items-center justify-center rounded-lg border bg-white ${border}`}
+                >
                   <Icon className={`h-5 w-5 ${color}`} />
                 </div>
-                <CardTitle className="text-base font-semibold text-slate-800">{title}</CardTitle>
+                <CardTitle className="text-base font-semibold text-slate-800">
+                  {title}
+                </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-slate-500 leading-relaxed">
+              <CardContent className="text-sm leading-relaxed text-slate-500">
                 {desc}
               </CardContent>
             </Card>
@@ -161,27 +176,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="rounded-2xl border bg-white p-6 shadow-sm">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">
+        <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-slate-400">
           How it works
         </p>
-        <div className="grid md:grid-cols-4 gap-4">
-          {[
-            { step: "01", title: "Student Intake", desc: "Students fill a structured form — skills, availability, reflection, and collaboration style." },
-            { step: "02", title: "Profile Generation", desc: "Gemini analyzes each intake and generates a structured collaboration profile with risk flags." },
-            { step: "03", title: "Team Formation", desc: "A deterministic scorer assigns balanced teams and writes a plain-English rationale for each." },
-            { step: "04", title: "Ongoing Support", desc: "The coaching agent monitors participation and alerts instructors when a student goes quiet." },
-          ].map(({ step, title, desc }) => (
+        <div className="grid gap-4 md:grid-cols-4">
+          {workflowSteps.map(({ step, title, desc }) => (
             <div key={step} className="space-y-2">
               <p className="text-3xl font-bold text-slate-100">{step}</p>
               <p className="text-sm font-semibold text-slate-800">{title}</p>
-              <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+              <p className="text-xs leading-relaxed text-slate-500">{desc}</p>
             </div>
           ))}
         </div>
       </section>
-
     </div>
   );
 }

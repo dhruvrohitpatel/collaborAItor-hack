@@ -56,6 +56,7 @@ export type StudentProfile = StudentIntake & {
   profileSummary: string;
   inferredTags: string[];
   leadershipSignal: LeadershipSignal;
+  riskFlags: RiskFlag[];
   profileSource: "mock" | "ai";
   profileGeneratedAt: string;
 };
