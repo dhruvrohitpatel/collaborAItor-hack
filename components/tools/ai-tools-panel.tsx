@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,6 +93,8 @@ export function AiToolsPanel({
   const [notesOutput, setNotesOutput] = useState("");
   const [notesMeta, setNotesMeta] = useState<AIResponseMeta | null>(null);
   const [notesLoading, setNotesLoading] = useState(false);
+  const [notesAudioUrl, setNotesAudioUrl] = useState<string | null>(null);
+  const [notesAudioLoading, setNotesAudioLoading] = useState(false);
 
   const [rewriteInput, setRewriteInput] = useState({
     message: "Can someone please finish their part? We are behind.",
@@ -102,6 +104,14 @@ export function AiToolsPanel({
   const [rewriteOutput, setRewriteOutput] = useState("");
   const [rewriteMeta, setRewriteMeta] = useState<AIResponseMeta | null>(null);
   const [rewriteLoading, setRewriteLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (notesAudioUrl) {
+        URL.revokeObjectURL(notesAudioUrl);
+      }
+    };
+  }, [notesAudioUrl]);
 
   async function callApi<T>(url: string, body: unknown): Promise<T> {
     const response = await fetch(url, {
@@ -170,6 +180,42 @@ export function AiToolsPanel({
       push({ kind: "error", title: "Meeting summary failed", description: error instanceof Error ? error.message : "Unknown error" });
     } finally {
       setNotesLoading(false);
+    }
+  }
+
+  async function handleNotesAudio() {
+    setNotesAudioLoading(true);
+
+    try {
+      const response = await fetch("/api/ai/summarize-meeting-audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes: notesInput })
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(payload?.error ?? "Failed to generate audio summary.");
+      }
+
+      const blob = await response.blob();
+      const nextUrl = URL.createObjectURL(blob);
+
+      setNotesAudioUrl((current) => {
+        if (current) {
+          URL.revokeObjectURL(current);
+        }
+
+        return nextUrl;
+      });
+    } catch (error) {
+      push({
+        kind: "error",
+        title: "Audio summary failed",
+        description: error instanceof Error ? error.message : "Unknown error"
+      });
+    } finally {
+      setNotesAudioLoading(false);
     }
   }
 
@@ -262,12 +308,31 @@ export function AiToolsPanel({
               />
             </div>
             <div className="flex items-center justify-between">
-              <Button onClick={handleNotes} disabled={notesLoading}>
-                {notesLoading ? "Summarizing..." : "Summarize Notes"}
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button onClick={handleNotes} disabled={notesLoading}>
+                  {notesLoading ? "Summarizing..." : "Summarize Notes"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleNotesAudio}
+                  disabled={notesAudioLoading || notesInput.trim().length < 10}
+                >
+                  {notesAudioLoading ? "Generating Audio..." : "Hear Summary"}
+                </Button>
+              </div>
               <MetaPill meta={notesMeta} />
             </div>
             <OutputBox value={notesOutput} />
+            {notesAudioUrl ? (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-400">
+                  Audio Summary
+                </p>
+                <audio controls className="w-full" src={notesAudioUrl}>
+                  Your browser does not support audio playback.
+                </audio>
+              </div>
+            ) : null}
           </TabsContent>
 
           {/* ── Rewrite Message ── */}
