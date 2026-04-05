@@ -443,7 +443,21 @@ export function buildTeamsFromCandidates(candidates: TeamCandidate[]): Team[] {
       rationale: buildRationale(team.id, team.members, team.scoreSummary),
       riskFlags,
       scoreSummary: team.scoreSummary,
-      support: defaultSupport(team.id, team.members)
+      support: defaultSupport(team.id, team.members),
+      projectTheme: "Course project",
+      currentMilestone: null,
+      preferredMeetingDurationMin: 60,
+      aiOptIn: true,
+      teamNorms: [
+        "Surface blockers within 24 hours.",
+        "Post one async update before the weekly sync.",
+        "Ask for clarification before assuming intent."
+      ],
+      lastPulseAt: null,
+      activeMeetingId: null,
+      tasks: [],
+      meetings: [],
+      copilotRuns: []
     };
   });
 }

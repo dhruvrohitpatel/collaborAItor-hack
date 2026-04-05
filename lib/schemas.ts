@@ -108,13 +108,123 @@ export const teamSupportArtifactsSchema = z.object({
   kickoffChecklist: z.array(z.string().min(1))
 });
 
+export const teamTaskSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().default(""),
+  status: z.enum(["todo", "in_progress", "blocked", "done"]),
+  priority: z.enum(["low", "medium", "high"]),
+  assigneeStudentId: z.string().nullable().default(null),
+  source: z.enum(["manual", "meeting_followup", "weekly_pulse", "copilot"]),
+  sourceRunId: z.string().nullable().default(null),
+  sourceMeetingId: z.string().nullable().default(null),
+  dueAt: z.string().datetime().nullable().default(null),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  createdByStudentId: z.string().nullable().default(null)
+});
+
+export const teamMeetingSlotSchema = z.object({
+  startAt: z.string().datetime(),
+  endAt: z.string().datetime(),
+  score: z.number().min(0).max(100),
+  memberIdsAvailable: z.array(z.string().min(1))
+});
+
+export const teamMeetingSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["proposed", "scheduled", "completed", "cancelled"]),
+  proposedSlots: z.array(teamMeetingSlotSchema).default([]),
+  selectedSlot: z
+    .object({
+      startAt: z.string().datetime(),
+      endAt: z.string().datetime()
+    })
+    .nullable()
+    .default(null),
+  durationMin: z.number().int().min(15).max(240),
+  timezone: z.string().min(2),
+  calendarEventId: z.string().nullable().default(null),
+  calendarHtmlLink: z.string().nullable().default(null),
+  meetUrl: z.string().nullable().default(null),
+  agenda: z.string().nullable().default(null),
+  notesRaw: z.string().nullable().default(null),
+  summary: z.string().nullable().default(null),
+  openQuestions: z.array(z.string()).default([]),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  createdByStudentId: z.string().nullable().default(null)
+});
+
+export const teamCopilotPreviewSectionSchema = z.object({
+  title: z.string().min(1),
+  body: z.string().min(1),
+  bullets: z.array(z.string()).default([])
+});
+
+export const teamCopilotPreviewSchema = z.object({
+  headline: z.string().min(1),
+  summary: z.string().min(1),
+  sections: z.array(teamCopilotPreviewSectionSchema).default([])
+});
+
+export const teamCopilotRunSchema = z.object({
+  id: z.string().min(1),
+  intent: z.enum([
+    "rewrite_message",
+    "schedule_meeting",
+    "meeting_followup",
+    "weekly_pulse"
+  ]),
+  status: z.enum(["preview", "approved", "executed", "failed"]),
+  actorStudentId: z.string().nullable().default(null),
+  inputSnapshot: z.record(z.unknown()).default({}),
+  preview: teamCopilotPreviewSchema,
+  outputSummary: z.string().min(1),
+  suggestedActions: z.array(z.string()).default([]),
+  requiresApproval: z.boolean(),
+  persistedRefs: z
+    .object({
+      meetingId: z.string().nullable().optional(),
+      taskIds: z.array(z.string()).optional()
+    })
+    .nullable()
+    .default(null),
+  approvedAt: z.string().datetime().nullable().default(null),
+  executedAt: z.string().datetime().nullable().default(null),
+  errorMessage: z.string().nullable().default(null),
+  createdAt: z.string().datetime()
+});
+
+export const googleConnectionSchema = z.object({
+  id: z.string().min(1),
+  firebaseUid: z.string().nullable().default(null),
+  email: z.string().email(),
+  scopes: z.array(z.string()).default([]),
+  refreshTokenEncrypted: z.string().min(1),
+  accessTokenEncrypted: z.string().nullable().default(null),
+  expiry: z.string().datetime().nullable().default(null),
+  connectedAt: z.string().datetime(),
+  revokedAt: z.string().datetime().nullable().default(null)
+});
+
 export const teamSchema = z.object({
   id: z.string().min(1),
   members: z.array(collaborationProfileSchema),
   rationale: z.string().min(1),
   riskFlags: z.array(riskFlagSchema),
   scoreSummary: teamScoreBreakdownSchema,
-  support: teamSupportArtifactsSchema
+  support: teamSupportArtifactsSchema,
+  projectTheme: z.string().default("Course project"),
+  currentMilestone: z.string().nullable().default(null),
+  preferredMeetingDurationMin: z.number().int().min(15).max(240).default(60),
+  aiOptIn: z.boolean().default(true),
+  teamNorms: z.array(z.string()).default([]),
+  lastPulseAt: z.string().datetime().nullable().default(null),
+  activeMeetingId: z.string().nullable().default(null),
+  tasks: z.array(teamTaskSchema).default([]),
+  meetings: z.array(teamMeetingSchema).default([]),
+  copilotRuns: z.array(teamCopilotRunSchema).default([])
 });
 
 export const demoStateMetaSchema = z.object({
@@ -167,3 +277,4 @@ export type MoveStudentRequestInput = z.infer<typeof moveStudentRequestSchema>;
 export type RiskFlagInput = z.infer<typeof riskFlagSchema>;
 export type CollaborationProfile = z.infer<typeof collaborationProfileSchema>;
 export type DemoStateMetaInput = z.infer<typeof demoStateMetaSchema>;
+export type GoogleConnectionInput = z.infer<typeof googleConnectionSchema>;

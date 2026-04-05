@@ -3,7 +3,9 @@ import {
   doc,
   getDoc,
   getDocs,
+  query,
   setDoc,
+  where,
   writeBatch
 } from "firebase/firestore";
 
@@ -11,14 +13,16 @@ import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 import {
   collaborationProfileSchema,
   demoStateMetaSchema,
+  googleConnectionSchema,
   studentIntakeSchema,
   teamSchema
 } from "@/lib/schemas";
 import type { StudentIntake, StudentProfile, Team } from "@/types/domain";
-import type { DemoStateMetaInput } from "@/lib/schemas";
+import type { DemoStateMetaInput, GoogleConnectionInput } from "@/lib/schemas";
 
 const META_COLLECTION = "meta";
 const DEMO_STATE_META_DOC = "demo-state";
+const GOOGLE_CONNECTIONS_COLLECTION = "googleConnections";
 
 function getConfiguredFirestoreDb() {
   if (!isFirebaseConfigured) {
@@ -165,6 +169,15 @@ export async function saveFirestoreTeams(teams: Team[]): Promise<Team[]> {
   return validatedTeams;
 }
 
+export async function saveFirestoreTeam(team: Team): Promise<Team> {
+  const db = getConfiguredFirestoreDb();
+  const validatedTeam = teamSchema.parse(team);
+
+  await setDoc(doc(db, "teams", validatedTeam.id), validatedTeam);
+
+  return validatedTeam;
+}
+
 export async function getFirestoreStateMeta(): Promise<DemoStateMetaInput | null> {
   const db = getConfiguredFirestoreDb();
   const metaDoc = await getDoc(doc(db, META_COLLECTION, DEMO_STATE_META_DOC));
@@ -185,4 +198,73 @@ export async function saveFirestoreStateMeta(
   await setDoc(doc(db, META_COLLECTION, DEMO_STATE_META_DOC), parsedMeta);
 
   return parsedMeta;
+}
+
+export async function getFirestoreGoogleConnectionById(
+  id: string
+): Promise<GoogleConnectionInput | null> {
+  const db = getConfiguredFirestoreDb();
+  const connectionDoc = await getDoc(doc(db, GOOGLE_CONNECTIONS_COLLECTION, id));
+
+  if (!connectionDoc.exists()) {
+    return null;
+  }
+
+  return googleConnectionSchema.parse({
+    ...connectionDoc.data(),
+    id: connectionDoc.id
+  });
+}
+
+export async function getFirestoreGoogleConnectionByEmail(
+  email: string
+): Promise<GoogleConnectionInput | null> {
+  const db = getConfiguredFirestoreDb();
+  const normalizedEmail = email.trim().toLowerCase();
+  const snapshot = await getDocs(
+    query(collection(db, GOOGLE_CONNECTIONS_COLLECTION), where("email", "==", normalizedEmail))
+  );
+
+  const record = snapshot.docs.at(0);
+  if (!record) {
+    return null;
+  }
+
+  return googleConnectionSchema.parse({
+    ...record.data(),
+    id: record.id
+  });
+}
+
+export async function listFirestoreGoogleConnectionsByEmails(
+  emails: string[]
+): Promise<GoogleConnectionInput[]> {
+  const db = getConfiguredFirestoreDb();
+  const normalized = [...new Set(emails.map((email) => email.trim().toLowerCase()).filter(Boolean))];
+
+  if (!normalized.length) {
+    return [];
+  }
+
+  const snapshot = await getDocs(
+    query(collection(db, GOOGLE_CONNECTIONS_COLLECTION), where("email", "in", normalized))
+  );
+
+  return snapshot.docs.map((record) =>
+    googleConnectionSchema.parse({
+      ...record.data(),
+      id: record.id
+    })
+  );
+}
+
+export async function saveFirestoreGoogleConnection(
+  connection: GoogleConnectionInput
+): Promise<GoogleConnectionInput> {
+  const db = getConfiguredFirestoreDb();
+  const parsed = googleConnectionSchema.parse(connection);
+
+  await setDoc(doc(db, GOOGLE_CONNECTIONS_COLLECTION, parsed.id), parsed);
+
+  return parsed;
 }

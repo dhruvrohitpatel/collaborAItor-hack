@@ -16,6 +16,7 @@ import {
   clearFirestoreTeams,
   getFirestoreStateMeta,
   getFirestoreProfiles,
+  saveFirestoreTeam,
   getFirestoreStudents,
   getFirestoreTeamById,
   getFirestoreTeams,
@@ -24,6 +25,7 @@ import {
   saveFirestoreTeams,
   updateFirestoreStudentIntake
 } from "@/lib/repo/firestoreRepository";
+import { mergeTeamWorkspace, normalizeTeamWorkspace } from "@/lib/team-workspace";
 import {
   addStudentIntake as addMockStudentIntake,
   generateProfilesForStudents as generateMockProfilesForStudents,
@@ -33,6 +35,7 @@ import {
   loadDemoSeed as loadMockDemoSeed,
   moveStudentBetweenTeams as moveMockStudentBetweenTeams,
   resolveTeamMoveRequest as resolveMockTeamMoveRequest,
+  saveTeam as saveMockTeam,
   updateStudentIntake as updateMockStudentIntake
 } from "@/lib/repo/mockRepository";
 import {
@@ -112,7 +115,7 @@ async function ensureDerivedFirestoreState(
   const hydratedState = normalizeDemoState({
     students: state.students,
     profiles,
-    teams,
+    teams: mergeTeamWorkspace(state.teams, teams),
     studentsUpdatedAt: state.studentsUpdatedAt,
     profilesUpdatedAt: state.profiles.length ? state.profilesUpdatedAt : now,
     teamsUpdatedAt: now
@@ -266,7 +269,7 @@ export async function generateTeamsForProfiles(teamSize = 4): Promise<Team[]> {
   const savedTeams = await persistFirestoreTeams({
     students: state.students,
     profiles,
-    teams,
+    teams: mergeTeamWorkspace(state.teams, teams),
     studentsUpdatedAt: state.studentsUpdatedAt,
     profilesUpdatedAt,
     teamsUpdatedAt: new Date().toISOString()
@@ -280,7 +283,24 @@ export async function getTeamById(teamId: string): Promise<Team | null> {
     return getMockTeamById(teamId);
   }
 
-  return getFirestoreTeamById(teamId);
+  const team = await getFirestoreTeamById(teamId);
+  return team ? normalizeTeamWorkspace(team) : null;
+}
+
+export async function saveTeam(team: Team): Promise<Team> {
+  if (isMockDataEnabled()) {
+    return saveMockTeam(team);
+  }
+
+  const saved = await saveFirestoreTeam(normalizeTeamWorkspace(team));
+  const state = await getFirestoreBackedState();
+  await saveFirestoreStateMeta({
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt: state.profilesUpdatedAt,
+    teamsUpdatedAt: new Date().toISOString()
+  });
+
+  return structuredClone(saved);
 }
 
 export async function moveStudentBetweenTeams(input: {
@@ -324,7 +344,7 @@ export async function moveStudentBetweenTeams(input: {
     members: [...team.members]
   }));
   const moved = applyInstructorSwap(candidates, parsed);
-  const teams = buildTeamsFromCandidates(moved);
+  const teams = mergeTeamWorkspace(state.teams, buildTeamsFromCandidates(moved));
   const savedTeams = await persistFirestoreTeams({
     students: state.students,
     profiles: state.profiles,
@@ -441,7 +461,10 @@ export async function resolveTeamMoveRequest(
   let nextTeams = state.teams;
 
   if (parsed.action === "simple_move") {
-    nextTeams = buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed));
+    nextTeams = mergeTeamWorkspace(
+      state.teams,
+      buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed))
+    );
   }
 
   if (parsed.action === "swap_move") {
@@ -452,13 +475,16 @@ export async function resolveTeamMoveRequest(
       };
     }
 
-    nextTeams = buildTeamsFromCandidates(
-      applyPairwiseSwap(toTeamCandidates(state.teams), {
-        fromTeamId: parsed.fromTeamId,
-        toTeamId: parsed.toTeamId,
-        incomingStudentId: parsed.studentId,
-        displacedStudentId: parsed.displacedStudentId
-      })
+    nextTeams = mergeTeamWorkspace(
+      state.teams,
+      buildTeamsFromCandidates(
+        applyPairwiseSwap(toTeamCandidates(state.teams), {
+          fromTeamId: parsed.fromTeamId,
+          toTeamId: parsed.toTeamId,
+          incomingStudentId: parsed.studentId,
+          displacedStudentId: parsed.displacedStudentId
+        })
+      )
     );
   }
 
@@ -487,11 +513,17 @@ export async function resolveTeamMoveRequest(
       };
     }
 
-    nextTeams = buildTeamsFromCandidates(applyRerouteMove(toTeamCandidates(state.teams), parsed));
+    nextTeams = mergeTeamWorkspace(
+      state.teams,
+      buildTeamsFromCandidates(applyRerouteMove(toTeamCandidates(state.teams), parsed))
+    );
   }
 
   if (parsed.action === "force_override_move") {
-    nextTeams = buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed));
+    nextTeams = mergeTeamWorkspace(
+      state.teams,
+      buildTeamsFromCandidates(applyInstructorSwap(toTeamCandidates(state.teams), parsed))
+    );
   }
 
   const savedTeams = await persistFirestoreTeams({

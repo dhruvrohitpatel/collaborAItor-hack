@@ -1,4 +1,5 @@
 import type { DemoState, StudentProfile, Team } from "@/types/domain";
+import { normalizeTeamWorkspace } from "@/lib/team-workspace";
 
 type DemoStateInput = {
   students: DemoState["students"];
@@ -21,10 +22,11 @@ function latestTimestamp(values: Array<string | null | undefined>) {
  */
 export function normalizeDemoState(input: DemoStateInput): DemoState {
   const now = new Date().toISOString();
+  const teams = input.teams.map((team) => normalizeTeamWorkspace(team));
   const fallbackTimestamp = latestTimestamp([
     input.updatedAt,
     ...input.profiles.map((profile) => profile.profileGeneratedAt),
-    ...input.teams.flatMap((team) => team.members.map((member) => member.profileGeneratedAt))
+    ...teams.flatMap((team) => team.members.map((member) => member.profileGeneratedAt))
   ]) ?? now;
 
   const studentsUpdatedAt = input.studentsUpdatedAt ?? fallbackTimestamp;
@@ -48,7 +50,7 @@ export function normalizeDemoState(input: DemoStateInput): DemoState {
   return {
     students: input.students,
     profiles: input.profiles,
-    teams: input.teams,
+    teams,
     studentsUpdatedAt,
     profilesUpdatedAt,
     teamsUpdatedAt,

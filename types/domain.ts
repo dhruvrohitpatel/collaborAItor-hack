@@ -60,6 +60,99 @@ export type TeamSupportArtifacts = {
   kickoffChecklist: string[];
 };
 
+export type TeamTaskStatus = "todo" | "in_progress" | "blocked" | "done";
+
+export type TeamTaskPriority = "low" | "medium" | "high";
+
+export type TeamTaskSource = "manual" | "meeting_followup" | "weekly_pulse" | "copilot";
+
+export type TeamTask = {
+  id: string;
+  title: string;
+  description: string;
+  status: TeamTaskStatus;
+  priority: TeamTaskPriority;
+  assigneeStudentId: string | null;
+  source: TeamTaskSource;
+  sourceRunId: string | null;
+  sourceMeetingId: string | null;
+  dueAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  createdByStudentId: string | null;
+};
+
+export type TeamMeetingStatus = "proposed" | "scheduled" | "completed" | "cancelled";
+
+export type TeamMeetingSlot = {
+  startAt: string;
+  endAt: string;
+  score: number;
+  memberIdsAvailable: string[];
+};
+
+export type TeamMeeting = {
+  id: string;
+  status: TeamMeetingStatus;
+  proposedSlots: TeamMeetingSlot[];
+  selectedSlot: {
+    startAt: string;
+    endAt: string;
+  } | null;
+  durationMin: number;
+  timezone: string;
+  calendarEventId: string | null;
+  calendarHtmlLink: string | null;
+  meetUrl: string | null;
+  agenda: string | null;
+  notesRaw: string | null;
+  summary: string | null;
+  openQuestions: string[];
+  createdAt: string;
+  updatedAt: string;
+  createdByStudentId: string | null;
+};
+
+export type TeamCopilotIntent =
+  | "rewrite_message"
+  | "schedule_meeting"
+  | "meeting_followup"
+  | "weekly_pulse";
+
+export type TeamCopilotRunStatus = "preview" | "approved" | "executed" | "failed";
+
+export type TeamCopilotPreviewSection = {
+  title: string;
+  body: string;
+  bullets: string[];
+};
+
+export type TeamCopilotPreview = {
+  headline: string;
+  summary: string;
+  sections: TeamCopilotPreviewSection[];
+};
+
+export type TeamCopilotRun = {
+  id: string;
+  intent: TeamCopilotIntent;
+  status: TeamCopilotRunStatus;
+  actorStudentId: string | null;
+  inputSnapshot: Record<string, unknown>;
+  preview: TeamCopilotPreview;
+  outputSummary: string;
+  suggestedActions: string[];
+  requiresApproval: boolean;
+  persistedRefs: {
+    meetingId?: string | null;
+    taskIds?: string[];
+  } | null;
+  approvedAt: string | null;
+  executedAt: string | null;
+  errorMessage: string | null;
+  createdAt: string;
+};
+
 export type Team = {
   id: string;
   members: StudentProfile[];
@@ -67,6 +160,16 @@ export type Team = {
   riskFlags: RiskFlag[];
   scoreSummary: TeamScoreBreakdown;
   support: TeamSupportArtifacts;
+  projectTheme: string;
+  currentMilestone: string | null;
+  preferredMeetingDurationMin: number;
+  aiOptIn: boolean;
+  teamNorms: string[];
+  lastPulseAt: string | null;
+  activeMeetingId: string | null;
+  tasks: TeamTask[];
+  meetings: TeamMeeting[];
+  copilotRuns: TeamCopilotRun[];
 };
 
 export type MoveAction =

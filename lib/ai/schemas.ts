@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { riskFlagSchema, studentIntakeSchema } from "@/lib/schemas";
+import {
+  riskFlagSchema,
+  studentIntakeSchema,
+  teamCopilotPreviewSchema
+} from "@/lib/schemas";
 
 export const aiProfileRequestSchema = z.object({
   student: studentIntakeSchema
@@ -115,17 +119,6 @@ export const aiRewriteMessageResponseSchema = z.object({
   notes: z.string().min(5)
 });
 
-export type AIProfileRequest = z.infer<typeof aiProfileRequestSchema>;
-export type AIProfileResponse = z.infer<typeof aiProfileResponseSchema>;
-export type AIBatchProfileResponse = z.infer<typeof aiBatchProfileResponseSchema>;
-export type AIResponseMeta = z.infer<typeof aiResponseMetaSchema>;
-export type AIGenerateTeamsRationaleRequest = z.infer<typeof aiGenerateTeamsRationaleRequestSchema>;
-export type AIGenerateTeamsRationaleResponse = z.infer<typeof aiGenerateTeamsRationaleResponseSchema>;
-export type AICharterRequest = z.infer<typeof aiCharterRequestSchema>;
-export type AICharterResponse = z.infer<typeof aiCharterResponseSchema>;
-export type AIRewriteMessageRequest = z.infer<typeof aiRewriteMessageRequestSchema>;
-export type AIRewriteMessageResponse = z.infer<typeof aiRewriteMessageResponseSchema>;
-
 // ── Coaching agent ─────────────────────────────────────────────────────────
 
 export const teamMessageSchema = z.object({
@@ -175,6 +168,131 @@ export const aiCoachingResponseSchema = z.object({
     })
   )
 });
+
+const rewriteMessagePayloadSchema = z.object({
+  message: z.string().min(5),
+  tone: z.enum(["polite", "direct", "encouraging", "professional"]),
+  audience: z.string().min(2)
+});
+
+const dateOnlySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+const scheduleMeetingPayloadSchema = z.object({
+  durationMin: z.number().int().min(15).max(240).default(60),
+  dateRangeStart: dateOnlySchema.nullable().default(null),
+  dateRangeEnd: dateOnlySchema.nullable().default(null),
+  createCalendarInvite: z.boolean().default(false),
+  agenda: z.string().nullable().default(null)
+});
+
+const meetingFollowupPayloadSchema = z.object({
+  notes: z.string().min(10),
+  meetingId: z.string().nullable().default(null)
+});
+
+const weeklyPulsePayloadSchema = z.object({}).default({});
+
+export const teamCopilotRequestSchema = z.discriminatedUnion("intent", [
+  z.object({
+    teamId: z.string().min(1),
+    actorStudentId: z.string().nullable().default(null),
+    intent: z.literal("rewrite_message"),
+    payload: rewriteMessagePayloadSchema
+  }),
+  z.object({
+    teamId: z.string().min(1),
+    actorStudentId: z.string().nullable().default(null),
+    intent: z.literal("schedule_meeting"),
+    payload: scheduleMeetingPayloadSchema
+  }),
+  z.object({
+    teamId: z.string().min(1),
+    actorStudentId: z.string().nullable().default(null),
+    intent: z.literal("meeting_followup"),
+    payload: meetingFollowupPayloadSchema
+  }),
+  z.object({
+    teamId: z.string().min(1),
+    actorStudentId: z.string().nullable().default(null),
+    intent: z.literal("weekly_pulse"),
+    payload: weeklyPulsePayloadSchema
+  })
+]);
+
+export const teamCopilotResponseSchema = z.object({
+  runId: z.string().min(1),
+  intent: z.enum([
+    "rewrite_message",
+    "schedule_meeting",
+    "meeting_followup",
+    "weekly_pulse"
+  ]),
+  requiresApproval: z.boolean(),
+  preview: teamCopilotPreviewSchema,
+  suggestedActions: z.array(z.string()).default([]),
+  persistedRefs: z
+    .object({
+      meetingId: z.string().nullable().optional(),
+      taskIds: z.array(z.string()).optional()
+    })
+    .nullable()
+    .default(null),
+  diagnostics: z
+    .object({
+      availabilitySource: z.enum(["intake", "google_freebusy_mixed"]).optional(),
+      windowUsed: z
+        .object({
+          startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+        })
+        .optional(),
+      membersMissingGoogle: z.array(z.string().email()).default([])
+    })
+    .nullable()
+    .default(null),
+  meta: aiResponseMetaSchema
+});
+
+export const teamCopilotExecuteRequestSchema = z.object({
+  teamId: z.string().min(1),
+  runId: z.string().min(1),
+  approved: z.literal(true)
+});
+
+export const teamCopilotExecuteResponseSchema = z.object({
+  status: z.enum(["executed", "failed"]),
+  updatedRefs: z
+    .object({
+      meetingId: z.string().nullable().optional(),
+      taskIds: z.array(z.string()).optional()
+    })
+    .nullable()
+    .default(null),
+  externalLinks: z
+    .object({
+      calendarHtmlLink: z.string().nullable().optional(),
+      meetUrl: z.string().nullable().optional()
+    })
+    .nullable()
+    .default(null),
+  membersMissingGoogle: z.array(z.string().email()).default([]),
+  meta: aiResponseMetaSchema
+});
+
+export type AIProfileRequest = z.infer<typeof aiProfileRequestSchema>;
+export type AIProfileResponse = z.infer<typeof aiProfileResponseSchema>;
+export type AIBatchProfileResponse = z.infer<typeof aiBatchProfileResponseSchema>;
+export type AIResponseMeta = z.infer<typeof aiResponseMetaSchema>;
+export type AIGenerateTeamsRationaleRequest = z.infer<typeof aiGenerateTeamsRationaleRequestSchema>;
+export type AIGenerateTeamsRationaleResponse = z.infer<typeof aiGenerateTeamsRationaleResponseSchema>;
+export type AICharterRequest = z.infer<typeof aiCharterRequestSchema>;
+export type AICharterResponse = z.infer<typeof aiCharterResponseSchema>;
+export type AIRewriteMessageRequest = z.infer<typeof aiRewriteMessageRequestSchema>;
+export type AIRewriteMessageResponse = z.infer<typeof aiRewriteMessageResponseSchema>;
+export type TeamCopilotRequest = z.infer<typeof teamCopilotRequestSchema>;
+export type TeamCopilotResponse = z.infer<typeof teamCopilotResponseSchema>;
+export type TeamCopilotExecuteRequest = z.infer<typeof teamCopilotExecuteRequestSchema>;
+export type TeamCopilotExecuteResponse = z.infer<typeof teamCopilotExecuteResponseSchema>;
 
 export type AICoachingRequest = z.infer<typeof aiCoachingRequestSchema>;
 export type AICoachingResponse = z.infer<typeof aiCoachingResponseSchema>;

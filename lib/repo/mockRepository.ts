@@ -5,6 +5,7 @@ import { seedStudents } from "@/data/seedStudents";
 import { MAX_TEAM_SIZE, MIN_TEAM_SIZE } from "@/lib/config";
 import { normalizeDemoState } from "@/lib/demo-state";
 import { generateMockProfile } from "@/lib/ai/mock";
+import { mergeTeamWorkspace, normalizeTeamWorkspace } from "@/lib/team-workspace";
 import {
   generateTeamsInputSchema,
   moveStudentInputSchema,
@@ -62,7 +63,9 @@ async function buildProfiles(students: StudentIntake[]): Promise<StudentProfile[
 
 async function createSeedState(): Promise<DemoState> {
   const profiles = await buildProfiles(seedStudents);
-  const teams = generateTeamsDeterministic(profiles, 4);
+  const teams = generateTeamsDeterministic(profiles, 4).map((team) =>
+    normalizeTeamWorkspace(team)
+  );
   const now = new Date().toISOString();
 
   return rehydrateState({
@@ -195,7 +198,10 @@ export async function generateTeamsForProfiles(teamSize = 4) {
   }
 
   const now = new Date().toISOString();
-  const teams = generateTeamsDeterministic(profiles, parsed.teamSize);
+  const teams = mergeTeamWorkspace(
+    state.teams,
+    generateTeamsDeterministic(profiles, parsed.teamSize)
+  );
 
   inMemoryState = rehydrateState({
     students: state.students,
@@ -211,7 +217,31 @@ export async function generateTeamsForProfiles(teamSize = 4) {
 
 export async function getTeamById(teamId: string): Promise<Team | null> {
   const state = await ensureState();
-  return state.teams.find((team) => team.id === teamId) ?? null;
+  const team = state.teams.find((candidate) => candidate.id === teamId);
+  return team ? normalizeTeamWorkspace(team) : null;
+}
+
+export async function saveTeam(team: Team): Promise<Team> {
+  const state = await ensureState();
+  const normalized = normalizeTeamWorkspace(team);
+  const nextTeams = state.teams.map((candidate) =>
+    candidate.id === normalized.id ? normalized : candidate
+  );
+
+  if (!nextTeams.some((candidate) => candidate.id === normalized.id)) {
+    nextTeams.push(normalized);
+  }
+
+  inMemoryState = rehydrateState({
+    students: state.students,
+    profiles: state.profiles,
+    teams: nextTeams,
+    studentsUpdatedAt: state.studentsUpdatedAt,
+    profilesUpdatedAt: state.profilesUpdatedAt,
+    teamsUpdatedAt: new Date().toISOString()
+  });
+  await persistState(inMemoryState);
+  return structuredClone(normalized);
 }
 
 export async function moveStudentBetweenTeams(input: {
@@ -254,10 +284,11 @@ export async function moveStudentBetweenTeams(input: {
     members: [...team.members]
   }));
   const moved = applyInstructorSwap(candidates, parsed);
+  const teams = mergeTeamWorkspace(state.teams, buildTeamsFromCandidates(moved));
   inMemoryState = rehydrateState({
     students: state.students,
     profiles: state.profiles,
-    teams: buildTeamsFromCandidates(moved),
+    teams,
     studentsUpdatedAt: state.studentsUpdatedAt,
     profilesUpdatedAt: state.profilesUpdatedAt,
     teamsUpdatedAt: new Date().toISOString()
@@ -364,7 +395,7 @@ export async function resolveTeamMoveRequest(
 
   if (parsed.action === "simple_move") {
     const moved = applyInstructorSwap(toTeamCandidates(state.teams), parsed);
-    state.teams = buildTeamsFromCandidates(moved);
+    state.teams = mergeTeamWorkspace(state.teams, buildTeamsFromCandidates(moved));
   }
 
   if (parsed.action === "swap_move") {
@@ -381,7 +412,7 @@ export async function resolveTeamMoveRequest(
       incomingStudentId: parsed.studentId,
       displacedStudentId: parsed.displacedStudentId
     });
-    state.teams = buildTeamsFromCandidates(swapped);
+    state.teams = mergeTeamWorkspace(state.teams, buildTeamsFromCandidates(swapped));
   }
 
   if (parsed.action === "reroute_move") {
@@ -410,12 +441,12 @@ export async function resolveTeamMoveRequest(
     }
 
     const rerouted = applyRerouteMove(toTeamCandidates(state.teams), parsed);
-    state.teams = buildTeamsFromCandidates(rerouted);
+    state.teams = mergeTeamWorkspace(state.teams, buildTeamsFromCandidates(rerouted));
   }
 
   if (parsed.action === "force_override_move") {
     const moved = applyInstructorSwap(toTeamCandidates(state.teams), parsed);
-    state.teams = buildTeamsFromCandidates(moved);
+    state.teams = mergeTeamWorkspace(state.teams, buildTeamsFromCandidates(moved));
   }
 
   inMemoryState = rehydrateState({
