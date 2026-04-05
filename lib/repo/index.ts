@@ -14,16 +14,19 @@ import { normalizeDemoState } from "@/lib/demo-state";
 import {
   addFirestoreStudentIntake,
   clearFirestoreTeams,
+  getFirestoreBadgeBySubject,
   getFirestoreStateMeta,
   getFirestoreProfiles,
   getFirestoreStudents,
   getFirestoreTeamById,
   getFirestoreTeams,
+  saveFirestoreBadge,
   saveFirestoreProfiles,
   saveFirestoreStateMeta,
   saveFirestoreTeams,
   updateFirestoreStudentIntake
 } from "@/lib/repo/firestoreRepository";
+import { buildTeamGoodStandingBadge } from "@/lib/solana/badges";
 import {
   addStudentIntake as addMockStudentIntake,
   generateProfilesForStudents as generateMockProfilesForStudents,
@@ -54,6 +57,7 @@ import {
   getTopSwapSuggestions
 } from "@/lib/teamFormation";
 import type {
+  BadgeCredential,
   DemoState,
   DestinationFullResolution,
   MoveStudentRequest,
@@ -395,6 +399,34 @@ export async function getTeamById(teamId: string): Promise<Team | null> {
   }
 
   return getFirestoreTeamById(teamId);
+}
+
+export async function getTeamBadge(teamId: string): Promise<BadgeCredential | null> {
+  if (isMockDataEnabled()) {
+    return null;
+  }
+
+  return getFirestoreBadgeBySubject("team", teamId);
+}
+
+export async function issueOrUpdateTeamBadge(teamId: string): Promise<BadgeCredential> {
+  const team = await getTeamById(teamId);
+
+  if (!team) {
+    throw new Error(`Team "${teamId}" was not found.`);
+  }
+
+  if (isMockDataEnabled()) {
+    return buildTeamGoodStandingBadge({ team });
+  }
+
+  const existingBadge = await getFirestoreBadgeBySubject("team", teamId);
+  const nextBadge = buildTeamGoodStandingBadge({
+    team,
+    existingBadge
+  });
+
+  return saveFirestoreBadge(nextBadge);
 }
 
 export async function moveStudentBetweenTeams(input: {

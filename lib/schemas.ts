@@ -265,6 +265,21 @@ export const demoStateMetaSchema = z.object({
   teamsUpdatedAt: z.string().datetime().nullable().default(null)
 });
 
+export const badgeCredentialSchema = z.object({
+  id: z.string().min(1),
+  subjectType: z.enum(["student", "team"]),
+  subjectId: z.string().min(1),
+  badgeType: z.enum(["good_standing"]),
+  isActive: z.boolean(),
+  issuedAt: z.string().datetime().nullable(),
+  updatedAt: z.string().datetime(),
+  reasonSummary: z.string().min(5),
+  solanaNetwork: z.literal("devnet"),
+  solanaReference: z.string().nullable(),
+  transactionSignature: z.string().nullable(),
+  proofStatus: z.enum(["none", "reference_prepared", "anchored_devnet"])
+});
+
 export const generateTeamsInputSchema = z.object({
   teamSize: z.number().int().min(MIN_TEAM_SIZE).max(MAX_TEAM_SIZE).default(DEFAULT_TEAM_SIZE)
 });
@@ -311,3 +326,4 @@ export type MoveStudentRequestInput = z.infer<typeof moveStudentRequestSchema>;
 export type RiskFlagInput = z.infer<typeof riskFlagSchema>;
 export type CollaborationProfile = z.infer<typeof collaborationProfileSchema>;
 export type DemoStateMetaInput = z.infer<typeof demoStateMetaSchema>;
+export type BadgeCredentialInput = z.infer<typeof badgeCredentialSchema>;

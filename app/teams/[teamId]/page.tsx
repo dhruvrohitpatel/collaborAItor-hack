@@ -6,7 +6,7 @@ import { DisengagementPanel } from "@/components/teams/disengagement-panel";
 import { AiToolsPanel } from "@/components/tools/ai-tools-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTeamById } from "@/lib/repo";
+import { getTeamBadge, getTeamById } from "@/lib/repo";
 
 type TeamDetailPageProps = {
   params: {
@@ -15,7 +15,7 @@ type TeamDetailPageProps = {
 };
 
 export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
-  const team = await getTeamById(params.teamId);
+  const [team, badge] = await Promise.all([getTeamById(params.teamId), getTeamBadge(params.teamId)]);
 
   if (!team) {
     notFound();
@@ -31,9 +31,27 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-semibold">{team.id} Detail</h1>
           {isOutOfBounds ? <Badge variant="danger">Out of bounds</Badge> : null}
+          {badge?.isActive ? <Badge variant="success">Solana Good Standing</Badge> : null}
         </div>
         <p className="text-sm text-muted-foreground">Transparent assignment rationale and support tools.</p>
       </div>
+
+      {badge?.isActive ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Verifiable Collaboration Credential</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p>{badge.reasonSummary}</p>
+            <p className="text-xs text-muted-foreground">
+              Solana network: {badge.solanaNetwork} • Proof status: {badge.proofStatus}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Reference: {badge.solanaReference ?? "Not prepared"}
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
         <Card>

@@ -177,6 +177,27 @@ export type Team = {
   activeMeetingId: string | null;
 };
 
+export type BadgeSubjectType = "student" | "team";
+
+export type BadgeType = "good_standing";
+
+export type BadgeProofStatus = "none" | "reference_prepared" | "anchored_devnet";
+
+export type BadgeCredential = {
+  id: string;
+  subjectType: BadgeSubjectType;
+  subjectId: string;
+  badgeType: BadgeType;
+  isActive: boolean;
+  issuedAt: string | null;
+  updatedAt: string;
+  reasonSummary: string;
+  solanaNetwork: "devnet";
+  solanaReference: string | null;
+  transactionSignature: string | null;
+  proofStatus: BadgeProofStatus;
+};
+
 export type MoveAction =
   | "simple_move"
   | "analyze_move"
