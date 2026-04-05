@@ -1,5 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -34,6 +35,13 @@ export function getFirebaseAuth() {
 export function getGoogleProvider() {
   if (!isFirebaseConfigured) return null;
   return new GoogleAuthProvider();
+}
+
+export function getFirestoreDb() {
+  const configuredApp = getFirebaseApp();
+  if (!configuredApp) return null;
+
+  return getFirestore(configuredApp);
 }
 
 // TODO: Replace mock auth UI with Firebase Auth pop-up/sign-in flows for production.
