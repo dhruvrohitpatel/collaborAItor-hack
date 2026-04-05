@@ -161,7 +161,8 @@ export function scoreCommunicationBalance(members: StudentProfile[]) {
   const uniqueStyles = styleCounts.size;
   const maxStyleCount = Math.max(...styleCounts.values());
   const diversity = normalize(uniqueStyles, Math.min(4, members.length));
-  const dominancePenalty = clampScore((maxStyleCount / members.length) * 100) - 25;
+  const dominancePenalty =
+    clampScore((maxStyleCount / members.length) * 100) - 25;
 
   return clampScore(diversity - dominancePenalty * 0.5);
 }
@@ -171,7 +172,9 @@ export function scoreCommunicationBalance(members: StudentProfile[]) {
  * Highest score is exactly one strong leadership signal per team.
  */
 export function scoreLeadershipBalance(members: StudentProfile[]) {
-  const high = members.filter((member) => member.leadershipSignal === "high").length;
+  const high = members.filter(
+    (member) => member.leadershipSignal === "high"
+  ).length;
   const medium = members.filter(
     (member) => member.leadershipSignal === "medium"
   ).length;
@@ -194,7 +197,9 @@ export function scoreGrowthFit(members: StudentProfile[]) {
     member.growthAreas.map(normalizeToken)
   );
 
-  const matches = allGrowthTargets.filter((target) => allStrengths.has(target)).length;
+  const matches = allGrowthTargets.filter((target) =>
+    allStrengths.has(target)
+  ).length;
   return normalize(matches, allGrowthTargets.length || 1);
 }
 
@@ -213,7 +218,8 @@ export function scoreRiskConcentration(members: StudentProfile[]) {
   const uniqueRoles = roleCounts.size;
   const maxRoleCount = Math.max(...roleCounts.values());
   const diversity = normalize(uniqueRoles, Math.min(3, members.length));
-  const concentrationPenalty = clampScore((maxRoleCount / members.length) * 100) - 35;
+  const concentrationPenalty =
+    clampScore((maxRoleCount / members.length) * 100) - 35;
 
   return clampScore(diversity - concentrationPenalty * 0.8);
 }
@@ -242,7 +248,9 @@ function deriveRiskFlags(
     });
   }
 
-  if (components.availabilityOverlap < SCORING_TUNABLES.lowAvailabilityThreshold) {
+  if (
+    components.availabilityOverlap < SCORING_TUNABLES.lowAvailabilityThreshold
+  ) {
     flags.push({
       code: "availability_low",
       label: "Low schedule overlap",
@@ -251,7 +259,9 @@ function deriveRiskFlags(
     });
   }
 
-  if (components.communicationBalance < SCORING_TUNABLES.lowCommunicationThreshold) {
+  if (
+    components.communicationBalance < SCORING_TUNABLES.lowCommunicationThreshold
+  ) {
     flags.push({
       code: "communication_monoculture",
       label: "Communication style concentration",
@@ -260,7 +270,9 @@ function deriveRiskFlags(
     });
   }
 
-  const highLeaders = members.filter((member) => member.leadershipSignal === "high").length;
+  const highLeaders = members.filter(
+    (member) => member.leadershipSignal === "high"
+  ).length;
   if (highLeaders === 0) {
     flags.push({
       code: "leadership_gap",
@@ -279,7 +291,9 @@ function deriveRiskFlags(
     });
   }
 
-  if (components.growthOpportunityFit < SCORING_TUNABLES.lowGrowthFitThreshold) {
+  if (
+    components.growthOpportunityFit < SCORING_TUNABLES.lowGrowthFitThreshold
+  ) {
     flags.push({
       code: "growth_support_low",
       label: "Limited growth support fit",
@@ -288,7 +302,10 @@ function deriveRiskFlags(
     });
   }
 
-  if (scoreRiskConcentration(members) < SCORING_TUNABLES.lowRiskConcentrationThreshold) {
+  if (
+    scoreRiskConcentration(members) <
+    SCORING_TUNABLES.lowRiskConcentrationThreshold
+  ) {
     flags.push({
       code: "role_concentration",
       label: "Role concentration risk",
@@ -302,8 +319,10 @@ function deriveRiskFlags(
 
 function riskPenaltyFromFlags(flags: RiskFlag[]) {
   return flags.reduce((total, flag) => {
-    if (flag.severity === "high") return total + SCORING_TUNABLES.riskPenaltyHigh;
-    if (flag.severity === "medium") return total + SCORING_TUNABLES.riskPenaltyMedium;
+    if (flag.severity === "high")
+      return total + SCORING_TUNABLES.riskPenaltyHigh;
+    if (flag.severity === "medium")
+      return total + SCORING_TUNABLES.riskPenaltyMedium;
     return total + SCORING_TUNABLES.riskPenaltyLow;
   }, 0);
 }
@@ -352,7 +371,9 @@ export function scoreTeam(members: StudentProfile[]): {
  * Scores all teams together and adds roster-level fairness checks.
  * Use this to compare whole-roster quality after swaps/repairs.
  */
-export function scoreTeamsAcrossRoster(candidates: TeamCandidate[]): ScoredRoster {
+export function scoreTeamsAcrossRoster(
+  candidates: TeamCandidate[]
+): ScoredRoster {
   const teams = candidates.map((candidate) => {
     const scored = scoreTeam(candidate.members);
     return {
@@ -364,10 +385,12 @@ export function scoreTeamsAcrossRoster(candidates: TeamCandidate[]): ScoredRoste
 
   const totalScores = teams.map((team) => team.scoreSummary.total);
   const highLeaderCounts = teams.map(
-    (team) => team.members.filter((member) => member.leadershipSignal === "high").length
+    (team) =>
+      team.members.filter((member) => member.leadershipSignal === "high").length
   );
   const communicationDiversity = teams.map(
-    (team) => new Set(team.members.map((member) => member.communicationStyle)).size
+    (team) =>
+      new Set(team.members.map((member) => member.communicationStyle)).size
   );
   const highRiskCounts = teams.map(
     (team) => team.riskFlags.filter((flag) => flag.severity === "high").length
@@ -375,11 +398,15 @@ export function scoreTeamsAcrossRoster(candidates: TeamCandidate[]): ScoredRoste
 
   // Lower standard deviation => fairer distribution across teams.
   const scoreSpread = clampScore(100 - standardDeviation(totalScores) * 3);
-  const leadershipSpread = clampScore(100 - standardDeviation(highLeaderCounts) * 45);
+  const leadershipSpread = clampScore(
+    100 - standardDeviation(highLeaderCounts) * 45
+  );
   const communicationSpread = clampScore(
     100 - standardDeviation(communicationDiversity) * 35
   );
-  const highRiskSpread = clampScore(100 - standardDeviation(highRiskCounts) * 50);
+  const highRiskSpread = clampScore(
+    100 - standardDeviation(highRiskCounts) * 50
+  );
 
   const overall = clampScore(
     scoreSpread * 0.4 +
@@ -395,8 +422,8 @@ export function scoreTeamsAcrossRoster(candidates: TeamCandidate[]): ScoredRoste
       : teams
           .filter(
             (team) =>
-              team.riskFlags.filter((flag) => flag.severity === "high").length ===
-              maxHighRiskCount
+              team.riskFlags.filter((flag) => flag.severity === "high")
+                .length === maxHighRiskCount
           )
           .map((team) => team.id);
 
@@ -413,7 +440,11 @@ export function scoreTeamsAcrossRoster(candidates: TeamCandidate[]): ScoredRoste
   };
 }
 
-function buildRationale(teamId: string, members: StudentProfile[], score: TeamScoreBreakdown) {
+function buildRationale(
+  teamId: string,
+  members: StudentProfile[],
+  score: TeamScoreBreakdown
+) {
   const memberNames = members.map((member) => member.name).join(", ");
   return `${teamId} was formed with balanced collaboration signals across ${memberNames}. Composite score ${score.total} emphasizes skill coverage (${score.skillDiversity}), availability overlap (${score.availabilityOverlap}), and growth fit (${score.growthOpportunityFit}) while highlighting risks for instructor review.`;
 }
@@ -444,13 +475,18 @@ export function buildTeamsFromCandidates(candidates: TeamCandidate[]): Team[] {
       riskFlags,
       scoreSummary: team.scoreSummary,
       support: defaultSupport(team.id, team.members),
-      ...defaultTeamMetadata()
+      ...defaultTeamMetadata(),
+      tasks: [],
+      meetings: [],
+      copilotRuns: []
     };
   });
 }
 
 function teamScoreById(candidates: TeamCandidate[]) {
-  return scoreTeamsAcrossRoster(candidates).teams.reduce<Record<string, number>>((acc, team) => {
+  return scoreTeamsAcrossRoster(candidates).teams.reduce<
+    Record<string, number>
+  >((acc, team) => {
     acc[team.id] = team.scoreSummary.total;
     return acc;
   }, {});
@@ -478,12 +514,12 @@ function defaultTeamMetadata() {
   return {
     projectTheme: "Course project",
     currentMilestone: null,
-    preferredMeetingDurationMin: 45,
+    preferredMeetingDurationMin: 60,
     aiOptIn: true,
     teamNorms: [
-      "Share blockers within 24 hours",
-      "Keep task owners explicit",
-      "Review work before submission"
+      "Surface blockers within 24 hours.",
+      "Post one async update before the weekly sync.",
+      "Ask for clarification before assuming intent."
     ],
     lastPulseAt: null,
     activeMeetingId: null
@@ -502,7 +538,9 @@ function cloneTeamCandidates(candidates: TeamCandidate[]) {
 }
 
 function objectiveFromScoredRoster(scored: ScoredRoster) {
-  const minTeamScore = Math.min(...scored.teams.map((team) => team.scoreSummary.total));
+  const minTeamScore = Math.min(
+    ...scored.teams.map((team) => team.scoreSummary.total)
+  );
   const averageTeamScore = average(
     scored.teams.map((team) => team.scoreSummary.total)
   );
@@ -641,7 +679,11 @@ export function applyRerouteMove(
 function objectiveScore(candidates: TeamCandidate[]) {
   const scored = scoreTeamsAcrossRoster(candidates);
   const objective = objectiveFromScoredRoster(scored);
-  return objective.minTeamScore * 1000 + objective.overallFairness * 10 + objective.averageTeamScore;
+  return (
+    objective.minTeamScore * 1000 +
+    objective.overallFairness * 10 +
+    objective.averageTeamScore
+  );
 }
 
 /**
@@ -678,7 +720,9 @@ export function getTopSwapSuggestions(
         displacedStudentId: displacedStudent.id
       });
       const projectedRoster = scoreTeamsAcrossRoster(projectedCandidates);
-      const projectedScores = projectedRoster.teams.reduce<Record<string, number>>((acc, team) => {
+      const projectedScores = projectedRoster.teams.reduce<
+        Record<string, number>
+      >((acc, team) => {
         acc[team.id] = team.scoreSummary.total;
         return acc;
       }, {});
@@ -688,9 +732,11 @@ export function getTopSwapSuggestions(
         displacedStudentName: displacedStudent.name,
         displacedStudentRole: displacedStudent.preferredRole,
         sourceTeamScoreDelta:
-          projectedScores[params.fromTeamId] - (baselineScores[params.fromTeamId] ?? 0),
+          projectedScores[params.fromTeamId] -
+          (baselineScores[params.fromTeamId] ?? 0),
         destinationTeamScoreDelta:
-          projectedScores[params.toTeamId] - (baselineScores[params.toTeamId] ?? 0),
+          projectedScores[params.toTeamId] -
+          (baselineScores[params.toTeamId] ?? 0),
         fairnessDelta: projectedRoster.fairness.overall - baselineFairness,
         legal: true,
         projectedCandidates,
@@ -724,11 +770,16 @@ export function getLegalRerouteTargets(
 
   return candidates
     .filter((team) => team.id !== params.toTeamId)
-    .filter((team) => team.id === params.fromTeamId || team.members.length < MAX_TEAM_SIZE)
+    .filter(
+      (team) =>
+        team.id === params.fromTeamId || team.members.length < MAX_TEAM_SIZE
+    )
     .sort((left, right) => left.id.localeCompare(right.id))
     .map((team) => {
       const memberCount =
-        team.id === params.fromTeamId ? Math.max(0, (fromTeam?.members.length ?? 0) - 1) : team.members.length;
+        team.id === params.fromTeamId
+          ? Math.max(0, (fromTeam?.members.length ?? 0) - 1)
+          : team.members.length;
 
       return {
         teamId: team.id,
@@ -743,7 +794,9 @@ export function getLegalRerouteTargets(
  * Finds the best pairwise swap to improve roster quality.
  * Deterministic tie-breaking comes from sorted team/member iteration order.
  */
-export function findBestSwapRepair(candidates: TeamCandidate[]): SwapProposal | null {
+export function findBestSwapRepair(
+  candidates: TeamCandidate[]
+): SwapProposal | null {
   const baselineScored = scoreTeamsAcrossRoster(candidates);
   const baselineObjective = objectiveFromScoredRoster(baselineScored);
 
@@ -838,8 +891,12 @@ export function repairTeamsBySwap(
       left.members[leftIndex]
     ];
 
-    const beforeObjective = objectiveFromScoredRoster(scoreTeamsAcrossRoster(current));
-    const afterObjective = objectiveFromScoredRoster(scoreTeamsAcrossRoster(improved));
+    const beforeObjective = objectiveFromScoredRoster(
+      scoreTeamsAcrossRoster(current)
+    );
+    const afterObjective = objectiveFromScoredRoster(
+      scoreTeamsAcrossRoster(improved)
+    );
 
     // Stop if no meaningful objective improvement.
     if (!isBetterObjective(afterObjective, beforeObjective)) {
@@ -865,9 +922,14 @@ export function generateTeamsDeterministic(
   const sortedProfiles = [...profiles].sort(compareProfileOrder);
   const teamCount = Math.max(1, Math.floor(sortedProfiles.length / teamSize));
 
-  const buckets: StudentProfile[][] = Array.from({ length: teamCount }, () => []);
+  const buckets: StudentProfile[][] = Array.from(
+    { length: teamCount },
+    () => []
+  );
 
-  const leaders = sortedProfiles.filter((profile) => profile.leadershipSignal === "high");
+  const leaders = sortedProfiles.filter(
+    (profile) => profile.leadershipSignal === "high"
+  );
   const nonLeaders = sortedProfiles.filter(
     (profile) => profile.leadershipSignal !== "high"
   );
@@ -877,7 +939,9 @@ export function generateTeamsDeterministic(
     if (buckets[index]) buckets[index].push(leader);
   });
 
-  const placementPool = [...nonLeaders, ...leaders.slice(teamCount)].sort(compareProfileOrder);
+  const placementPool = [...nonLeaders, ...leaders.slice(teamCount)].sort(
+    compareProfileOrder
+  );
 
   placementPool.forEach((candidate) => {
     let bestTeamIndex = 0;
@@ -890,7 +954,10 @@ export function generateTeamsDeterministic(
       const projected = scoreTeam(projectedMembers);
 
       // Small bonus for filling shorter teams keeps roster balanced.
-      const placementBonus = teamMembers.length < Math.floor(sortedProfiles.length / teamCount) ? 4 : 0;
+      const placementBonus =
+        teamMembers.length < Math.floor(sortedProfiles.length / teamCount)
+          ? 4
+          : 0;
       const projectedScore = projected.scoreSummary.total + placementBonus;
 
       if (projectedScore > bestProjectedScore) {

@@ -124,6 +124,15 @@ Set variables in `.env.local`.
 
 If Gemini/Vertex credentials are missing, all AI routes return realistic mock responses so demo flow remains fully operational.
 
+### Google OAuth + Calendar (optional)
+
+Required only if you want real Google Calendar invites + Meet links from Team Copilot.
+
+- `GOOGLE_OAUTH_CLIENT_ID`
+- `GOOGLE_OAUTH_CLIENT_SECRET`
+- `GOOGLE_OAUTH_REDIRECT_URI` (e.g. `http://localhost:3000/api/google/connect/callback`)
+- `GOOGLE_TOKEN_ENCRYPTION_KEY` (used server-side to encrypt stored tokens)
+
 ## Mock Mode Behavior
 
 - On first run, demo state is initialized from seeded students
