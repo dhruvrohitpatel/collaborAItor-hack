@@ -30,7 +30,9 @@ import {
 import {
   generateTeamsInputSchema,
   moveStudentInputSchema,
-  moveStudentRequestSchema
+  moveStudentRequestSchema,
+  questionnaireSubmissionSchema,
+  rosterSetupInputSchema
 } from "@/lib/schemas";
 import {
   applyInstructorSwap,
@@ -49,6 +51,7 @@ import type {
   MoveStudentRequest,
   MoveStudentResponse,
   StudentIntake,
+  StudentQuestionnaire,
   StudentProfile,
   Team
 } from "@/types/domain";
@@ -64,6 +67,52 @@ let firestoreState: DerivedFirestoreState | null = null;
 
 function buildSourceSignature(students: StudentIntake[]) {
   return students.map((student) => student.id).sort().join("|");
+}
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function buildStudentId(name: string, email: string) {
+  const emailLocal = email.split("@")[0] ?? "";
+  const base = slugify(`${name}-${emailLocal}`).slice(0, 24);
+  return base ? `stu-${base}` : `stu-${Date.now()}`;
+}
+
+function buildRosterDefaults(name: string, email: string, section?: string, cohort?: string): StudentIntake {
+  return {
+    id: buildStudentId(name, email),
+    name,
+    email,
+    timezone: "America/Phoenix",
+    availability: [{ day: "Mon", start: "17:00", end: "19:00" }],
+    strengths: ["collaboration", "reliability"],
+    growthAreas: ["technical depth", "project planning"],
+    preferredRole: "General contributor",
+    communicationStyle: "collaborative",
+    collaborationPreferences: ["shared docs", "weekly check-ins"],
+    shortReflection: "Roster record created before student questionnaire completion.",
+    roster: {
+      section,
+      cohort,
+      rosterSource: "manual"
+    }
+  };
+}
+
+async function saveStudentRecord(student: StudentIntake) {
+  if (isMockDataEnabled()) {
+    return addMockStudentIntake(student);
+  }
+
+  return addFirestoreStudentIntake(student);
+}
+
+async function getStudentByEmail(email: string) {
+  const normalized = email.trim().toLowerCase();
+  const students = await getStudents();
+
+  return students.find((student) => student.email.trim().toLowerCase() === normalized) ?? null;
 }
 
 function buildEmptyDemoState(students: StudentIntake[]): DemoState {
@@ -188,6 +237,70 @@ export async function addStudentIntake(input: StudentIntake): Promise<StudentInt
 
   const student = await addFirestoreStudentIntake(input);
   return student;
+}
+
+export async function createRosterStudent(input: {
+  name: string;
+  email: string;
+  section?: string;
+  cohort?: string;
+}): Promise<StudentIntake> {
+  const parsed = rosterSetupInputSchema.parse(input);
+  const existing = await getStudentByEmail(parsed.email);
+
+  const nextStudent: StudentIntake = existing
+    ? {
+        ...existing,
+        name: parsed.name,
+        email: parsed.email,
+        roster: {
+          ...existing.roster,
+          section: parsed.section,
+          cohort: parsed.cohort,
+          rosterSource: existing.roster?.rosterSource ?? "manual"
+        }
+      }
+    : buildRosterDefaults(parsed.name, parsed.email, parsed.section, parsed.cohort);
+
+  return saveStudentRecord(nextStudent);
+}
+
+export async function submitStudentQuestionnaire(input: {
+  name: string;
+  email: string;
+  timezone: string;
+  availability: StudentIntake["availability"];
+  strengths: string[];
+  growthAreas: string[];
+  preferredRole: string;
+  communicationStyle: StudentIntake["communicationStyle"];
+  collaborationPreferences: string[];
+  shortReflection: string;
+  questionnaire: StudentQuestionnaire;
+}): Promise<StudentIntake> {
+  const parsed = questionnaireSubmissionSchema.parse(input);
+  const existing = await getStudentByEmail(parsed.email);
+
+  const nextStudent: StudentIntake = {
+    ...(existing ?? buildRosterDefaults(parsed.name, parsed.email)),
+    name: parsed.name,
+    email: parsed.email,
+    timezone: parsed.timezone,
+    availability: parsed.availability,
+    strengths: parsed.strengths,
+    growthAreas: parsed.growthAreas,
+    preferredRole: parsed.preferredRole,
+    communicationStyle: parsed.communicationStyle,
+    collaborationPreferences: parsed.collaborationPreferences,
+    shortReflection: parsed.shortReflection,
+    questionnaire: {
+      ...existing?.questionnaire,
+      ...parsed.questionnaire,
+      completedAt: parsed.questionnaire.completedAt ?? new Date().toISOString()
+    }
+  };
+
+  return saveStudentRecord(nextStudent);
 }
 
 export async function generateProfilesForStudents(): Promise<StudentProfile[]> {

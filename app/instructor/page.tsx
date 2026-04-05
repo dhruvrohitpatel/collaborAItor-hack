@@ -1,8 +1,11 @@
 import { InstructorActions } from "@/components/instructor/instructor-actions";
 import { KpiCards } from "@/components/instructor/kpi-cards";
 import { RosterTable } from "@/components/instructor/roster-table";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDemoState } from "@/lib/repo";
+import Link from "next/link";
+import type { Route } from "next";
 
 export default async function InstructorPage() {
   const state = await getDemoState();
@@ -14,6 +17,11 @@ export default async function InstructorPage() {
         <p className="text-sm text-muted-foreground">
           Load demo data, generate profiles, and create transparent teams.
         </p>
+        <div className="pt-2">
+          <Link href={"/instructor/roster" as Route} className={buttonVariants({ variant: "outline" })}>
+            Open Roster Setup
+          </Link>
+        </div>
       </div>
 
       <KpiCards
