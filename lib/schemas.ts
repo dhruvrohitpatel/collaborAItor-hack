@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { DEFAULT_TEAM_SIZE, MAX_TEAM_SIZE, MIN_TEAM_SIZE } from "@/lib/config";
+
 export const availabilitySlotSchema = z.object({
   day: z.enum(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]),
   start: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
@@ -91,10 +93,45 @@ export const collaborationProfileSchema = studentIntakeSchema.extend({
 });
 
 export const generateTeamsInputSchema = z.object({
-  teamSize: z.number().int().min(2).max(6).default(4)
+  teamSize: z.number().int().min(MIN_TEAM_SIZE).max(MAX_TEAM_SIZE).default(DEFAULT_TEAM_SIZE)
 });
+
+export const moveStudentInputSchema = z.object({
+  studentId: z.string().min(1),
+  fromTeamId: z.string().min(1),
+  toTeamId: z.string().min(1)
+});
+
+const moveActionBaseSchema = z.object({
+  studentId: z.string().min(1),
+  fromTeamId: z.string().min(1),
+  toTeamId: z.string().min(1)
+});
+
+export const moveStudentRequestSchema = z.discriminatedUnion("action", [
+  moveActionBaseSchema.extend({
+    action: z.literal("simple_move")
+  }),
+  moveActionBaseSchema.extend({
+    action: z.literal("analyze_move")
+  }),
+  moveActionBaseSchema.extend({
+    action: z.literal("force_override_move")
+  }),
+  moveActionBaseSchema.extend({
+    action: z.literal("swap_move"),
+    displacedStudentId: z.string().min(1)
+  }),
+  moveActionBaseSchema.extend({
+    action: z.literal("reroute_move"),
+    displacedStudentId: z.string().min(1),
+    rerouteTeamId: z.string().min(1)
+  })
+]);
 
 export type StudentIntakeInput = z.infer<typeof studentIntakeSchema>;
 export type GenerateTeamsInput = z.infer<typeof generateTeamsInputSchema>;
+export type MoveStudentInput = z.infer<typeof moveStudentInputSchema>;
+export type MoveStudentRequestInput = z.infer<typeof moveStudentRequestSchema>;
 export type RiskFlagInput = z.infer<typeof riskFlagSchema>;
 export type CollaborationProfile = z.infer<typeof collaborationProfileSchema>;
