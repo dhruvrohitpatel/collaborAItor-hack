@@ -8,6 +8,37 @@ export const availabilitySlotSchema = z.object({
   end: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/)
 });
 
+export const studentRosterSchema = z.object({
+  section: z.string().min(1).optional(),
+  cohort: z.string().min(1).optional(),
+  rosterSource: z.enum(["seed", "manual", "import"]).optional()
+});
+
+export const studentQuestionnaireSchema = z.object({
+  classPriority: z.enum(["low", "medium", "high"]).optional(),
+  weeklyCapacityHours: z.number().int().min(0).max(80).optional(),
+  externalCommitments: z.string().min(2).optional(),
+  scheduleConfidence: z.enum(["tight", "manageable", "flexible"]).optional(),
+  academicConfidence: z.enum(["needs_support", "steady", "strong"]).optional(),
+  priorExperience: z.array(z.string().min(1)).optional(),
+  communicationHabits: z.array(z.string().min(1)).optional(),
+  leadershipPreference: z
+    .enum(["avoid", "supporting", "comfortable", "prefer"])
+    .optional(),
+  collaborationStylePreferences: z.array(z.string().min(1)).optional(),
+  classGoals: z.array(z.string().min(1)).optional(),
+  openReflection: z.string().min(10).optional(),
+  completedAt: z.string().datetime().optional()
+});
+
+export const communicationStyleSchema = z.enum([
+  "direct",
+  "collaborative",
+  "reflective",
+  "facilitative",
+  "analytical"
+]);
+
 export const studentIntakeSchema = z.object({
   id: z.string().min(2),
   name: z.string().min(2),
@@ -17,15 +48,39 @@ export const studentIntakeSchema = z.object({
   strengths: z.array(z.string().min(1)).min(1),
   growthAreas: z.array(z.string().min(1)).min(1),
   preferredRole: z.string().min(2),
-  communicationStyle: z.enum([
-    "direct",
-    "collaborative",
-    "reflective",
-    "facilitative",
-    "analytical"
-  ]),
+  communicationStyle: communicationStyleSchema,
   collaborationPreferences: z.array(z.string().min(1)).min(1),
-  shortReflection: z.string().min(10)
+  shortReflection: z.string().min(10),
+  roster: studentRosterSchema.optional(),
+  questionnaire: studentQuestionnaireSchema.optional()
+});
+
+export const rosterSetupInputSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  section: z.string().min(1).optional(),
+  cohort: z.string().min(1).optional()
+});
+
+export const questionnaireSubmissionSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  timezone: z.string().min(2),
+  availability: z.array(availabilitySlotSchema).min(1),
+  strengths: z.array(z.string().min(1)).min(1),
+  growthAreas: z.array(z.string().min(1)).min(1),
+  preferredRole: z.string().min(2),
+  communicationStyle: communicationStyleSchema,
+  collaborationPreferences: z.array(z.string().min(1)).min(1),
+  shortReflection: z.string().min(10),
+  questionnaire: studentQuestionnaireSchema.extend({
+    classPriority: z.enum(["low", "medium", "high"]),
+    weeklyCapacityHours: z.number().int().min(0).max(80),
+    scheduleConfidence: z.enum(["tight", "manageable", "flexible"]),
+    academicConfidence: z.enum(["needs_support", "steady", "strong"]),
+    leadershipPreference: z.enum(["avoid", "supporting", "comfortable", "prefer"]),
+    openReflection: z.string().min(10)
+  })
 });
 
 /**
@@ -108,19 +163,121 @@ export const teamSupportArtifactsSchema = z.object({
   kickoffChecklist: z.array(z.string().min(1))
 });
 
+export const teamMetadataDefaultsSchema = z.object({
+  projectTheme: z.string().default("Course project"),
+  currentMilestone: z.string().nullable().default(null),
+  preferredMeetingDurationMin: z.number().int().min(15).max(180).default(45),
+  aiOptIn: z.boolean().default(true),
+  teamNorms: z
+    .array(z.string().min(1))
+    .default([
+      "Share blockers within 24 hours",
+      "Keep task owners explicit",
+      "Review work before submission"
+    ]),
+  lastPulseAt: z.string().datetime().nullable().default(null),
+  activeMeetingId: z.string().nullable().default(null)
+});
+
 export const teamSchema = z.object({
   id: z.string().min(1),
   members: z.array(collaborationProfileSchema),
   rationale: z.string().min(1),
   riskFlags: z.array(riskFlagSchema),
   scoreSummary: teamScoreBreakdownSchema,
-  support: teamSupportArtifactsSchema
+  support: teamSupportArtifactsSchema,
+  projectTheme: teamMetadataDefaultsSchema.shape.projectTheme,
+  currentMilestone: teamMetadataDefaultsSchema.shape.currentMilestone,
+  preferredMeetingDurationMin: teamMetadataDefaultsSchema.shape.preferredMeetingDurationMin,
+  aiOptIn: teamMetadataDefaultsSchema.shape.aiOptIn,
+  teamNorms: teamMetadataDefaultsSchema.shape.teamNorms,
+  lastPulseAt: teamMetadataDefaultsSchema.shape.lastPulseAt,
+  activeMeetingId: teamMetadataDefaultsSchema.shape.activeMeetingId
+});
+
+const nullableIsoDatetimeSchema = z.string().datetime().nullable();
+
+export const teamTaskSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().default(""),
+  status: z.enum(["todo", "in_progress", "blocked", "done"]),
+  priority: z.enum(["low", "medium", "high"]),
+  assigneeStudentId: z.string().nullable(),
+  source: z.enum(["manual", "meeting_followup", "weekly_pulse", "copilot"]),
+  sourceRunId: z.string().nullable(),
+  sourceMeetingId: z.string().nullable(),
+  dueAt: nullableIsoDatetimeSchema.default(null),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  createdByStudentId: z.string().nullable()
+});
+
+export const meetingSlotProposalSchema = z.object({
+  startAt: z.string().datetime(),
+  endAt: z.string().datetime(),
+  score: z.number(),
+  memberIdsAvailable: z.array(z.string().min(1))
+});
+
+export const selectedMeetingSlotSchema = z.object({
+  startAt: z.string().datetime(),
+  endAt: z.string().datetime()
+});
+
+export const teamMeetingSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["proposed", "scheduled", "completed", "cancelled"]),
+  proposedSlots: z.array(meetingSlotProposalSchema).default([]),
+  selectedSlot: selectedMeetingSlotSchema.nullable().default(null),
+  durationMin: z.number().int().min(15).max(180),
+  timezone: z.string().min(2),
+  calendarEventId: z.string().nullable().default(null),
+  calendarHtmlLink: z.string().nullable().default(null),
+  meetUrl: z.string().nullable().default(null),
+  agenda: z.string().nullable().default(null),
+  notesRaw: z.string().nullable().default(null),
+  summary: z.string().nullable().default(null),
+  openQuestions: z.array(z.string()).default([]),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  createdByStudentId: z.string().nullable().default(null)
+});
+
+export const teamCopilotRunSchema = z.object({
+  id: z.string().min(1),
+  intent: z.enum(["rewrite_message", "schedule_meeting", "meeting_followup", "weekly_pulse"]),
+  status: z.enum(["preview", "approved", "executed", "failed"]),
+  actorStudentId: z.string().nullable().default(null),
+  inputSnapshot: z.record(z.unknown()).default({}),
+  preview: z.record(z.unknown()).default({}),
+  outputSummary: z.string().default(""),
+  requiresApproval: z.boolean(),
+  approvedAt: nullableIsoDatetimeSchema.default(null),
+  executedAt: nullableIsoDatetimeSchema.default(null),
+  errorMessage: z.string().nullable().default(null),
+  createdAt: z.string().datetime()
 });
 
 export const demoStateMetaSchema = z.object({
   studentsUpdatedAt: z.string().datetime(),
   profilesUpdatedAt: z.string().datetime().nullable().default(null),
   teamsUpdatedAt: z.string().datetime().nullable().default(null)
+});
+
+export const badgeCredentialSchema = z.object({
+  id: z.string().min(1),
+  subjectType: z.enum(["student", "team"]),
+  subjectId: z.string().min(1),
+  badgeType: z.enum(["good_standing"]),
+  isActive: z.boolean(),
+  issuedAt: z.string().datetime().nullable(),
+  updatedAt: z.string().datetime(),
+  reasonSummary: z.string().min(5),
+  solanaNetwork: z.literal("devnet"),
+  solanaReference: z.string().nullable(),
+  transactionSignature: z.string().nullable(),
+  proofStatus: z.enum(["none", "reference_prepared", "anchored_devnet"])
 });
 
 export const generateTeamsInputSchema = z.object({
@@ -161,9 +318,12 @@ export const moveStudentRequestSchema = z.discriminatedUnion("action", [
 ]);
 
 export type StudentIntakeInput = z.infer<typeof studentIntakeSchema>;
+export type RosterSetupInput = z.infer<typeof rosterSetupInputSchema>;
+export type QuestionnaireSubmissionInput = z.infer<typeof questionnaireSubmissionSchema>;
 export type GenerateTeamsInput = z.infer<typeof generateTeamsInputSchema>;
 export type MoveStudentInput = z.infer<typeof moveStudentInputSchema>;
 export type MoveStudentRequestInput = z.infer<typeof moveStudentRequestSchema>;
 export type RiskFlagInput = z.infer<typeof riskFlagSchema>;
 export type CollaborationProfile = z.infer<typeof collaborationProfileSchema>;
 export type DemoStateMetaInput = z.infer<typeof demoStateMetaSchema>;
+export type BadgeCredentialInput = z.infer<typeof badgeCredentialSchema>;

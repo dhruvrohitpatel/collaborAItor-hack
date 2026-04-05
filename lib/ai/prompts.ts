@@ -3,7 +3,51 @@ import type { DisengagementCandidate } from "@/lib/ai/participation";
 import type { ParticipationSignal } from "@/types/domain";
 import type { StudentIntake } from "@/types/domain";
 
+function formatOptionalList(label: string, values: string[] | undefined) {
+  if (!values?.length) {
+    return null;
+  }
+
+  return `${label}: ${values.join(", ")}`;
+}
+
 export function buildProfilePrompt(student: StudentIntake) {
+  const questionnaireLines = [
+    student.questionnaire?.classPriority
+      ? `Class priority: ${student.questionnaire.classPriority}`
+      : null,
+    student.questionnaire?.weeklyCapacityHours !== undefined
+      ? `Weekly capacity hours: ${student.questionnaire.weeklyCapacityHours}`
+      : null,
+    student.questionnaire?.externalCommitments
+      ? `External commitments: ${student.questionnaire.externalCommitments}`
+      : null,
+    student.questionnaire?.scheduleConfidence
+      ? `Schedule confidence: ${student.questionnaire.scheduleConfidence}`
+      : null,
+    student.questionnaire?.academicConfidence
+      ? `Academic confidence: ${student.questionnaire.academicConfidence}`
+      : null,
+    formatOptionalList("Prior experience", student.questionnaire?.priorExperience),
+    formatOptionalList("Communication habits", student.questionnaire?.communicationHabits),
+    student.questionnaire?.leadershipPreference
+      ? `Leadership preference: ${student.questionnaire.leadershipPreference}`
+      : null,
+    formatOptionalList(
+      "Collaboration style preferences",
+      student.questionnaire?.collaborationStylePreferences
+    ),
+    formatOptionalList("Class goals", student.questionnaire?.classGoals),
+    student.questionnaire?.openReflection
+      ? `Questionnaire reflection: ${student.questionnaire.openReflection}`
+      : null
+  ].filter((line): line is string => Boolean(line));
+
+  const rosterLines = [
+    student.roster?.section ? `Section: ${student.roster.section}` : null,
+    student.roster?.cohort ? `Cohort: ${student.roster.cohort}` : null
+  ].filter((line): line is string => Boolean(line));
+
   return [
     "You are a neutral collaboration profiler for an academic team-formation tool.",
     "Analyze the student intake data below and return ONLY a JSON object — no markdown, no explanation.",
@@ -22,6 +66,8 @@ export function buildProfilePrompt(student: StudentIntake) {
     "- inferredTags: 3-5 lowercase tags derived from strengths, style, and role (e.g. async-first, detail-oriented).",
     "- leadershipSignal: high if preferred role or style suggests facilitation/leadership; emerging if limited signals; otherwise medium.",
     "- riskFlags: flag genuine collaboration risks only (e.g. single-style dominance, very limited availability, narrow skill set). Empty array if none.",
+    "- If questionnaire data is present, prioritize it as the richer source of collaboration signal.",
+    "- Treat roster metadata as context only; it should not dominate the profile.",
     "- Do NOT include the student's email or any PII in any field.",
     "- Be descriptive and neutral — no value judgements.",
     "",
@@ -34,7 +80,13 @@ export function buildProfilePrompt(student: StudentIntake) {
     `Preferred role: ${student.preferredRole}`,
     `Communication style: ${student.communicationStyle}`,
     `Collaboration preferences: ${student.collaborationPreferences.join(", ")}`,
-    `Short reflection: ${student.shortReflection}`
+    `Short reflection: ${student.shortReflection}`,
+    "",
+    "Roster metadata:",
+    ...(rosterLines.length ? rosterLines : ["None provided"]),
+    "",
+    "Questionnaire data:",
+    ...(questionnaireLines.length ? questionnaireLines : ["None provided"])
   ].join("\n");
 }
 

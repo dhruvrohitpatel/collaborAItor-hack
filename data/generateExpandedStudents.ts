@@ -63,23 +63,48 @@ const communicationStyleCycle: CommunicationStyle[] = [
   "facilitative"
 ];
 
-const slotTweaks = [
+const canonicalAvailabilityPatterns: AvailabilitySlot[][] = [
   [
-    { dayOffset: 0, minutesOffset: -60 },
-    { dayOffset: 0, minutesOffset: 0 }
+    { day: "Mon", start: "17:00", end: "19:00" },
+    { day: "Wed", start: "17:00", end: "19:00" }
   ],
   [
-    { dayOffset: 0, minutesOffset: 0 },
-    { dayOffset: -1, minutesOffset: 60 }
+    { day: "Mon", start: "18:00", end: "20:00" },
+    { day: "Thu", start: "18:00", end: "20:00" }
   ],
   [
-    { dayOffset: 1, minutesOffset: 0 },
-    { dayOffset: 0, minutesOffset: -30 }
+    { day: "Tue", start: "16:00", end: "18:00" },
+    { day: "Thu", start: "16:00", end: "18:00" }
   ],
   [
-    { dayOffset: 0, minutesOffset: 30 },
-    { dayOffset: 1, minutesOffset: 0 }
+    { day: "Tue", start: "18:00", end: "20:00" },
+    { day: "Thu", start: "18:00", end: "20:00" }
+  ],
+  [
+    { day: "Wed", start: "16:00", end: "18:00" },
+    { day: "Fri", start: "16:00", end: "18:00" }
+  ],
+  [
+    { day: "Wed", start: "17:00", end: "19:00" },
+    { day: "Fri", start: "17:00", end: "19:00" }
+  ],
+  [
+    { day: "Mon", start: "19:00", end: "21:00" },
+    { day: "Thu", start: "19:00", end: "21:00" }
+  ],
+  [
+    { day: "Sat", start: "10:00", end: "12:00" },
+    { day: "Sun", start: "11:00", end: "13:00" }
   ]
+];
+
+const availabilityPatternFamilies = [
+  [0, 1, 0, 2],
+  [3, 4, 3, 5],
+  [2, 5, 2, 6],
+  [1, 3, 1, 4],
+  [0, 4, 0, 7],
+  [2, 3, 2, 5]
 ] as const;
 
 const roleVariantsByBaseId: Record<string, string[]> = {
@@ -362,49 +387,60 @@ const reflectionTemplatesByBaseId: Record<string, string[]> = {
   ]
 };
 
-const days: AvailabilitySlot["day"][] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-function minutesFromTime(time: string) {
-  const [hours, minutes] = time.split(":").map(Number);
-  return hours * 60 + minutes;
-}
-
-function timeFromMinutes(totalMinutes: number) {
-  const normalized = Math.max(8 * 60, Math.min(22 * 60, totalMinutes));
-  const hours = Math.floor(normalized / 60);
-  const minutes = normalized % 60;
-
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-}
-
-function shiftDay(day: AvailabilitySlot["day"], offset: number): AvailabilitySlot["day"] {
-  const currentIndex = days.indexOf(day);
-  const nextIndex = (currentIndex + offset + days.length) % days.length;
-  return days[nextIndex];
-}
-
-function tweakSlot(
-  slot: AvailabilitySlot,
-  tweak: { dayOffset: number; minutesOffset: number }
-): AvailabilitySlot {
-  return {
-    day: shiftDay(slot.day, tweak.dayOffset),
-    start: timeFromMinutes(minutesFromTime(slot.start) + tweak.minutesOffset),
-    end: timeFromMinutes(minutesFromTime(slot.end) + tweak.minutesOffset)
-  };
-}
-
 function createEmail(name: string) {
   return `${name.toLowerCase().replace(/[^a-z]+/g, ".").replace(/^\.+|\.+$/g, "")}@example.edu`;
+}
+
+function cloneAvailabilityPattern(patternIndex: number) {
+  return canonicalAvailabilityPatterns[patternIndex].map((slot) => ({ ...slot }));
+}
+
+function normalizeGrowthArea(area: string) {
+  const normalized = area.trim().toLowerCase();
+  const aliasMap: Record<string, string> = {
+    coding: "backend",
+    design: "ui-design",
+    database: "database-design",
+    analytics: "data-analysis",
+    data_visualization: "data-analysis",
+    "data-visualization": "data-analysis",
+    technical_depth: "backend",
+    "technical-depth": "backend",
+    api_literacy: "api-design",
+    "api-literacy": "api-design",
+    public_speaking: "presentation",
+    "public-speaking": "presentation",
+    team_facilitation: "facilitation",
+    "team-facilitation": "facilitation",
+    project_planning: "planning",
+    "project-planning": "planning",
+    product_thinking: "planning",
+    "product-thinking": "planning",
+    technical_scoping: "planning",
+    "technical-scoping": "planning",
+    communication: "writing",
+    mentoring: "facilitation",
+    ui_design: "ui-design",
+    implementation_tradeoffs: "system-design",
+    "implementation-tradeoffs": "system-design",
+    design_collaboration: "ui-design",
+    "design-collaboration": "ui-design",
+    technical_confidence: "debugging",
+    "technical-confidence": "debugging"
+  };
+
+  return aliasMap[normalized] ?? area;
+}
+
+function buildGrowthAreas(baseStudentId: string, variantIndex: number) {
+  return [...new Set(growthVariantsByBaseId[baseStudentId][variantIndex].map(normalizeGrowthArea))];
 }
 
 function createVariantStudent(baseStudent: StudentIntake, baseIndex: number, variantIndex: number) {
   const globalVariantIndex = baseIndex * 4 + variantIndex;
   const name = variantNames[globalVariantIndex];
-  const tweaks = slotTweaks[variantIndex];
-  const availability = baseStudent.availability.map((slot, slotIndex) =>
-    tweakSlot(slot, tweaks[slotIndex] ?? tweaks[1])
-  );
+  const availabilityFamily = availabilityPatternFamilies[baseIndex % availabilityPatternFamilies.length];
+  const availability = cloneAvailabilityPattern(availabilityFamily[variantIndex]);
 
   return {
     ...baseStudent,
@@ -413,7 +449,7 @@ function createVariantStudent(baseStudent: StudentIntake, baseIndex: number, var
     email: createEmail(name),
     availability,
     strengths: strengthVariantsByBaseId[baseStudent.id][variantIndex],
-    growthAreas: growthVariantsByBaseId[baseStudent.id][variantIndex],
+    growthAreas: buildGrowthAreas(baseStudent.id, variantIndex),
     preferredRole: roleVariantsByBaseId[baseStudent.id][variantIndex],
     communicationStyle:
       variantIndex % 2 === 0

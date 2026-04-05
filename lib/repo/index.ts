@@ -14,16 +14,21 @@ import { normalizeDemoState } from "@/lib/demo-state";
 import {
   addFirestoreStudentIntake,
   clearFirestoreTeams,
+  getFirestoreBadgeBySubject,
+  getFirestoreBadgesBySubjectType,
   getFirestoreStateMeta,
   getFirestoreProfiles,
   getFirestoreStudents,
   getFirestoreTeamById,
   getFirestoreTeams,
+  saveFirestoreBadge,
+  saveFirestoreBadges,
   saveFirestoreProfiles,
   saveFirestoreStateMeta,
   saveFirestoreTeams,
   updateFirestoreStudentIntake
 } from "@/lib/repo/firestoreRepository";
+import { buildTeamGoodStandingBadge } from "@/lib/solana/badges";
 import {
   addStudentIntake as addMockStudentIntake,
   generateProfilesForStudents as generateMockProfilesForStudents,
@@ -38,7 +43,9 @@ import {
 import {
   generateTeamsInputSchema,
   moveStudentInputSchema,
-  moveStudentRequestSchema
+  moveStudentRequestSchema,
+  questionnaireSubmissionSchema,
+  rosterSetupInputSchema
 } from "@/lib/schemas";
 import {
   applyInstructorSwap,
@@ -52,13 +59,62 @@ import {
   getTopSwapSuggestions
 } from "@/lib/teamFormation";
 import type {
+  BadgeCredential,
   DemoState,
   DestinationFullResolution,
   MoveStudentRequest,
   MoveStudentResponse,
   StudentIntake,
+  StudentQuestionnaire,
+  StudentProfile,
   Team
 } from "@/types/domain";
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function buildStudentId(name: string, email: string) {
+  const emailLocal = email.split("@")[0] ?? "";
+  const base = slugify(`${name}-${emailLocal}`).slice(0, 24);
+  return base ? `stu-${base}` : `stu-${Date.now()}`;
+}
+
+function buildRosterDefaults(name: string, email: string, section?: string, cohort?: string): StudentIntake {
+  return {
+    id: buildStudentId(name, email),
+    name,
+    email,
+    timezone: "America/Phoenix",
+    availability: [{ day: "Mon", start: "17:00", end: "19:00" }],
+    strengths: ["collaboration", "reliability"],
+    growthAreas: ["technical depth", "project planning"],
+    preferredRole: "General contributor",
+    communicationStyle: "collaborative",
+    collaborationPreferences: ["shared docs", "weekly check-ins"],
+    shortReflection: "Roster record created before student questionnaire completion.",
+    roster: {
+      section,
+      cohort,
+      rosterSource: "manual"
+    }
+  };
+}
+
+async function saveStudentRecord(student: StudentIntake) {
+  if (isMockDataEnabled()) {
+    return addMockStudentIntake(student);
+  }
+
+  return addFirestoreStudentIntake(student);
+}
+
+async function getStudentByEmail(email: string) {
+  const normalized = email.trim().toLowerCase();
+  const students = await getStudents();
+
+  return students.find((student) => student.email.trim().toLowerCase() === normalized) ?? null;
+}
 
 function buildEmptyDemoState(students: StudentIntake[]): DemoState {
   const now = new Date().toISOString();
@@ -133,6 +189,7 @@ async function persistFirestoreTeams(
   >
 ) {
   const savedTeams = await saveFirestoreTeams(state.teams);
+  await syncTeamBadges(savedTeams);
   const nextState = normalizeDemoState({
     students: state.students,
     profiles: state.profiles,
@@ -148,6 +205,22 @@ async function persistFirestoreTeams(
   });
 
   return savedTeams;
+}
+
+async function syncTeamBadges(teams: Team[]) {
+  const existingBadges = await getFirestoreBadgesBySubjectType("team");
+  const existingByTeamId = new Map(
+    existingBadges.map((badge) => [badge.subjectId, badge] as const)
+  );
+
+  const nextBadges = teams.map((team) =>
+    buildTeamGoodStandingBadge({
+      team,
+      existingBadge: existingByTeamId.get(team.id) ?? null
+    })
+  );
+
+  return saveFirestoreBadges("team", nextBadges);
 }
 
 export async function getStudents(): Promise<StudentIntake[]> {
@@ -172,7 +245,11 @@ export async function loadDemoSeed(): Promise<DemoState> {
   }
 
   const students = await getFirestoreStudents();
-  await Promise.all([saveFirestoreProfiles([]), clearFirestoreTeams()]);
+  await Promise.all([
+    saveFirestoreProfiles([]),
+    clearFirestoreTeams(),
+    saveFirestoreBadges("team", [])
+  ]);
   await saveFirestoreStateMeta({
     studentsUpdatedAt: new Date().toISOString(),
     profilesUpdatedAt: null,
@@ -197,6 +274,32 @@ export async function addStudentIntake(input: StudentIntake): Promise<StudentInt
   return student;
 }
 
+export async function createRosterStudent(input: {
+  name: string;
+  email: string;
+  section?: string;
+  cohort?: string;
+}): Promise<StudentIntake> {
+  const parsed = rosterSetupInputSchema.parse(input);
+  const existing = await getStudentByEmail(parsed.email);
+
+  const nextStudent: StudentIntake = existing
+    ? {
+        ...existing,
+        name: parsed.name,
+        email: parsed.email,
+        roster: {
+          ...existing.roster,
+          section: parsed.section,
+          cohort: parsed.cohort,
+          rosterSource: existing.roster?.rosterSource ?? "manual"
+        }
+      }
+    : buildRosterDefaults(parsed.name, parsed.email, parsed.section, parsed.cohort);
+
+  return saveStudentRecord(nextStudent);
+}
+
 export async function updateStudentIntake(input: StudentIntake): Promise<StudentIntake> {
   if (isMockDataEnabled()) {
     return updateMockStudentIntake(input);
@@ -211,6 +314,44 @@ export async function updateStudentIntake(input: StudentIntake): Promise<Student
   });
 
   return student;
+}
+
+export async function submitStudentQuestionnaire(input: {
+  name: string;
+  email: string;
+  timezone: string;
+  availability: StudentIntake["availability"];
+  strengths: string[];
+  growthAreas: string[];
+  preferredRole: string;
+  communicationStyle: StudentIntake["communicationStyle"];
+  collaborationPreferences: string[];
+  shortReflection: string;
+  questionnaire: StudentQuestionnaire;
+}): Promise<StudentIntake> {
+  const parsed = questionnaireSubmissionSchema.parse(input);
+  const existing = await getStudentByEmail(parsed.email);
+
+  const nextStudent: StudentIntake = {
+    ...(existing ?? buildRosterDefaults(parsed.name, parsed.email)),
+    name: parsed.name,
+    email: parsed.email,
+    timezone: parsed.timezone,
+    availability: parsed.availability,
+    strengths: parsed.strengths,
+    growthAreas: parsed.growthAreas,
+    preferredRole: parsed.preferredRole,
+    communicationStyle: parsed.communicationStyle,
+    collaborationPreferences: parsed.collaborationPreferences,
+    shortReflection: parsed.shortReflection,
+    questionnaire: {
+      ...existing?.questionnaire,
+      ...parsed.questionnaire,
+      completedAt: parsed.questionnaire.completedAt ?? new Date().toISOString()
+    }
+  };
+
+  return saveStudentRecord(nextStudent);
 }
 
 export async function generateProfilesForStudents(): Promise<ProfileGenerationResult> {
@@ -281,6 +422,34 @@ export async function getTeamById(teamId: string): Promise<Team | null> {
   }
 
   return getFirestoreTeamById(teamId);
+}
+
+export async function getTeamBadge(teamId: string): Promise<BadgeCredential | null> {
+  if (isMockDataEnabled()) {
+    return null;
+  }
+
+  return getFirestoreBadgeBySubject("team", teamId);
+}
+
+export async function issueOrUpdateTeamBadge(teamId: string): Promise<BadgeCredential> {
+  const team = await getTeamById(teamId);
+
+  if (!team) {
+    throw new Error(`Team "${teamId}" was not found.`);
+  }
+
+  if (isMockDataEnabled()) {
+    return buildTeamGoodStandingBadge({ team });
+  }
+
+  const existingBadge = await getFirestoreBadgeBySubject("team", teamId);
+  const nextBadge = buildTeamGoodStandingBadge({
+    team,
+    existingBadge
+  });
+
+  return saveFirestoreBadge(nextBadge);
 }
 
 export async function moveStudentBetweenTeams(input: {

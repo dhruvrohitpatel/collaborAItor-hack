@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
@@ -310,13 +311,58 @@ export function AiToolsPanel({
                 </div>
               </div>
 
-              <div>
-                <FieldLabel label="Audience" hint="Who will read this message?" />
-                <Input
+          <TabsContent value="rewrite" className="space-y-3">
+            <Textarea
+              value={rewriteInput.message}
+              onChange={(event) =>
+                setRewriteInput((prev) => ({ ...prev, message: event.target.value }))
+              }
+              rows={4}
+            />
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-1">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Tone
+                </p>
+                <Select
+                  value={rewriteInput.tone}
+                  onValueChange={(value) =>
+                    setRewriteInput((prev) => ({ ...prev, tone: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rewriteToneOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Audience
+                </p>
+                <Select
                   value={rewriteInput.audience}
-                  onChange={(e) => setRewriteInput((p) => ({ ...p, audience: e.target.value }))}
-                  placeholder="e.g. student project team"
-                />
+                  onValueChange={(value) =>
+                    setRewriteInput((prev) => ({ ...prev, audience: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select audience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rewriteAudienceOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

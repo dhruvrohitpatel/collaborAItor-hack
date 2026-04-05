@@ -80,8 +80,8 @@ export default function LandingPage() {
               <Link href="/instructor" className={buttonVariants({})}>
                 Open Instructor Dashboard <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-              <Link href="/student/intake" className={buttonVariants({ variant: "outline" })}>
-                Student Intake Form
+              <Link href="/student/questionnaire" className={buttonVariants({ variant: "outline" })}>
+                Open Student Onboarding
               </Link>
             </div>
 
@@ -99,6 +99,23 @@ export default function LandingPage() {
                 <p className="text-xs text-slate-400">Black-box decisions</p>
               </div>
             </div>
+      <section className="grid gap-6 rounded-2xl border bg-white p-8 shadow-sm md:grid-cols-[1.4fr_1fr]">
+        <div className="space-y-4">
+          <Badge variant="secondary">Google Track Hackathon MVP</Badge>
+          <h1 className="text-4xl font-semibold tracking-tight">
+            Build better student teams with transparent AI support.
+          </h1>
+          <p className="max-w-2xl text-slate-600">
+            Collabor-AI-tor helps instructors gather collaboration signals, generate structured
+            profiles, form balanced teams, and provide practical team support tools.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/instructor" className={buttonVariants({})}>
+              Open Instructor Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+            <Link href="/student/questionnaire" className={buttonVariants({ variant: "outline" })}>
+              Open Student Onboarding
+            </Link>
           </div>
 
           {/* Right — principles */}

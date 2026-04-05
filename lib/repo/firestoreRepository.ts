@@ -3,22 +3,37 @@ import {
   doc,
   getDoc,
   getDocs,
+  query,
   setDoc,
+  where,
   writeBatch
 } from "firebase/firestore";
 
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
+import type { BadgeCredentialInput, DemoStateMetaInput } from "@/lib/schemas";
 import {
+  badgeCredentialSchema,
   collaborationProfileSchema,
   demoStateMetaSchema,
   studentIntakeSchema,
+  teamCopilotRunSchema,
+  teamMeetingSchema,
+  teamTaskSchema,
   teamSchema
 } from "@/lib/schemas";
-import type { StudentIntake, StudentProfile, Team } from "@/types/domain";
-import type { DemoStateMetaInput } from "@/lib/schemas";
+import type {
+  BadgeCredential,
+  StudentIntake,
+  StudentProfile,
+  Team,
+  TeamCopilotRun,
+  TeamMeeting,
+  TeamTask
+} from "@/types/domain";
 
 const META_COLLECTION = "meta";
 const DEMO_STATE_META_DOC = "demo-state";
+const BADGES_COLLECTION = "badges";
 
 function getConfiguredFirestoreDb() {
   if (!isFirebaseConfigured) {
@@ -36,6 +51,53 @@ function getConfiguredFirestoreDb() {
   }
 
   return db;
+}
+
+function getTeamSubcollection<T extends { id: string }>(
+  teamId: string,
+  subcollectionName: "tasks" | "meetings" | "copilot_runs",
+  parse: (value: unknown) => T
+) {
+  return async () => {
+    const db = getConfiguredFirestoreDb();
+    const snapshot = await getDocs(collection(db, "teams", teamId, subcollectionName));
+
+    return snapshot.docs
+      .map((itemDoc) =>
+        parse({
+          ...itemDoc.data(),
+          id: itemDoc.id
+        })
+      )
+      .sort((left, right) => left.id.localeCompare(right.id));
+  };
+}
+
+async function syncTeamSubcollection<T extends { id: string }>(
+  teamId: string,
+  subcollectionName: "tasks" | "meetings" | "copilot_runs",
+  items: T[],
+  parse: (value: unknown) => T
+) {
+  const db = getConfiguredFirestoreDb();
+  const validatedItems = items.map((item) => parse(item));
+  const validIds = new Set(validatedItems.map((item) => item.id));
+  const existingSnapshot = await getDocs(collection(db, "teams", teamId, subcollectionName));
+  const batch = writeBatch(db);
+
+  for (const existingDoc of existingSnapshot.docs) {
+    if (!validIds.has(existingDoc.id)) {
+      batch.delete(existingDoc.ref);
+    }
+  }
+
+  for (const item of validatedItems) {
+    batch.set(doc(db, "teams", teamId, subcollectionName, item.id), item);
+  }
+
+  await batch.commit();
+
+  return validatedItems;
 }
 
 export async function getFirestoreStudents(): Promise<StudentIntake[]> {
@@ -163,6 +225,149 @@ export async function saveFirestoreTeams(teams: Team[]): Promise<Team[]> {
   await batch.commit();
 
   return validatedTeams;
+}
+
+export const getFirestoreTeamTasks = (teamId: string) =>
+  getTeamSubcollection(teamId, "tasks", (value) => teamTaskSchema.parse(value))();
+
+export async function saveFirestoreTeamTasks(teamId: string, tasks: TeamTask[]): Promise<TeamTask[]> {
+  return syncTeamSubcollection(teamId, "tasks", tasks, (value) => teamTaskSchema.parse(value));
+}
+
+export async function addFirestoreTeamTask(teamId: string, task: TeamTask): Promise<TeamTask> {
+  const db = getConfiguredFirestoreDb();
+  const validatedTask = teamTaskSchema.parse(task);
+
+  await setDoc(doc(db, "teams", teamId, "tasks", validatedTask.id), validatedTask);
+
+  return validatedTask;
+}
+
+export const getFirestoreTeamMeetings = (teamId: string) =>
+  getTeamSubcollection(teamId, "meetings", (value) => teamMeetingSchema.parse(value))();
+
+export async function saveFirestoreTeamMeetings(
+  teamId: string,
+  meetings: TeamMeeting[]
+): Promise<TeamMeeting[]> {
+  return syncTeamSubcollection(teamId, "meetings", meetings, (value) =>
+    teamMeetingSchema.parse(value)
+  );
+}
+
+export async function addFirestoreTeamMeeting(
+  teamId: string,
+  meeting: TeamMeeting
+): Promise<TeamMeeting> {
+  const db = getConfiguredFirestoreDb();
+  const validatedMeeting = teamMeetingSchema.parse(meeting);
+
+  await setDoc(doc(db, "teams", teamId, "meetings", validatedMeeting.id), validatedMeeting);
+
+  return validatedMeeting;
+}
+
+export const getFirestoreCopilotRuns = (teamId: string) =>
+  getTeamSubcollection(teamId, "copilot_runs", (value) => teamCopilotRunSchema.parse(value))();
+
+export async function saveFirestoreCopilotRuns(
+  teamId: string,
+  runs: TeamCopilotRun[]
+): Promise<TeamCopilotRun[]> {
+  return syncTeamSubcollection(teamId, "copilot_runs", runs, (value) =>
+    teamCopilotRunSchema.parse(value)
+  );
+}
+
+export async function addFirestoreCopilotRun(
+  teamId: string,
+  run: TeamCopilotRun
+): Promise<TeamCopilotRun> {
+  const db = getConfiguredFirestoreDb();
+  const validatedRun = teamCopilotRunSchema.parse(run);
+
+  await setDoc(doc(db, "teams", teamId, "copilot_runs", validatedRun.id), validatedRun);
+
+  return validatedRun;
+}
+
+export async function getFirestoreBadgeBySubject(
+  subjectType: BadgeCredential["subjectType"],
+  subjectId: string
+): Promise<BadgeCredential | null> {
+  const db = getConfiguredFirestoreDb();
+  const snapshot = await getDocs(
+    query(
+      collection(db, BADGES_COLLECTION),
+      where("subjectType", "==", subjectType),
+      where("subjectId", "==", subjectId)
+    )
+  );
+
+  const firstDoc = snapshot.docs[0];
+
+  if (!firstDoc) {
+    return null;
+  }
+
+  return badgeCredentialSchema.parse({
+    ...firstDoc.data(),
+    id: firstDoc.id
+  });
+}
+
+export async function getFirestoreBadgesBySubjectType(
+  subjectType: BadgeCredential["subjectType"]
+): Promise<BadgeCredential[]> {
+  const db = getConfiguredFirestoreDb();
+  const snapshot = await getDocs(
+    query(collection(db, BADGES_COLLECTION), where("subjectType", "==", subjectType))
+  );
+
+  return snapshot.docs
+    .map((badgeDoc) =>
+      badgeCredentialSchema.parse({
+        ...badgeDoc.data(),
+        id: badgeDoc.id
+      })
+    )
+    .sort((left, right) => left.id.localeCompare(right.id));
+}
+
+export async function saveFirestoreBadge(input: BadgeCredentialInput): Promise<BadgeCredential> {
+  const db = getConfiguredFirestoreDb();
+  const badge = badgeCredentialSchema.parse(input);
+
+  await setDoc(doc(db, BADGES_COLLECTION, badge.id), badge);
+
+  return badge;
+}
+
+export async function saveFirestoreBadges(
+  subjectType: BadgeCredential["subjectType"],
+  inputs: BadgeCredentialInput[]
+): Promise<BadgeCredential[]> {
+  const db = getConfiguredFirestoreDb();
+  const badges = inputs.map((input) => badgeCredentialSchema.parse(input));
+  const validIds = new Set(badges.map((badge) => badge.id));
+  const existingSnapshot = await getDocs(
+    query(collection(db, BADGES_COLLECTION), where("subjectType", "==", subjectType))
+  );
+  const batch = writeBatch(db);
+
+  for (const existingDoc of existingSnapshot.docs) {
+    if (!validIds.has(existingDoc.id)) {
+      batch.delete(existingDoc.ref);
+    }
+  }
+
+  for (const badge of badges) {
+    batch.set(doc(db, BADGES_COLLECTION, badge.id), badge);
+  }
+
+  await batch.commit();
+
+  return badges;
 }
 
 export async function getFirestoreStateMeta(): Promise<DemoStateMetaInput | null> {
