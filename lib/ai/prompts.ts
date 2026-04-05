@@ -1,4 +1,6 @@
 import type { AICharterRequest, AIGenerateTeamsRationaleRequest } from "@/lib/ai/schemas";
+import type { DisengagementCandidate } from "@/lib/ai/participation";
+import type { ParticipationSignal } from "@/types/domain";
 import type { StudentIntake } from "@/types/domain";
 
 export function buildProfilePrompt(student: StudentIntake) {
@@ -151,6 +153,55 @@ export function buildMeetingSummaryPrompt(notes: string) {
     "",
     "Meeting notes:",
     notes
+  ].join("\n");
+}
+
+export function buildCoachingPrompt(
+  teamId: string,
+  signals: ParticipationSignal[],
+  candidates: DisengagementCandidate[]
+) {
+  const summaryLines = signals
+    .map((s) => `  ${s.memberName}: ${s.sharePercent}% share, ${s.messageCount} messages, last active ${s.daysSilent === 0 ? "today" : `${s.daysSilent}d ago`}`)
+    .join("\n");
+
+  const flagLines = candidates
+    .map((c) => `  ${c.signal.memberName}: ${c.reasons.join("; ")} → tentative severity: ${c.severity}`)
+    .join("\n");
+
+  return [
+    "You are a proactive coaching assistant for an academic instructor.",
+    "Generate instructor-facing disengagement alerts based on participation data.",
+    "Return ONLY a JSON object — no markdown, no preamble.",
+    "",
+    "Required JSON shape:",
+    "{",
+    '  "alerts": [',
+    '    {',
+    '      "flaggedMember": "<name>",',
+    '      "memberId": "<id>",',
+    '      "reason": "<one sentence, non-judgmental, references specific numbers>",',
+    '      "suggestedFollowUp": "<one concrete action the instructor can take>",',
+    '      "severity": "<low | medium | high>"',
+    '    }',
+    "  ]",
+    "}",
+    "",
+    "Rules:",
+    "- One alert object per flagged member only. Empty array if no candidates.",
+    "- reason: cite the specific signal (e.g. '7% of team messages and silent for 5 days').",
+    "  Use 'may be' / 'appears to' — never state disengagement as fact.",
+    "  Do NOT use the word 'disengaged' or make character judgements.",
+    "- suggestedFollowUp: a direct, actionable step (e.g. 'Send a brief check-in message').",
+    "- severity: use the tentative severity unless the data clearly warrants adjustment.",
+    "- Keep each field to one sentence.",
+    "",
+    `Team: ${teamId}`,
+    "Participation (last 7 days):",
+    summaryLines,
+    "",
+    "Flagged for review:",
+    flagLines.length > 0 ? flagLines : "  None"
   ].join("\n");
 }
 

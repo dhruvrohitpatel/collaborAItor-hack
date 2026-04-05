@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { ScoreSummary } from "@/components/teams/score-summary";
 import { RiskBadge } from "@/components/teams/risk-badge";
+import { DisengagementPanel } from "@/components/teams/disengagement-panel";
 import { AiToolsPanel } from "@/components/tools/ai-tools-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTeamById } from "@/lib/repo";
@@ -54,6 +55,10 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
         </Card>
 
         <ScoreSummary score={team.scoreSummary} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <DisengagementPanel teamId={team.id} members={team.members} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

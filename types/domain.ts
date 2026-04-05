@@ -75,3 +75,39 @@ export type DemoState = {
   teams: Team[];
   updatedAt: string;
 };
+
+/** A single message event — content is excluded to keep analysis privacy-preserving. */
+export type TeamMessage = {
+  memberId: string;
+  memberName: string;
+  /** ISO 8601 timestamp. */
+  timestamp: string;
+  /** Proxy for contribution volume without exposing message text. */
+  wordCount: number;
+};
+
+/** Per-member participation summary computed from a message window. */
+export type ParticipationSignal = {
+  memberId: string;
+  memberName: string;
+  messageCount: number;
+  wordCount: number;
+  /** Percentage of total team messages (0–100). */
+  sharePercent: number;
+  /** ISO timestamp of most recent message, or "never". */
+  lastActiveAt: string;
+  daysSilent: number;
+};
+
+/** Instructor-facing flag produced by the coaching agent. */
+export type CoachingAlert = {
+  flaggedMember: string;
+  memberId: string;
+  /** Non-judgmental explanation referencing specific signals. */
+  reason: string;
+  /** Concrete follow-up suggestion for the instructor. */
+  suggestedFollowUp: string;
+  severity: "low" | "medium" | "high";
+  participationShare: number;
+  daysSilent: number;
+};
