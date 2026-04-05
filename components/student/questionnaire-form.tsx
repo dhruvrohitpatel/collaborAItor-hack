@@ -138,7 +138,7 @@ export function StudentQuestionnaireForm() {
       push({
         kind: "success",
         title: "Questionnaire submitted",
-        description: "Your richer collaboration data is now available for profile generation."
+        description: "Your onboarding responses are now available for AI profile generation."
       });
       setForm(initialState);
     } catch (error) {
@@ -155,7 +155,7 @@ export function StudentQuestionnaireForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Student Self-Assessment Questionnaire</CardTitle>
+        <CardTitle>Student Onboarding Questionnaire</CardTitle>
       </CardHeader>
       <CardContent className="overflow-visible">
         <form onSubmit={onSubmit} className="space-y-6">
@@ -180,10 +180,10 @@ export function StudentQuestionnaireForm() {
           </div>
 
           <div className="rounded-md border bg-slate-50 p-4">
-            <h3 className="text-sm font-semibold">Current collaboration baseline</h3>
+            <h3 className="text-sm font-semibold">Collaboration habits and availability</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              These fields keep the current matching engine working while the richer onboarding
-              model is being introduced.
+              Complete one onboarding form. These answers are mapped into the current matching
+              model while also giving Gemini richer context for profile generation.
             </p>
 
             <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -297,10 +297,9 @@ export function StudentQuestionnaireForm() {
           </div>
 
           <div className="rounded-md border bg-white p-4">
-            <h3 className="text-sm font-semibold">Deeper self-assessment</h3>
+            <h3 className="text-sm font-semibold">Workload, support, and goals</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              These answers feed the richer Gemini profile prompt without replacing the current
-              working flow.
+              Share the context that helps the AI summarize how you work best with a team.
             </p>
 
             <div className="mt-4 grid gap-4 md:grid-cols-2">

@@ -316,6 +316,24 @@ export async function getFirestoreBadgeBySubject(
   });
 }
 
+export async function getFirestoreBadgesBySubjectType(
+  subjectType: BadgeCredential["subjectType"]
+): Promise<BadgeCredential[]> {
+  const db = getConfiguredFirestoreDb();
+  const snapshot = await getDocs(
+    query(collection(db, BADGES_COLLECTION), where("subjectType", "==", subjectType))
+  );
+
+  return snapshot.docs
+    .map((badgeDoc) =>
+      badgeCredentialSchema.parse({
+        ...badgeDoc.data(),
+        id: badgeDoc.id
+      })
+    )
+    .sort((left, right) => left.id.localeCompare(right.id));
+}
+
 export async function saveFirestoreBadge(input: BadgeCredentialInput): Promise<BadgeCredential> {
   const db = getConfiguredFirestoreDb();
   const badge = badgeCredentialSchema.parse(input);
@@ -323,6 +341,33 @@ export async function saveFirestoreBadge(input: BadgeCredentialInput): Promise<B
   await setDoc(doc(db, BADGES_COLLECTION, badge.id), badge);
 
   return badge;
+}
+
+export async function saveFirestoreBadges(
+  subjectType: BadgeCredential["subjectType"],
+  inputs: BadgeCredentialInput[]
+): Promise<BadgeCredential[]> {
+  const db = getConfiguredFirestoreDb();
+  const badges = inputs.map((input) => badgeCredentialSchema.parse(input));
+  const validIds = new Set(badges.map((badge) => badge.id));
+  const existingSnapshot = await getDocs(
+    query(collection(db, BADGES_COLLECTION), where("subjectType", "==", subjectType))
+  );
+  const batch = writeBatch(db);
+
+  for (const existingDoc of existingSnapshot.docs) {
+    if (!validIds.has(existingDoc.id)) {
+      batch.delete(existingDoc.ref);
+    }
+  }
+
+  for (const badge of badges) {
+    batch.set(doc(db, BADGES_COLLECTION, badge.id), badge);
+  }
+
+  await batch.commit();
+
+  return badges;
 }
 
 export async function getFirestoreStateMeta(): Promise<DemoStateMetaInput | null> {

@@ -74,6 +74,10 @@ export function buildTeamGoodStandingBadge(input: {
   const badgeId = input.existingBadge?.id ?? `badge-team-${input.team.id}-good-standing`;
   const issuedAt =
     isActive ? input.existingBadge?.issuedAt ?? updatedAt : input.existingBadge?.issuedAt ?? null;
+  const blockingRisks = input.team.riskFlags
+    .filter((flag) => flag.severity === "high")
+    .map((flag) => flag.label)
+    .join(", ");
 
   return {
     id: badgeId,
@@ -84,8 +88,8 @@ export function buildTeamGoodStandingBadge(input: {
     issuedAt,
     updatedAt,
     reasonSummary: isActive
-      ? "No high-severity team risk flags are active, so this team is currently on track."
-      : "Badge inactive because the team currently has at least one high-severity collaboration risk.",
+      ? "This team is currently in good standing and eligible for the on-track collaboration credential."
+      : `Credential currently inactive because this team still has high-priority collaboration risks: ${blockingRisks}.`,
     solanaNetwork: "devnet",
     solanaReference: isActive
       ? prepareSolanaBadgeReference({

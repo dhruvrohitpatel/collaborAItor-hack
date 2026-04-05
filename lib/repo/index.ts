@@ -15,12 +15,14 @@ import {
   addFirestoreStudentIntake,
   clearFirestoreTeams,
   getFirestoreBadgeBySubject,
+  getFirestoreBadgesBySubjectType,
   getFirestoreStateMeta,
   getFirestoreProfiles,
   getFirestoreStudents,
   getFirestoreTeamById,
   getFirestoreTeams,
   saveFirestoreBadge,
+  saveFirestoreBadges,
   saveFirestoreProfiles,
   saveFirestoreStateMeta,
   saveFirestoreTeams,
@@ -187,6 +189,7 @@ async function persistFirestoreTeams(
   >
 ) {
   const savedTeams = await saveFirestoreTeams(state.teams);
+  await syncTeamBadges(savedTeams);
   const nextState = normalizeDemoState({
     students: state.students,
     profiles: state.profiles,
@@ -202,6 +205,22 @@ async function persistFirestoreTeams(
   });
 
   return savedTeams;
+}
+
+async function syncTeamBadges(teams: Team[]) {
+  const existingBadges = await getFirestoreBadgesBySubjectType("team");
+  const existingByTeamId = new Map(
+    existingBadges.map((badge) => [badge.subjectId, badge] as const)
+  );
+
+  const nextBadges = teams.map((team) =>
+    buildTeamGoodStandingBadge({
+      team,
+      existingBadge: existingByTeamId.get(team.id) ?? null
+    })
+  );
+
+  return saveFirestoreBadges("team", nextBadges);
 }
 
 export async function getStudents(): Promise<StudentIntake[]> {
@@ -226,7 +245,11 @@ export async function loadDemoSeed(): Promise<DemoState> {
   }
 
   const students = await getFirestoreStudents();
-  await Promise.all([saveFirestoreProfiles([]), clearFirestoreTeams()]);
+  await Promise.all([
+    saveFirestoreProfiles([]),
+    clearFirestoreTeams(),
+    saveFirestoreBadges("team", [])
+  ]);
   await saveFirestoreStateMeta({
     studentsUpdatedAt: new Date().toISOString(),
     profilesUpdatedAt: null,

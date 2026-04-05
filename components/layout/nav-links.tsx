@@ -10,8 +10,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/instructor", label: "Instructor" },
   { href: "/instructor/roster", label: "Roster Setup" },
-  { href: "/student/intake", label: "Student Intake" },
-  { href: "/student/questionnaire", label: "Questionnaire" },
+  { href: "/student/questionnaire", label: "Student Onboarding" },
   { href: "/student/profile-review", label: "Profiles" },
   { href: "/teams", label: "Teams" },
   { href: "/tools", label: "AI Tools" }

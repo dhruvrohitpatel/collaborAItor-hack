@@ -31,23 +31,22 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-semibold">{team.id} Detail</h1>
           {isOutOfBounds ? <Badge variant="danger">Out of bounds</Badge> : null}
-          {badge?.isActive ? <Badge variant="success">Solana Good Standing</Badge> : null}
+          {badge?.isActive ? <Badge variant="success">On-Track Team</Badge> : null}
         </div>
         <p className="text-sm text-muted-foreground">Transparent assignment rationale and support tools.</p>
       </div>
 
-      {badge?.isActive ? (
+      {badge ? (
         <Card>
           <CardHeader>
-            <CardTitle>Verifiable Collaboration Credential</CardTitle>
+            <CardTitle>{badge.isActive ? "Good Standing" : "Needs Attention"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <p>{badge.reasonSummary}</p>
             <p className="text-xs text-muted-foreground">
-              Solana network: {badge.solanaNetwork} • Proof status: {badge.proofStatus}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Reference: {badge.solanaReference ?? "Not prepared"}
+              {badge.isActive
+                ? "A verifiable collaboration credential has been prepared for this team."
+                : "Resolve the active high-priority team risks to restore good standing."}
             </p>
           </CardContent>
         </Card>
