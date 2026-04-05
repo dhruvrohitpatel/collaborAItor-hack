@@ -5,6 +5,8 @@ import { ProfileCard } from "@/components/student/profile-card";
 import { buttonVariants } from "@/components/ui/button";
 import { getDemoState } from "@/lib/repo";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfileReviewPage() {
   const state = await getDemoState();
   const aiProfiles = state.profiles.filter((profile) => profile.profileSource === "ai").length;

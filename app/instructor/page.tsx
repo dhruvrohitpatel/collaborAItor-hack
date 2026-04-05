@@ -8,6 +8,8 @@ import { getDemoState } from "@/lib/repo";
 import Link from "next/link";
 import type { Route } from "next";
 
+export const dynamic = "force-dynamic";
+
 export default async function InstructorPage() {
   const state = await getDemoState();
 

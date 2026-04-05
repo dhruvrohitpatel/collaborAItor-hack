@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTeamBadge, getTeamById } from "@/lib/repo";
 
+export const dynamic = "force-dynamic";
+
 type TeamDetailPageProps = {
   params: {
     teamId: string;

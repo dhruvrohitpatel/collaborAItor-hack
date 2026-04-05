@@ -66,7 +66,6 @@ import type {
   MoveStudentResponse,
   StudentIntake,
   StudentQuestionnaire,
-  StudentProfile,
   Team
 } from "@/types/domain";
 
