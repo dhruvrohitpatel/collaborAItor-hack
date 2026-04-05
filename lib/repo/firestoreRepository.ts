@@ -11,6 +11,7 @@ import {
 
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 import type { BadgeCredentialInput, DemoStateMetaInput } from "@/lib/schemas";
+import type { DemoStateMetaInput } from "@/lib/schemas";
 import {
   badgeCredentialSchema,
   collaborationProfileSchema,
@@ -291,6 +292,7 @@ export async function addFirestoreCopilotRun(
   return validatedRun;
 }
 
+<<<<<<< HEAD
 export async function getFirestoreBadgeBySubject(
   subjectType: BadgeCredential["subjectType"],
   subjectId: string
@@ -370,6 +372,8 @@ export async function saveFirestoreBadges(
   return badges;
 }
 
+=======
+>>>>>>> backend
 export async function getFirestoreStateMeta(): Promise<DemoStateMetaInput | null> {
   const db = getConfiguredFirestoreDb();
   const metaDoc = await getDoc(doc(db, META_COLLECTION, DEMO_STATE_META_DOC));
