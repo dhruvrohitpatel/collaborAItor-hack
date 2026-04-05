@@ -9,7 +9,23 @@
  * Callers are responsible for parsing and validating the returned value.
  */
 
-const GEMINI_MODEL = "gemini-1.5-flash";
+export function getGeminiModel() {
+  return process.env.GEMINI_MODEL || "gemini-2.5-flash";
+}
+
+export class GeminiApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "GeminiApiError";
+    this.status = status;
+  }
+}
+
+export function isGeminiRateLimitError(error: unknown) {
+  return error instanceof GeminiApiError && error.status === 429;
+}
 
 export async function callGeminiForJSON(prompt: string): Promise<unknown> {
   if (process.env.GEMINI_API_KEY) {
@@ -24,7 +40,7 @@ export async function callGeminiForJSON(prompt: string): Promise<unknown> {
 }
 
 async function callViaAPIKey(prompt: string, apiKey: string): Promise<unknown> {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${apiKey}`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -39,7 +55,7 @@ async function callViaAPIKey(prompt: string, apiKey: string): Promise<unknown> {
   });
 
   if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.status}`);
+    throw new GeminiApiError(response.status, `Gemini API error: ${response.status}`);
   }
 
   const data = (await response.json()) as {
@@ -56,7 +72,7 @@ async function callViaAPIKey(prompt: string, apiKey: string): Promise<unknown> {
 
 async function callViaVertex(prompt: string, projectId: string): Promise<unknown> {
   const location = process.env.VERTEX_LOCATION ?? "us-central1";
-  const endpoint = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${GEMINI_MODEL}:generateContent`;
+  const endpoint = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${getGeminiModel()}:generateContent`;
 
   const tokenRes = await fetch(
     "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
@@ -64,7 +80,7 @@ async function callViaVertex(prompt: string, projectId: string): Promise<unknown
   );
 
   if (!tokenRes.ok) {
-    throw new Error(`Failed to fetch Vertex ADC token: ${tokenRes.status}`);
+    throw new GeminiApiError(tokenRes.status, `Failed to fetch Vertex ADC token: ${tokenRes.status}`);
   }
 
   const { access_token: accessToken } = (await tokenRes.json()) as { access_token: string };
@@ -83,7 +99,7 @@ async function callViaVertex(prompt: string, projectId: string): Promise<unknown
   });
 
   if (!response.ok) {
-    throw new Error(`Vertex API error: ${response.status}`);
+    throw new GeminiApiError(response.status, `Vertex API error: ${response.status}`);
   }
 
   const data = (await response.json()) as {

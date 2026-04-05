@@ -8,6 +8,37 @@ export const availabilitySlotSchema = z.object({
   end: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/)
 });
 
+export const studentRosterSchema = z.object({
+  section: z.string().min(1).optional(),
+  cohort: z.string().min(1).optional(),
+  rosterSource: z.enum(["seed", "manual", "import"]).optional()
+});
+
+export const studentQuestionnaireSchema = z.object({
+  classPriority: z.enum(["low", "medium", "high"]).optional(),
+  weeklyCapacityHours: z.number().int().min(0).max(80).optional(),
+  externalCommitments: z.string().min(2).optional(),
+  scheduleConfidence: z.enum(["tight", "manageable", "flexible"]).optional(),
+  academicConfidence: z.enum(["needs_support", "steady", "strong"]).optional(),
+  priorExperience: z.array(z.string().min(1)).optional(),
+  communicationHabits: z.array(z.string().min(1)).optional(),
+  leadershipPreference: z
+    .enum(["avoid", "supporting", "comfortable", "prefer"])
+    .optional(),
+  collaborationStylePreferences: z.array(z.string().min(1)).optional(),
+  classGoals: z.array(z.string().min(1)).optional(),
+  openReflection: z.string().min(10).optional(),
+  completedAt: z.string().datetime().optional()
+});
+
+export const communicationStyleSchema = z.enum([
+  "direct",
+  "collaborative",
+  "reflective",
+  "facilitative",
+  "analytical"
+]);
+
 export const studentIntakeSchema = z.object({
   id: z.string().min(2),
   name: z.string().min(2),
@@ -17,15 +48,39 @@ export const studentIntakeSchema = z.object({
   strengths: z.array(z.string().min(1)).min(1),
   growthAreas: z.array(z.string().min(1)).min(1),
   preferredRole: z.string().min(2),
-  communicationStyle: z.enum([
-    "direct",
-    "collaborative",
-    "reflective",
-    "facilitative",
-    "analytical"
-  ]),
+  communicationStyle: communicationStyleSchema,
   collaborationPreferences: z.array(z.string().min(1)).min(1),
-  shortReflection: z.string().min(10)
+  shortReflection: z.string().min(10),
+  roster: studentRosterSchema.optional(),
+  questionnaire: studentQuestionnaireSchema.optional()
+});
+
+export const rosterSetupInputSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  section: z.string().min(1).optional(),
+  cohort: z.string().min(1).optional()
+});
+
+export const questionnaireSubmissionSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  timezone: z.string().min(2),
+  availability: z.array(availabilitySlotSchema).min(1),
+  strengths: z.array(z.string().min(1)).min(1),
+  growthAreas: z.array(z.string().min(1)).min(1),
+  preferredRole: z.string().min(2),
+  communicationStyle: communicationStyleSchema,
+  collaborationPreferences: z.array(z.string().min(1)).min(1),
+  shortReflection: z.string().min(10),
+  questionnaire: studentQuestionnaireSchema.extend({
+    classPriority: z.enum(["low", "medium", "high"]),
+    weeklyCapacityHours: z.number().int().min(0).max(80),
+    scheduleConfidence: z.enum(["tight", "manageable", "flexible"]),
+    academicConfidence: z.enum(["needs_support", "steady", "strong"]),
+    leadershipPreference: z.enum(["avoid", "supporting", "comfortable", "prefer"]),
+    openReflection: z.string().min(10)
+  })
 });
 
 /**
@@ -204,6 +259,12 @@ export const teamCopilotRunSchema = z.object({
   createdAt: z.string().datetime()
 });
 
+export const demoStateMetaSchema = z.object({
+  studentsUpdatedAt: z.string().datetime(),
+  profilesUpdatedAt: z.string().datetime().nullable().default(null),
+  teamsUpdatedAt: z.string().datetime().nullable().default(null)
+});
+
 export const generateTeamsInputSchema = z.object({
   teamSize: z.number().int().min(MIN_TEAM_SIZE).max(MAX_TEAM_SIZE).default(DEFAULT_TEAM_SIZE)
 });
@@ -242,8 +303,11 @@ export const moveStudentRequestSchema = z.discriminatedUnion("action", [
 ]);
 
 export type StudentIntakeInput = z.infer<typeof studentIntakeSchema>;
+export type RosterSetupInput = z.infer<typeof rosterSetupInputSchema>;
+export type QuestionnaireSubmissionInput = z.infer<typeof questionnaireSubmissionSchema>;
 export type GenerateTeamsInput = z.infer<typeof generateTeamsInputSchema>;
 export type MoveStudentInput = z.infer<typeof moveStudentInputSchema>;
 export type MoveStudentRequestInput = z.infer<typeof moveStudentRequestSchema>;
 export type RiskFlagInput = z.infer<typeof riskFlagSchema>;
 export type CollaborationProfile = z.infer<typeof collaborationProfileSchema>;
+export type DemoStateMetaInput = z.infer<typeof demoStateMetaSchema>;

@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Route } from "next";
 
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/", label: "Home" },
   { href: "/instructor", label: "Instructor" },
+  { href: "/instructor/roster", label: "Roster Setup" },
   { href: "/student/intake", label: "Student Intake" },
+  { href: "/student/questionnaire", label: "Questionnaire" },
   { href: "/student/profile-review", label: "Profiles" },
   { href: "/teams", label: "Teams" },
   { href: "/tools", label: "AI Tools" }
@@ -25,7 +28,7 @@ export function NavLinks() {
         return (
           <Link
             key={link.href}
-            href={link.href}
+            href={link.href as Route}
             className={cn(
               "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
               active

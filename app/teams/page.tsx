@@ -1,3 +1,4 @@
+import { DerivedDataAlert } from "@/components/shared/derived-data-alert";
 import { TeamActions } from "@/components/teams/team-actions";
 import { TeamCard } from "@/components/teams/team-card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,11 @@ export default async function TeamsPage() {
         </div>
         <TeamActions />
       </div>
+
+      <DerivedDataAlert
+        profilesStale={state.profilesStale}
+        teamsStale={state.teamsStale}
+      />
 
       <Card>
         <CardHeader>
