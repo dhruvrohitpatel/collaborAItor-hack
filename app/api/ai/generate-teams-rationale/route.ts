@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { callGeminiForJSON } from "@/lib/ai/gemini";
+import { callGeminiForJSON, getGeminiModel } from "@/lib/ai/gemini";
 import { generateMockRationale, hasGeminiCredentials } from "@/lib/ai/mock";
 import { buildTeamRationalePrompt } from "@/lib/ai/prompts";
 import {
@@ -11,6 +11,7 @@ import {
 export async function POST(request: Request) {
   const body = await request.json();
   const payload = aiGenerateTeamsRationaleRequestSchema.parse(body);
+  const model = getGeminiModel();
 
   if (hasGeminiCredentials()) {
     try {
@@ -18,14 +19,36 @@ export async function POST(request: Request) {
       const raw = await callGeminiForJSON(prompt);
 
       const validated = aiGenerateTeamsRationaleResponseSchema.parse(raw);
-      return NextResponse.json(validated);
+      return NextResponse.json({
+        ...validated,
+        meta: {
+          provider: "gemini",
+          model,
+          fallbackReason: null
+        }
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.error(`[rationale] Gemini call failed for ${payload.teamId}: ${message}`);
-      // Fall through to deterministic mock.
+      const rationale = await generateMockRationale(payload);
+      return NextResponse.json({
+        ...aiGenerateTeamsRationaleResponseSchema.parse({ rationale }),
+        meta: {
+          provider: "mock",
+          model,
+          fallbackReason: message
+        }
+      });
     }
   }
 
   const rationale = await generateMockRationale(payload);
-  return NextResponse.json(aiGenerateTeamsRationaleResponseSchema.parse({ rationale }));
+  return NextResponse.json({
+    ...aiGenerateTeamsRationaleResponseSchema.parse({ rationale }),
+    meta: {
+      provider: "mock",
+      model,
+      fallbackReason: "No Gemini credentials found."
+    }
+  });
 }

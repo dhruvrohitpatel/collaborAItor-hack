@@ -15,7 +15,7 @@ const links = [
 ] as const;
 
 export function NavLinks() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   return (
     <nav className="flex flex-wrap items-center gap-2">

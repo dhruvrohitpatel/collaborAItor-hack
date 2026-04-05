@@ -69,10 +69,95 @@ export type Team = {
   support: TeamSupportArtifacts;
 };
 
+export type MoveAction =
+  | "simple_move"
+  | "analyze_move"
+  | "swap_move"
+  | "reroute_move"
+  | "force_override_move";
+
+export type MoveStudentRequest =
+  | {
+      action: "simple_move" | "analyze_move" | "force_override_move";
+      studentId: string;
+      fromTeamId: string;
+      toTeamId: string;
+    }
+  | {
+      action: "swap_move";
+      studentId: string;
+      fromTeamId: string;
+      toTeamId: string;
+      displacedStudentId: string;
+    }
+  | {
+      action: "reroute_move";
+      studentId: string;
+      fromTeamId: string;
+      toTeamId: string;
+      displacedStudentId: string;
+      rerouteTeamId: string;
+    };
+
+export type MoveStudentOption = {
+  studentId: string;
+  studentName: string;
+  preferredRole: string;
+};
+
+export type MoveTargetOption = {
+  teamId: string;
+  teamName: string;
+  memberCount: number;
+  willBeInBounds: boolean;
+};
+
+export type SuggestedSwapOption = {
+  displacedStudentId: string;
+  displacedStudentName: string;
+  displacedStudentRole: string;
+  sourceTeamScoreDelta: number;
+  destinationTeamScoreDelta: number;
+  fairnessDelta: number;
+  legal: boolean;
+};
+
+export type DestinationFullResolution = {
+  destinationTeamId: string;
+  destinationTeamName: string;
+  currentSize: number;
+  maxSize: number;
+  suggestedSwaps: SuggestedSwapOption[];
+  destinationMembers: MoveStudentOption[];
+  rerouteTargets: MoveTargetOption[];
+};
+
+export type MoveStudentResponse =
+  | {
+      ok: true;
+      status: "moved";
+      resolution: "simple_move" | "swap_move" | "reroute_move" | "force_override_move";
+      teams: Team[];
+    }
+  | {
+      ok: true;
+      status: "destination_full";
+      resolution: DestinationFullResolution;
+    }
+  | {
+      ok: false;
+      error: string;
+    };
+
 export type DemoState = {
   students: StudentIntake[];
   profiles: StudentProfile[];
   teams: Team[];
+  studentsUpdatedAt: string;
+  profilesUpdatedAt: string | null;
+  teamsUpdatedAt: string | null;
+  profilesStale: boolean;
+  teamsStale: boolean;
   updatedAt: string;
 };
 
