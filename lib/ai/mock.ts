@@ -156,26 +156,92 @@ export async function summarizeMeetingNotes(notes: string) {
   return { summary, actionItems, openQuestions };
 }
 
+function capitalizeFirst(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function lowercaseFirst(value: string) {
+  return value.charAt(0).toLowerCase() + value.slice(1);
+}
+
+function ensureSentence(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+}
+
+function formatAudienceLabel(audience: string) {
+  return audience
+    .trim()
+    .split(/\s+/)
+    .map((part) => {
+      if (!part) return part;
+      if (part.includes("@")) return part;
+      if (part === part.toUpperCase()) return part;
+      return capitalizeFirst(part.toLowerCase());
+    })
+    .join(" ");
+}
+
+function sanitizeRewriteDraft(message: string) {
+  const normalized = message.trim().replace(/\s+/g, " ");
+  const containsAbusiveLanguage =
+    /\b(?:bitch|asshole|idiot|moron|stupid|dumb(?:ass)?|shit|fuck(?:ing)?|jerk)\b/i.test(
+      normalized
+    ) || /\byou little\b/i.test(normalized);
+
+  let cleaned = normalized
+    .replace(/^\s*(?:hey|hi|hello)\s+[^,]+,\s*/i, "")
+    .replace(/^\s*(?:hey|hi|hello|yo)\b[\s,:-]*/i, "")
+    .replace(/\byo\s+little\s+\w+\b/gi, "")
+    .replace(/\byou little\s+\w+\b/gi, "")
+    .replace(/\bfix your shit\b/gi, "address the current issue")
+    .replace(/\bfix (?:this|that|it)\b/gi, "address this")
+    .replace(/\bget your shit together\b/gi, "get this back on track")
+    .replace(/\b(?:bitch|asshole|idiot|moron|stupid|dumb(?:ass)?|jerk)\b/gi, "")
+    .replace(/\bfuck(?:ing)?\b/gi, "")
+    .replace(/\bshit\b/gi, "issue")
+    .replace(/\byou need to\b/gi, "please")
+    .replace(/\byou must\b/gi, "please")
+    .replace(/\bwhy haven't you\b/gi, "please")
+    .replace(/\bjust do it\b/gi, "please handle this")
+    .replace(/\bget it done\b/gi, "handle this")
+    .replace(/\bcan someone\b/gi, "please")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.;!?])/g, "$1")
+    .replace(/[,:;\-]+$/g, "")
+    .trim();
+
+  if (!cleaned) {
+    cleaned = "address the current issue";
+  }
+
+  if (containsAbusiveLanguage && !/\b(update|confirm|acknowledge|share)\b/i.test(cleaned)) {
+    cleaned = `${cleaned} and share an update`;
+  }
+
+  return {
+    cleaned,
+    containsAbusiveLanguage
+  };
+}
+
 export async function rewriteMessage(
   message: string,
   tone: "polite" | "direct" | "encouraging" | "professional",
   audience: string
 ) {
-  // Normalize: trim, strip trailing punctuation clusters, sentence-case.
-  const base = message.trim().replace(/[!?]+$/, "").replace(/\s+/g, " ");
-  const sentenceCased = base.charAt(0).toUpperCase() + base.slice(1);
-
-  // Replace common rough patterns across all tones.
-  const softened = sentenceCased
-    .replace(/\b(just do it|get it done|why haven't you|you need to|you must)\b/gi, "please prioritize")
-    .replace(/\b(failed|messed up|screwed up)\b/gi, "ran into an issue")
-    .replace(/\b(can't|won't)\b/gi, (m) => (m === "can't" ? "am not able to" : "will not"));
+  const { cleaned, containsAbusiveLanguage } = sanitizeRewriteDraft(message);
+  const formattedAudience = formatAudienceLabel(audience);
 
   const openers: Record<typeof tone, string> = {
-    polite: `Hi ${audience},`,
-    direct: `${audience.charAt(0).toUpperCase() + audience.slice(1)} —`,
-    encouraging: `Hey ${audience}, making good progress here —`,
-    professional: `Hello ${audience},`
+    polite: `Hi ${formattedAudience},`,
+    direct: `${formattedAudience} -`,
+    encouraging: `Hey ${formattedAudience},`,
+    professional: `Hello ${formattedAudience},`
   };
 
   const closers: Record<typeof tone, string> = {
@@ -192,14 +258,32 @@ export async function rewriteMessage(
     professional: "Standardized to neutral, structured language appropriate for a formal audience."
   };
 
-  const body =
-    tone === "direct"
-      ? softened.replace(/^(hey|hi|hello)[^,]*,\s*/i, "")
-      : softened;
+  let body = cleaned;
+
+  if (/^(hello|hi|hey)\s+/i.test(body)) {
+    body = body.replace(/^(hello|hi|hey)\s+[^,]+,\s*/i, "");
+  }
+
+  if (tone === "encouraging") {
+    body = `Let's get this back on track. Please ${lowercaseFirst(body)}`;
+  } else if (tone === "direct") {
+    body = capitalizeFirst(body);
+  } else {
+    const lowered = lowercaseFirst(body);
+    body = /^(please|could you please)\b/i.test(body) ? body : `Please ${lowered}`;
+  }
+
+  body = ensureSentence(capitalizeFirst(body));
+
+  const note = containsAbusiveLanguage
+    ? `${notesMap[tone]} Removed hostile language and converted it into a clear request.`
+    : notesMap[tone];
 
   return {
-    rewrittenMessage: `${openers[tone]} ${body} ${closers[tone]}`.replace(/\s{2,}/g, " ").trim(),
-    notes: notesMap[tone]
+    rewrittenMessage: `${openers[tone]} ${body} ${closers[tone]}`
+      .replace(/\s{2,}/g, " ")
+      .trim(),
+    notes: note
   };
 }
 

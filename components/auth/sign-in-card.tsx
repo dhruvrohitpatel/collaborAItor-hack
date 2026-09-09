@@ -55,7 +55,7 @@ export function SignInCard() {
   }
 
   return (
-    <Card className="max-w-lg">
+    <Card className="max-w-lg border-[rgba(0,153,255,0.15)] bg-[#090909] text-white">
       <CardHeader>
         <CardTitle>Sign In With Google</CardTitle>
         <CardDescription>
@@ -68,14 +68,14 @@ export function SignInCard() {
         <Button onClick={signIn} disabled={loading} className="w-full">
           {loading ? "Signing in..." : "Continue With Google"}
         </Button>
-        <div className="rounded-md border bg-slate-50 px-3 py-3 text-sm text-slate-700">
-          <p className="font-medium">OAuth demo path</p>
+        <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4 text-sm text-white/68">
+          <p className="font-medium text-white">OAuth demo path</p>
           <p className="mt-1">
             1. Google sign-in through Firebase. 2. Team access based on allowlisted email. 3.
             Optional Calendar consent only when you want invites and Meet links.
           </p>
         </div>
-        {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+        {error ? <p className="text-sm text-rose-300">{error}</p> : null}
       </CardContent>
     </Card>
   );

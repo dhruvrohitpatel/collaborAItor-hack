@@ -13,10 +13,13 @@ export default async function SignInPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold">Collabor-AI-tor Login</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
+    <div className="space-y-8">
+      <div className="space-y-3">
+        <p className="framer-kicker">Access</p>
+        <h1 className="max-w-3xl text-5xl font-medium leading-none tracking-[-0.07em] md:text-7xl">
+          Collabor-AI-tor login
+        </h1>
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
           Sign in with an allowlisted Google account. Student logins land on their team workspace, and instructor logins unlock roster and team management.
         </p>
       </div>

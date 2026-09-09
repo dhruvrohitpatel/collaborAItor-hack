@@ -27,6 +27,49 @@ export function isGeminiRateLimitError(error: unknown) {
   return error instanceof GeminiApiError && error.status === 429;
 }
 
+function truncateForLog(value: string, maxLength = 500) {
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  return `${value.slice(0, maxLength)}...`;
+}
+
+async function buildApiError(
+  response: Response,
+  prefix: "Gemini API" | "Vertex API" | "Vertex ADC token"
+) {
+  const rawText = await response.text();
+  let detail = rawText.trim();
+
+  if (detail) {
+    try {
+      const parsed = JSON.parse(detail) as {
+        error?: { message?: string; status?: string; details?: unknown };
+      };
+
+      const parts = [
+        parsed.error?.message,
+        parsed.error?.status,
+        parsed.error?.details ? JSON.stringify(parsed.error.details) : null
+      ].filter(Boolean);
+
+      if (parts.length > 0) {
+        detail = parts.join(" | ");
+      }
+    } catch {
+      // Keep raw response text when it is not JSON.
+    }
+  } else {
+    detail = "No response body returned.";
+  }
+
+  return new GeminiApiError(
+    response.status,
+    `${prefix} error: ${response.status} - ${truncateForLog(detail)}`
+  );
+}
+
 export async function callGeminiForJSON(prompt: string): Promise<unknown> {
   if (process.env.GEMINI_API_KEY) {
     return callViaAPIKey(prompt, process.env.GEMINI_API_KEY);
@@ -55,7 +98,7 @@ async function callViaAPIKey(prompt: string, apiKey: string): Promise<unknown> {
   });
 
   if (!response.ok) {
-    throw new GeminiApiError(response.status, `Gemini API error: ${response.status}`);
+    throw await buildApiError(response, "Gemini API");
   }
 
   const data = (await response.json()) as {
@@ -80,7 +123,7 @@ async function callViaVertex(prompt: string, projectId: string): Promise<unknown
   );
 
   if (!tokenRes.ok) {
-    throw new GeminiApiError(tokenRes.status, `Failed to fetch Vertex ADC token: ${tokenRes.status}`);
+    throw await buildApiError(tokenRes, "Vertex ADC token");
   }
 
   const { access_token: accessToken } = (await tokenRes.json()) as { access_token: string };
@@ -99,7 +142,7 @@ async function callViaVertex(prompt: string, projectId: string): Promise<unknown
   });
 
   if (!response.ok) {
-    throw new GeminiApiError(response.status, `Vertex API error: ${response.status}`);
+    throw await buildApiError(response, "Vertex API");
   }
 
   const data = (await response.json()) as {

@@ -1,0 +1,19 @@
+[
+  {
+    "id": "uid_bnS7AMPlyeQXyWmhN2lyM9VhLR83",
+    "firebaseUid": "bnS7AMPlyeQXyWmhN2lyM9VhLR83",
+    "email": "dhruvpatel007k@gmail.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/calendar.events",
+      "https://www.googleapis.com/auth/calendar.readonly",
+      "openid",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ],
+    "refreshTokenEncrypted": "kqaDLtwUtEv2yiJH.xXCbUkwb896rMOzLWKq2nrLYiDMYE4W5v9+xsZc4u1tGpcmzyd4vvBOXgh1cTDW+WXmYypX2uAoQ9Ff2PUt2yG2I55oIbmGLz1OmqmU2WI7pzHLdynn1y7UVLMzzamXaQNuJT0hkpg==.hfgpAughZdzH2RJ9joql+Q==",
+    "accessTokenEncrypted": "7PiCawbqfqXijTcK.lHWOEuadn8WaqFaVInpsSNggR5lZdKbD9Gh3/i9v8GAhrwvejsbMHqy7VfooqVQAQhLgnZhVkHSfDDsiYu+/EoH70cDidbo6DJ54Yeju24SWS7iMMU0rihRFgG8Gp6kBBoo1ROGFnVBNDw7VT+VqQVzWoZsu8Nbwm8B3Zb71vXfEczI1zr2qj5pwbjsxT8AAyOfTtfYWlbSGWwhp+/yZ7JytQSQqtXlO0SwGvO/OfRuxoVwohfmrZt30/t2OT2EIr5MQioWVdoC2s5tJW7JrBhNGU12XnpnHLpMferSpVPEEXxYcaRzDbjZiwHWN4E1G2ndH90zvsyHKFA4z/t4=.RkwZH1498Tl0ZLphRCl+3Q==",
+    "expiry": "2026-04-10T00:31:43.825Z",
+    "connectedAt": "2026-04-05T19:56:12.865Z",
+    "revokedAt": null
+  }
+]

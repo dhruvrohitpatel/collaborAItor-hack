@@ -453,7 +453,7 @@
       "leadershipSignal": "high",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-02",
@@ -498,7 +498,7 @@
       "leadershipSignal": "medium",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-03",
@@ -543,7 +543,7 @@
       "leadershipSignal": "medium",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-04",
@@ -588,7 +588,7 @@
       "leadershipSignal": "medium",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-05",
@@ -633,7 +633,7 @@
       "leadershipSignal": "high",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-06",
@@ -678,7 +678,7 @@
       "leadershipSignal": "medium",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-07",
@@ -723,7 +723,7 @@
       "leadershipSignal": "high",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-08",
@@ -768,7 +768,7 @@
       "leadershipSignal": "emerging",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-09",
@@ -813,7 +813,7 @@
       "leadershipSignal": "high",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-10",
@@ -858,7 +858,7 @@
       "leadershipSignal": "medium",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-11",
@@ -903,7 +903,7 @@
       "leadershipSignal": "medium",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     },
     {
       "id": "stu-12",
@@ -948,7 +948,7 @@
       "leadershipSignal": "emerging",
       "riskFlags": [],
       "profileSource": "mock",
-      "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+      "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
     }
   ],
   "teams": [
@@ -998,7 +998,7 @@
           "leadershipSignal": "high",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-02",
@@ -1043,7 +1043,7 @@
           "leadershipSignal": "medium",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-09",
@@ -1088,7 +1088,7 @@
           "leadershipSignal": "high",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-04",
@@ -1133,7 +1133,7 @@
           "leadershipSignal": "medium",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         }
       ],
       "rationale": "Team-1 was formed with balanced collaboration signals across Dhruv Patel, Wasil Ahmad, Prisha Nag, Dhruv Patel 3F. Composite score 56 emphasizes skill coverage (100), availability overlap (73), and growth fit (0) while highlighting risks for instructor review.",
@@ -1179,11 +1179,393 @@
         "Ask for clarification before assuming intent."
       ],
       "lastPulseAt": null,
-      "activeMeetingId": null,
+      "activeMeetingId": "meeting-7d300e5a",
       "tasks": [],
       "meetings": [
         {
-          "id": "meeting-77bca241",
+          "id": "meeting-7d300e5a",
+          "status": "scheduled",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T01:55:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:25:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T02:00:00.000Z",
+              "endAt": "2026-04-10T02:55:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": {
+            "startAt": "2026-04-10T01:00:00.000Z",
+            "endAt": "2026-04-10T01:55:00.000Z"
+          },
+          "durationMin": 55,
+          "timezone": "America/Phoenix",
+          "calendarEventId": "lmql6mdguei92jcdh24j8onj1k",
+          "calendarHtmlLink": "https://www.google.com/calendar/event?eid=bG1xbDZtZGd1ZWk5MmpjZGgyNGo4b25qMWsgZGhydXZwYXRlbDAwN2tAbQ",
+          "meetUrl": "https://meet.google.com/yrg-gekk-mvv",
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-09T23:31:41.835Z",
+          "updatedAt": "2026-04-09T23:31:44.569Z",
+          "createdByStudentId": null
+        },
+        {
+          "id": "meeting-b6d1dbf7",
+          "status": "proposed",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T02:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:30:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T02:00:00.000Z",
+              "endAt": "2026-04-10T03:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": null,
+          "durationMin": 60,
+          "timezone": "America/Phoenix",
+          "calendarEventId": null,
+          "calendarHtmlLink": null,
+          "meetUrl": null,
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-09T23:26:28.078Z",
+          "updatedAt": "2026-04-09T23:26:28.078Z",
+          "createdByStudentId": null
+        },
+        {
+          "id": "meeting-27884c62",
+          "status": "scheduled",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-08T00:00:00.000Z",
+              "endAt": "2026-04-08T01:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T02:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:30:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": {
+            "startAt": "2026-04-08T00:00:00.000Z",
+            "endAt": "2026-04-08T01:00:00.000Z"
+          },
+          "durationMin": 60,
+          "timezone": "America/Phoenix",
+          "calendarEventId": "d3m7306l6232mtv1uoo5pka99g",
+          "calendarHtmlLink": "https://www.google.com/calendar/event?eid=ZDNtNzMwNmw2MjMybXR2MXVvbzVwa2E5OWcgZGhydXZwYXRlbDAwN2tAbQ",
+          "meetUrl": "https://meet.google.com/gxs-gjzg-xby",
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-05T20:59:10.965Z",
+          "updatedAt": "2026-04-05T20:59:15.957Z",
+          "createdByStudentId": "stu-01"
+        },
+        {
+          "id": "meeting-f73f90e5",
+          "status": "scheduled",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-08T00:00:00.000Z",
+              "endAt": "2026-04-08T01:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T02:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:30:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": {
+            "startAt": "2026-04-08T00:00:00.000Z",
+            "endAt": "2026-04-08T01:00:00.000Z"
+          },
+          "durationMin": 60,
+          "timezone": "America/Phoenix",
+          "calendarEventId": "faol0d7c0280dm65me3eqdfqu4",
+          "calendarHtmlLink": "https://www.google.com/calendar/event?eid=ZmFvbDBkN2MwMjgwZG02NW1lM2VxZGZxdTQgZGhydXZwYXRlbDAwN2tAbQ",
+          "meetUrl": "https://meet.google.com/uhe-uemf-rus",
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-05T20:40:02.482Z",
+          "updatedAt": "2026-04-05T20:40:06.741Z",
+          "createdByStudentId": "stu-01"
+        },
+        {
+          "id": "meeting-ac27c128",
+          "status": "scheduled",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-08T00:00:00.000Z",
+              "endAt": "2026-04-08T01:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T02:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:30:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": {
+            "startAt": "2026-04-08T00:00:00.000Z",
+            "endAt": "2026-04-08T01:00:00.000Z"
+          },
+          "durationMin": 60,
+          "timezone": "America/Phoenix",
+          "calendarEventId": "vo46sdtmgcef9uc7k7e6un0d4c",
+          "calendarHtmlLink": "https://www.google.com/calendar/event?eid=dm80NnNkdG1nY2VmOXVjN2s3ZTZ1bjBkNGMgZGhydXZwYXRlbDAwN2tAbQ",
+          "meetUrl": "https://meet.google.com/ndz-rnen-mir",
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-05T20:21:42.844Z",
+          "updatedAt": "2026-04-05T20:21:49.756Z",
+          "createdByStudentId": "stu-01"
+        },
+        {
+          "id": "meeting-a1ee2d31",
+          "status": "scheduled",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-08T00:00:00.000Z",
+              "endAt": "2026-04-08T01:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T02:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:30:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": {
+            "startAt": "2026-04-08T00:00:00.000Z",
+            "endAt": "2026-04-08T01:00:00.000Z"
+          },
+          "durationMin": 60,
+          "timezone": "America/Phoenix",
+          "calendarEventId": "8435pfe5v4dmfd7cd8hnb7t498",
+          "calendarHtmlLink": "https://www.google.com/calendar/event?eid=ODQzNXBmZTV2NGRtZmQ3Y2Q4aG5iN3Q0OTggZGhydXZwYXRlbDAwN2tAbQ",
+          "meetUrl": "https://meet.google.com/vqq-dvhk-mgz",
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-05T20:06:43.797Z",
+          "updatedAt": "2026-04-05T20:06:47.018Z",
+          "createdByStudentId": "stu-01"
+        },
+        {
+          "id": "meeting-666b1058",
+          "status": "scheduled",
+          "proposedSlots": [
+            {
+              "startAt": "2026-04-08T00:00:00.000Z",
+              "endAt": "2026-04-08T01:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:00:00.000Z",
+              "endAt": "2026-04-10T02:00:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            },
+            {
+              "startAt": "2026-04-10T01:30:00.000Z",
+              "endAt": "2026-04-10T02:30:00.000Z",
+              "score": 100,
+              "memberIdsAvailable": [
+                "stu-01",
+                "stu-02",
+                "stu-09",
+                "stu-04"
+              ]
+            }
+          ],
+          "selectedSlot": {
+            "startAt": "2026-04-08T00:00:00.000Z",
+            "endAt": "2026-04-08T01:00:00.000Z"
+          },
+          "durationMin": 60,
+          "timezone": "America/Phoenix",
+          "calendarEventId": "8ckejhpa4pficjjb1oeg9mcst4",
+          "calendarHtmlLink": "https://www.google.com/calendar/event?eid=OGNrZWpocGE0cGZpY2pqYjFvZWc5bWNzdDQgZGhydXZwYXRlbDAwN2tAbQ",
+          "meetUrl": "https://meet.google.com/zun-kqrf-ppg",
+          "agenda": "Course project working session",
+          "notesRaw": null,
+          "summary": null,
+          "openQuestions": [],
+          "createdAt": "2026-04-05T19:56:20.210Z",
+          "updatedAt": "2026-04-05T19:56:23.437Z",
+          "createdByStudentId": "stu-01"
+        },
+        {
+          "id": "meeting-65dcda6f",
           "status": "proposed",
           "proposedSlots": [
             {
@@ -1230,16 +1612,132 @@
           "notesRaw": null,
           "summary": null,
           "openQuestions": [],
-          "createdAt": "2026-04-05T17:00:18.622Z",
-          "updatedAt": "2026-04-05T17:00:18.622Z",
+          "createdAt": "2026-04-05T19:55:44.742Z",
+          "updatedAt": "2026-04-05T19:55:44.742Z",
           "createdByStudentId": "stu-01"
         }
       ],
       "copilotRuns": [
         {
-          "id": "run-a5cf860d",
+          "id": "run-95875bad",
+          "intent": "schedule_meeting",
+          "status": "executed",
+          "actorStudentId": null,
+          "inputSnapshot": {
+            "durationMin": 55,
+            "dateRangeStart": null,
+            "dateRangeEnd": null,
+            "createCalendarInvite": true,
+            "agenda": "Course project working session",
+            "availabilitySource": "google_freebusy_mixed",
+            "membersMissingGoogle": [
+              "wasil.ahmad4@gmail.com",
+              "prisha.r.nag@gmail.com",
+              "dhruvpatel3f@gmail.com"
+            ],
+            "windowUsed": {
+              "startDate": "2026-04-09",
+              "endDate": "2026-04-23"
+            },
+            "meetingId": "meeting-7d300e5a",
+            "topSlotStartAt": "2026-04-10T01:00:00.000Z",
+            "topSlotEndAt": "2026-04-10T01:55:00.000Z"
+          },
+          "preview": {
+            "headline": "Meeting plan ready for approval",
+            "summary": "Found 3 workable meeting options for Team-1.",
+            "sections": [
+              {
+                "title": "Best slots",
+                "body": "Times shown in America/Phoenix.",
+                "bullets": [
+                  "Thu, Apr 9, 6:00 PM to Thu, Apr 9, 6:55 PM · 4/4 available",
+                  "Thu, Apr 9, 6:30 PM to Thu, Apr 9, 7:25 PM · 4/4 available",
+                  "Thu, Apr 9, 7:00 PM to Thu, Apr 9, 7:55 PM · 4/4 available"
+                ]
+              },
+              {
+                "title": "What approval does",
+                "body": "Approval will schedule the top slot and attach stub calendar + Meet links for the demo.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared meeting options and stored the proposal.",
+          "suggestedActions": [
+            "Approve to schedule the top slot."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-7d300e5a"
+          },
+          "approvedAt": "2026-04-09T23:31:44.569Z",
+          "executedAt": "2026-04-09T23:31:44.569Z",
+          "errorMessage": null,
+          "createdAt": "2026-04-09T23:31:41.836Z"
+        },
+        {
+          "id": "run-e31e5ddf",
           "intent": "schedule_meeting",
           "status": "preview",
+          "actorStudentId": null,
+          "inputSnapshot": {
+            "durationMin": 60,
+            "dateRangeStart": null,
+            "dateRangeEnd": null,
+            "createCalendarInvite": true,
+            "agenda": "Course project working session",
+            "availabilitySource": "google_freebusy_mixed",
+            "membersMissingGoogle": [
+              "wasil.ahmad4@gmail.com",
+              "prisha.r.nag@gmail.com",
+              "dhruvpatel3f@gmail.com"
+            ],
+            "windowUsed": {
+              "startDate": "2026-04-09",
+              "endDate": "2026-04-23"
+            },
+            "meetingId": "meeting-b6d1dbf7",
+            "topSlotStartAt": "2026-04-10T01:00:00.000Z",
+            "topSlotEndAt": "2026-04-10T02:00:00.000Z"
+          },
+          "preview": {
+            "headline": "Meeting plan ready for approval",
+            "summary": "Found 3 workable meeting options for Team-1.",
+            "sections": [
+              {
+                "title": "Best slots",
+                "body": "Times shown in America/Phoenix.",
+                "bullets": [
+                  "Thu, Apr 9, 6:00 PM to Thu, Apr 9, 7:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:30 PM to Thu, Apr 9, 7:30 PM · 4/4 available",
+                  "Thu, Apr 9, 7:00 PM to Thu, Apr 9, 8:00 PM · 4/4 available"
+                ]
+              },
+              {
+                "title": "What approval does",
+                "body": "Approval will schedule the top slot and attach stub calendar + Meet links for the demo.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared meeting options and stored the proposal.",
+          "suggestedActions": [
+            "Approve to schedule the top slot."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-b6d1dbf7"
+          },
+          "approvedAt": null,
+          "executedAt": null,
+          "errorMessage": null,
+          "createdAt": "2026-04-09T23:26:28.080Z"
+        },
+        {
+          "id": "run-6e217a5d",
+          "intent": "schedule_meeting",
+          "status": "executed",
           "actorStudentId": "stu-01",
           "inputSnapshot": {
             "durationMin": 60,
@@ -1257,7 +1755,7 @@
               "startDate": "2026-04-05",
               "endDate": "2026-04-19"
             },
-            "meetingId": "meeting-77bca241",
+            "meetingId": "meeting-27884c62",
             "topSlotStartAt": "2026-04-08T00:00:00.000Z",
             "topSlotEndAt": "2026-04-08T01:00:00.000Z"
           },
@@ -1287,12 +1785,396 @@
           ],
           "requiresApproval": true,
           "persistedRefs": {
-            "meetingId": "meeting-77bca241"
+            "meetingId": "meeting-27884c62"
+          },
+          "approvedAt": "2026-04-05T20:59:15.957Z",
+          "executedAt": "2026-04-05T20:59:15.957Z",
+          "errorMessage": null,
+          "createdAt": "2026-04-05T20:59:10.966Z"
+        },
+        {
+          "id": "run-8c7f8f15",
+          "intent": "schedule_meeting",
+          "status": "executed",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "durationMin": 60,
+            "dateRangeStart": null,
+            "dateRangeEnd": null,
+            "createCalendarInvite": true,
+            "agenda": "Course project working session",
+            "availabilitySource": "google_freebusy_mixed",
+            "membersMissingGoogle": [
+              "wasil.ahmad4@gmail.com",
+              "prisha.r.nag@gmail.com",
+              "dhruvpatel3f@gmail.com"
+            ],
+            "windowUsed": {
+              "startDate": "2026-04-05",
+              "endDate": "2026-04-19"
+            },
+            "meetingId": "meeting-f73f90e5",
+            "topSlotStartAt": "2026-04-08T00:00:00.000Z",
+            "topSlotEndAt": "2026-04-08T01:00:00.000Z"
+          },
+          "preview": {
+            "headline": "Meeting plan ready for approval",
+            "summary": "Found 3 workable meeting options for Team-1.",
+            "sections": [
+              {
+                "title": "Best slots",
+                "body": "Times shown in America/Phoenix.",
+                "bullets": [
+                  "Tue, Apr 7, 5:00 PM to Tue, Apr 7, 6:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:00 PM to Thu, Apr 9, 7:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:30 PM to Thu, Apr 9, 7:30 PM · 4/4 available"
+                ]
+              },
+              {
+                "title": "What approval does",
+                "body": "Approval will schedule the top slot and attach stub calendar + Meet links for the demo.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared meeting options and stored the proposal.",
+          "suggestedActions": [
+            "Approve to schedule the top slot."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-f73f90e5"
+          },
+          "approvedAt": "2026-04-05T20:40:06.741Z",
+          "executedAt": "2026-04-05T20:40:06.741Z",
+          "errorMessage": null,
+          "createdAt": "2026-04-05T20:40:02.486Z"
+        },
+        {
+          "id": "run-8a9cca4f",
+          "intent": "meeting_followup",
+          "status": "preview",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "notes": "Met today to talk about team formation logic. Dhruv is handling scoring and swap logic. Need to finalize what makes a “good team” before coding too much. We agreed skills + schedule overlap matter most. Personality should matter a little but not dominate. Need risk flags for stuff like low availability or everyone wanting the same role. Frontend team wants sample outputs soon for the dashboard. Need a first pass by tonight.",
+            "meetingId": "meeting-666b1058",
+            "summary": "Met today to talk about team formation logic. Dhruv is handling scoring and swap logic. Need to finalize what makes a “good team” before coding too much. We agreed skills + schedule overlap matter most. Personality should matter a little but not dominate. Need risk flags for stuff like low availability or everyone wanting the same role. Frontend team wants sample outputs soon for the dashboard. Need a first pass by tonight.",
+            "actionItems": [
+              {
+                "task": "Met today to talk about team formation logic. Dhruv is handling scoring and swap logic. Need to finalize what makes a “good team” before coding too much. We agreed skills + schedule overlap matter most. Personality should matter a little but not dominate. Need risk flags for stuff like low availability or everyone wanting the same role. Frontend team wants sample outputs soon for the dashboard. Need a first pass by tonight.",
+                "owner": ""
+              }
+            ],
+            "openQuestions": []
+          },
+          "preview": {
+            "headline": "Meeting notes processed",
+            "summary": "Extracted 1 action item from the notes.",
+            "sections": [
+              {
+                "title": "Summary",
+                "body": "Met today to talk about team formation logic. Dhruv is handling scoring and swap logic. Need to finalize what makes a “good team” before coding too much. We agreed skills + schedule overlap matter most. Personality should matter a little but not dominate. Need risk flags for stuff like low availability or everyone wanting the same role. Frontend team wants sample outputs soon for the dashboard. Need a first pass by tonight.",
+                "bullets": []
+              },
+              {
+                "title": "Action items",
+                "body": "Tasks will be created only after approval.",
+                "bullets": [
+                  "Met today to talk about team formation logic. Dhruv is handling scoring and swap logic. Need to finalize what makes a “good team” before coding too much. We agreed skills + schedule overlap matter most. Personality should matter a little but not dominate. Need risk flags for stuff like low availability or everyone wanting the same role. Frontend team wants sample outputs soon for the dashboard. Need a first pass by tonight."
+                ]
+              },
+              {
+                "title": "Open questions",
+                "body": "No unresolved questions were detected.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared a structured meeting notes-to-tasks draft.",
+          "suggestedActions": [
+            "Approve to update the meeting record and create tasks."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-666b1058"
           },
           "approvedAt": null,
           "executedAt": null,
           "errorMessage": null,
-          "createdAt": "2026-04-05T17:00:18.656Z"
+          "createdAt": "2026-04-05T20:25:36.235Z"
+        },
+        {
+          "id": "run-bdc462c2",
+          "intent": "schedule_meeting",
+          "status": "executed",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "durationMin": 60,
+            "dateRangeStart": null,
+            "dateRangeEnd": null,
+            "createCalendarInvite": true,
+            "agenda": "Course project working session",
+            "availabilitySource": "google_freebusy_mixed",
+            "membersMissingGoogle": [
+              "wasil.ahmad4@gmail.com",
+              "prisha.r.nag@gmail.com",
+              "dhruvpatel3f@gmail.com"
+            ],
+            "windowUsed": {
+              "startDate": "2026-04-05",
+              "endDate": "2026-04-19"
+            },
+            "meetingId": "meeting-ac27c128",
+            "topSlotStartAt": "2026-04-08T00:00:00.000Z",
+            "topSlotEndAt": "2026-04-08T01:00:00.000Z"
+          },
+          "preview": {
+            "headline": "Meeting plan ready for approval",
+            "summary": "Found 3 workable meeting options for Team-1.",
+            "sections": [
+              {
+                "title": "Best slots",
+                "body": "Times shown in America/Phoenix.",
+                "bullets": [
+                  "Tue, Apr 7, 5:00 PM to Tue, Apr 7, 6:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:00 PM to Thu, Apr 9, 7:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:30 PM to Thu, Apr 9, 7:30 PM · 4/4 available"
+                ]
+              },
+              {
+                "title": "What approval does",
+                "body": "Approval will schedule the top slot and attach stub calendar + Meet links for the demo.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared meeting options and stored the proposal.",
+          "suggestedActions": [
+            "Approve to schedule the top slot."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-ac27c128"
+          },
+          "approvedAt": "2026-04-05T20:21:49.756Z",
+          "executedAt": "2026-04-05T20:21:49.756Z",
+          "errorMessage": null,
+          "createdAt": "2026-04-05T20:21:42.844Z"
+        },
+        {
+          "id": "run-0334a767",
+          "intent": "schedule_meeting",
+          "status": "executed",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "durationMin": 60,
+            "dateRangeStart": null,
+            "dateRangeEnd": null,
+            "createCalendarInvite": true,
+            "agenda": "Course project working session",
+            "availabilitySource": "google_freebusy_mixed",
+            "membersMissingGoogle": [
+              "wasil.ahmad4@gmail.com",
+              "prisha.r.nag@gmail.com",
+              "dhruvpatel3f@gmail.com"
+            ],
+            "windowUsed": {
+              "startDate": "2026-04-05",
+              "endDate": "2026-04-19"
+            },
+            "meetingId": "meeting-a1ee2d31",
+            "topSlotStartAt": "2026-04-08T00:00:00.000Z",
+            "topSlotEndAt": "2026-04-08T01:00:00.000Z"
+          },
+          "preview": {
+            "headline": "Meeting plan ready for approval",
+            "summary": "Found 3 workable meeting options for Team-1.",
+            "sections": [
+              {
+                "title": "Best slots",
+                "body": "Times shown in America/Phoenix.",
+                "bullets": [
+                  "Tue, Apr 7, 5:00 PM to Tue, Apr 7, 6:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:00 PM to Thu, Apr 9, 7:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:30 PM to Thu, Apr 9, 7:30 PM · 4/4 available"
+                ]
+              },
+              {
+                "title": "What approval does",
+                "body": "Approval will schedule the top slot and attach stub calendar + Meet links for the demo.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared meeting options and stored the proposal.",
+          "suggestedActions": [
+            "Approve to schedule the top slot."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-a1ee2d31"
+          },
+          "approvedAt": "2026-04-05T20:06:47.018Z",
+          "executedAt": "2026-04-05T20:06:47.018Z",
+          "errorMessage": null,
+          "createdAt": "2026-04-05T20:06:43.798Z"
+        },
+        {
+          "id": "run-fb236f12",
+          "intent": "meeting_followup",
+          "status": "preview",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "notes": "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal.",
+            "meetingId": null,
+            "summary": "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal.",
+            "actionItems": [
+              {
+                "task": "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal.",
+                "owner": ""
+              }
+            ],
+            "openQuestions": [
+              "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal."
+            ]
+          },
+          "preview": {
+            "headline": "Meeting notes processed",
+            "summary": "Extracted 1 action item from the notes.",
+            "sections": [
+              {
+                "title": "Summary",
+                "body": "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal.",
+                "bullets": []
+              },
+              {
+                "title": "Action items",
+                "body": "Tasks will be created only after approval.",
+                "bullets": [
+                  "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal."
+                ]
+              },
+              {
+                "title": "Open questions",
+                "body": "Unresolved items to carry into the next sync.",
+                "bullets": [
+                  "Reviewed milestone status. Alex will finalize the API routes. Mina will tighten the demo story. Need to decide when to do the final rehearsal."
+                ]
+              }
+            ]
+          },
+          "outputSummary": "Prepared a structured meeting notes-to-tasks draft.",
+          "suggestedActions": [
+            "Approve to update the meeting record and create tasks."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": null,
+          "approvedAt": null,
+          "executedAt": null,
+          "errorMessage": null,
+          "createdAt": "2026-04-05T20:01:08.734Z"
+        },
+        {
+          "id": "run-412e12bf",
+          "intent": "weekly_pulse",
+          "status": "preview",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "taskCount": 0,
+            "meetingCount": 2,
+            "lastPulseAt": null
+          },
+          "preview": {
+            "headline": "Team status summary ready",
+            "summary": "Reviewed 0 open task(s), 2 meeting record(s), and recent participation signals.",
+            "sections": [
+              {
+                "title": "Current workload",
+                "body": "No blocked tasks detected right now.",
+                "bullets": []
+              },
+              {
+                "title": "Upcoming sync",
+                "body": "Next meeting is Tue, Apr 7, 5:00 PM.",
+                "bullets": [
+                  "Course project working session"
+                ]
+              },
+              {
+                "title": "Watch items",
+                "body": "Recent participation looks balanced enough for now.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared a team status summary using current team memory.",
+          "suggestedActions": [
+            "Save the pulse snapshot for the team."
+          ],
+          "requiresApproval": false,
+          "persistedRefs": null,
+          "approvedAt": null,
+          "executedAt": null,
+          "errorMessage": null,
+          "createdAt": "2026-04-05T20:00:58.378Z"
+        },
+        {
+          "id": "run-aa3d18d8",
+          "intent": "schedule_meeting",
+          "status": "executed",
+          "actorStudentId": "stu-01",
+          "inputSnapshot": {
+            "durationMin": 60,
+            "dateRangeStart": null,
+            "dateRangeEnd": null,
+            "createCalendarInvite": true,
+            "agenda": "Course project working session",
+            "availabilitySource": "google_freebusy_mixed",
+            "membersMissingGoogle": [
+              "wasil.ahmad4@gmail.com",
+              "prisha.r.nag@gmail.com",
+              "dhruvpatel3f@gmail.com"
+            ],
+            "windowUsed": {
+              "startDate": "2026-04-05",
+              "endDate": "2026-04-19"
+            },
+            "meetingId": "meeting-666b1058",
+            "topSlotStartAt": "2026-04-08T00:00:00.000Z",
+            "topSlotEndAt": "2026-04-08T01:00:00.000Z"
+          },
+          "preview": {
+            "headline": "Meeting plan ready for approval",
+            "summary": "Found 3 workable meeting options for Team-1.",
+            "sections": [
+              {
+                "title": "Best slots",
+                "body": "Times shown in America/Phoenix.",
+                "bullets": [
+                  "Tue, Apr 7, 5:00 PM to Tue, Apr 7, 6:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:00 PM to Thu, Apr 9, 7:00 PM · 4/4 available",
+                  "Thu, Apr 9, 6:30 PM to Thu, Apr 9, 7:30 PM · 4/4 available"
+                ]
+              },
+              {
+                "title": "What approval does",
+                "body": "Approval will schedule the top slot and attach stub calendar + Meet links for the demo.",
+                "bullets": []
+              }
+            ]
+          },
+          "outputSummary": "Prepared meeting options and stored the proposal.",
+          "suggestedActions": [
+            "Approve to schedule the top slot."
+          ],
+          "requiresApproval": true,
+          "persistedRefs": {
+            "meetingId": "meeting-666b1058"
+          },
+          "approvedAt": "2026-04-05T19:56:23.437Z",
+          "executedAt": "2026-04-05T19:56:23.437Z",
+          "errorMessage": null,
+          "createdAt": "2026-04-05T19:56:20.212Z"
         }
       ]
     },
@@ -1342,7 +2224,7 @@
           "leadershipSignal": "medium",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-06",
@@ -1387,7 +2269,7 @@
           "leadershipSignal": "medium",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-10",
@@ -1432,7 +2314,7 @@
           "leadershipSignal": "medium",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-05",
@@ -1477,7 +2359,7 @@
           "leadershipSignal": "high",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         }
       ],
       "rationale": "Team-2 was formed with balanced collaboration signals across Mina Patel, Liam Okafor, Arjun Desai, Sofia Nguyen. Composite score 49 emphasizes skill coverage (100), availability overlap (5), and growth fit (25) while highlighting risks for instructor review.",
@@ -1586,7 +2468,7 @@
           "leadershipSignal": "high",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-08",
@@ -1631,7 +2513,7 @@
           "leadershipSignal": "emerging",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-11",
@@ -1676,7 +2558,7 @@
           "leadershipSignal": "medium",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         },
         {
           "id": "stu-12",
@@ -1721,7 +2603,7 @@
           "leadershipSignal": "emerging",
           "riskFlags": [],
           "profileSource": "mock",
-          "profileGeneratedAt": "2026-04-05T16:55:29.417Z"
+          "profileGeneratedAt": "2026-04-09T23:25:54.312Z"
         }
       ],
       "rationale": "Team-3 was formed with balanced collaboration signals across Isabella Torres, Mateo Silva, Hannah Lee, Jordan Miller. Composite score 47 emphasizes skill coverage (100), availability overlap (8), and growth fit (13) while highlighting risks for instructor review.",
@@ -1785,10 +2667,10 @@
       "copilotRuns": []
     }
   ],
-  "studentsUpdatedAt": "2026-04-05T16:55:29.567Z",
-  "profilesUpdatedAt": "2026-04-05T16:55:29.567Z",
-  "teamsUpdatedAt": "2026-04-05T17:00:18.656Z",
+  "studentsUpdatedAt": "2026-04-05T19:23:54.415Z",
+  "profilesUpdatedAt": "2026-04-09T23:25:54.312Z",
+  "teamsUpdatedAt": "2026-04-09T23:31:45.556Z",
   "profilesStale": false,
   "teamsStale": false,
-  "updatedAt": "2026-04-05T17:00:18.656Z"
+  "updatedAt": "2026-04-09T23:31:45.556Z"
 }

@@ -17,7 +17,7 @@ export function AuthStatus({ user }: { user: SessionUser | null }) {
     return (
       <Link
         href={"/sign-in" as Route}
-        className="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
+        className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm hover:bg-white/14"
       >
         Sign in
       </Link>
@@ -27,11 +27,15 @@ export function AuthStatus({ user }: { user: SessionUser | null }) {
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       <Badge variant={user.role === "instructor" ? "secondary" : "success"}>
-        {user.role === "instructor" ? <ShieldCheck className="mr-1 h-3.5 w-3.5" /> : <UserRound className="mr-1 h-3.5 w-3.5" />}
+        {user.role === "instructor" ? (
+          <ShieldCheck className="mr-1 h-3.5 w-3.5" />
+        ) : (
+          <UserRound className="mr-1 h-3.5 w-3.5" />
+        )}
         {user.role}
       </Badge>
-      <div className="text-right text-xs leading-tight text-slate-600">
-        <p className="font-medium text-slate-800">{user.name ?? user.email}</p>
+      <div className="text-right text-xs leading-tight text-white/58">
+        <p className="font-medium text-white">{user.name ?? user.email}</p>
         <p>{user.email}</p>
       </div>
       <Button

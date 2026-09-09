@@ -3,24 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 40% 99%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --primary: 218 89% 52%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 218 89% 52%;
-  --radius: 0.75rem;
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 3.5%;
+  --card-foreground: 0 0% 100%;
+  --primary: 204 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 100% / 0.1;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 100% / 0.08;
+  --muted-foreground: 0 0% 65%;
+  --accent: 0 0% 100% / 0.1;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 73% 54%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 204 100% 50% / 0.15;
+  --input: 0 0% 100% / 0.1;
+  --ring: 204 100% 50%;
+  --radius: 0.875rem;
+  --font-display: "GT Walsheim", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+  --font-mono: "Azeret Mono", "SFMono-Regular", "SF Mono", monospace;
 }
 
 * {
@@ -29,4 +32,81 @@
 
 body {
   @apply bg-background text-foreground antialiased;
+  font-family: var(--font-body);
+  background-image:
+    radial-gradient(circle at top, rgba(0, 153, 255, 0.12), transparent 28%),
+    radial-gradient(circle at 80% 15%, rgba(255, 255, 255, 0.07), transparent 18%);
+  background-attachment: fixed;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv01", "cv05", "cv09", "cv11", "ss03", "ss07";
+}
+
+html {
+  background-color: #000;
+}
+
+a,
+button,
+input,
+textarea,
+[role="button"] {
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+::selection {
+  background: rgba(0, 153, 255, 0.25);
+  color: #fff;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.04em;
+  }
+}
+
+@layer components {
+  .framer-panel {
+    background: rgba(9, 9, 9, 0.88);
+    border: 1px solid rgba(0, 153, 255, 0.15);
+    box-shadow:
+      rgba(255, 255, 255, 0.1) 0 0.5px 0 0.5px,
+      rgba(0, 0, 0, 0.25) 0 10px 30px;
+  }
+
+  .framer-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .framer-display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.08em;
+  }
+
+  .framer-body {
+    color: rgba(255, 255, 255, 0.66);
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  .framer-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 36px 36px;
+  }
 }

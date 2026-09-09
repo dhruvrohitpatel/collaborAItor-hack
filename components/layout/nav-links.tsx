@@ -41,10 +41,10 @@ export function NavLinks({ role, authenticated }: { role: AppRole | null; authen
             key={link.href}
             href={link.href as Route}
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+              "rounded-full px-3.5 py-2 text-sm font-medium tracking-[-0.01em] transition",
               active
-                ? "bg-primary text-primary-foreground"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                ? "border border-[rgba(0,153,255,0.2)] bg-[rgba(0,153,255,0.14)] text-white shadow-[0_0_0_1px_rgba(0,153,255,0.15)]"
+                : "text-white/68 hover:bg-white/8 hover:text-white"
             )}
           >
             {link.label}
